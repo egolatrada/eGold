@@ -40,7 +40,10 @@ Thumbs.db
 # Build files
 dist/
 build/
+
+# Configuration files (contain server-specific IDs and secrets)
 config.json
+
+# Temporary files from development
 attached_assets/
-messages.json
 old-files/

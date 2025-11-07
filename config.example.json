@@ -1,0 +1,45 @@
+{
+  "_comment": "Copia este archivo como 'config.json' y rellena los valores reales",
+  
+  "allowedGuildId": "YOUR_GUILD_ID_HERE",
+
+  "tickets": {
+    "staffRoleId": "STAFF_ROLE_ID",
+    "ticketChannelId": "TICKET_CHANNEL_ID",
+    "hierarchyEnabled": true,
+    "hierarchy": {
+      "soporte": {
+        "roleId": "ROLE_ID",
+        "canWrite": true,
+        "level": 1
+      }
+    },
+    "categories": {
+      "example": {
+        "name": "Example Category",
+        "categoryId": "CATEGORY_ID",
+        "transcriptChannelId": "TRANSCRIPT_CHANNEL_ID",
+        "emoji": "📋",
+        "menuDescription": "Example description",
+        "channelDescription": "Example channel description",
+        "allowedRoles": []
+      }
+    }
+  },
+
+  "channels": {
+    "logsChannelId": "LOGS_CHANNEL_ID",
+    "suggestionsChannelId": "SUGGESTIONS_CHANNEL_ID",
+    "changelogChannelId": "CHANGELOG_CHANNEL_ID",
+    "verificationsChannelId": "VERIFICATIONS_CHANNEL_ID"
+  },
+
+  "roles": {
+    "verifiedRoleId": "VERIFIED_ROLE_ID"
+  },
+
+  "verification": {
+    "enabled": true,
+    "requiresManualApproval": true
+  }
+}
