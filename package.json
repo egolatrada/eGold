@@ -1,0 +1,25 @@
+{
+  "name": "egold-discord-bot",
+  "version": "2.0.0",
+  "description": "eGold Bot - Bot de Discord para Strangers RP con sistema de tickets, verificación, moderación, logs y gestión personalizada.",
+  "main": "watchdog.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node watchdog.js"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "tickets",
+    "moderation"
+  ],
+  "author": "egolatrada",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "dotenv": "^16.6.1",
+    "pg": "^8.16.3"
+  }
+}

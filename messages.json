@@ -1,0 +1,250 @@
+{
+  "welcome": {
+    "dmTitle": "🤖 ¡Gracias por añadir a Ego Bot!",
+    "dmDescription": "¡Hola! Has añadido **Ego Bot** a **{serverName}**.\n\n**Lo que hago por tu servidor:**\n• 🎫 Tickets avanzados (13 categorías), transcripciones y voz opcional\n• 🤖 Moderación con IA (spam/NSFW/gore/insultos) con acciones automáticas\n• 🧠 Q&A con IA basado en la información del servidor\n• 🔒 Verificación por botón y tracking de invitaciones\n• 🪶 Embeds anónimos y comandos personalizados (!triggers)\n• 📊 Logs completos (mensajes, miembros, roles, canales, voz, moderación, invitaciones, tickets)\n• 🔗 Vinculación de redes sociales por usuario\n• ♻️ Uptime 24/7 con watchdog y auto-reinicio\n\n**💡 Recordatorio:**\nEgo Bot forma parte del **servicio personalizado de @egolatrada**, quien se encarga de diseñar y adaptar cada servidor según tus preferencias, estilo y necesidades.\n\nNo se vende el código del bot, se ofrece la configuración completa y optimizada del servidor con todas sus funciones.",
+    "serverTitle": "🚀 Ego Bot añadido correctamente",
+    "serverDescription": "He sido añadido para ayudarte a gestionar este servidor con seguridad, automatización y soporte con IA.\n\n💬 Recuerda: lo que se ofrece es el **servicio personalizado de @egolatrada**, no la venta del código.",
+    "serverNoSystemChannel": "No pude enviar el mensaje de bienvenida al canal del sistema. Por favor, contacta con **@egolatrada** si necesitas ayuda con la configuración personalizada."
+  },
+  "panel": {
+    "title": "🎫 Sistema de Tickets — Strangers RP",
+    "description": "Antes de abrir un ticket, asegúrate de seleccionar la categoría correcta, ya que nos ayudará a atenderte más rápido y mantener el orden dentro del servidor. 🧩",
+    "footer": "📌 El staff revisará tu caso lo antes posible.",
+    "selectPlaceholder": "Selecciona el tipo de ticket"
+  },
+
+
+  
+  "ticketWelcome": {
+    "title": "{emoji} Ticket de {categoryName}",
+    "description": "¡Hola, {user}! Gracias por ponerte en contacto con el equipo administrativo.\n\nUn miembro del staff le atenderá con la mayor brevedad posible, mientras tanto, puedes dejar la consulta con el mayor detalle posible..\n\n**Tipo de ticket:** {categoryName}"
+  },
+
+
+  
+  "ticketClose": {
+    "title": "🔒 Ticket cerrado",
+    "description": "La transcripción ha sido enviada a su canal correspondiente.",
+    "processingMessage": "🔄 Cerrando ticket y guardando transcripción..."
+  },
+
+
+  
+  "transcript": {
+    "title": "📋 Transcripción del ticket",
+    "footer": "Sistema de transcripción de tickets"
+  },
+
+
+  
+  "errors": {
+    "configMissing": "❌ Error de configuración: El staffRoleId no está configurado en config.json. Por seguridad, no se puede crear el ticket sin un rol de staff válido.",
+    "creationError": "❌ Error al crear el ticket. Asegúrate de que el bot tenga los permisos necesarios y que los IDs en config.json sean correctos.",
+    "notTicketChannel": "❌ Este comando solo puede usarse en canales de ticket.",
+    "transcriptError": "❌ Error al guardar la transcripción."
+  },
+
+
+  
+  "buttons": {
+    "createTicket": "Abrir Ticket",
+    "closeTicket": "Cerrar Ticket"
+  },
+
+
+  
+  "success": {
+    "ticketCreated": "🪶 Su ticket ha sido creado en {channel}"
+  },
+
+
+
+
+
+
+
+
+  
+  "logs": {
+    "messages": {
+      "deleted": "🗑️ Mensaje eliminado",
+      "edited": "✏️ Mensaje editado"
+    },
+    "channels": {
+      "created": "➕ Canal creado",
+      "deleted": "➖ Canal eliminado",
+      "threadCreated": "🧵 Thread creado",
+      "threadDeleted": "🧵 Thread eliminado"
+    },
+    "members": {
+      "joined": "👋 Se acaba de unir",
+      "left": "👋 Acaba de salir",
+      "kicked": "🦶 Miembro expulsado",
+      "nicknameChanged": "📝 Nickname cambiado",
+      "banned": "🔨 Miembro baneado",
+      "unbanned": "🔓 Miembro desbaneado"
+    },
+    "roles": {
+      "created": "➕ Rol creado",
+      "deleted": "➖ Rol eliminado",
+      "updated": "🔄 Rol actualizado",
+      "memberRolesUpdated": "🎭 Roles de miembro actualizados"
+    },
+    "voice": {
+      "joined": "🔊 Usuario entró a canal de voz",
+      "left": "🔇 Usuario salió de canal de voz",
+      "moved": "🔀 Usuario movido entre canales de voz"
+    },
+    "commands": {
+      "admin": "⚡ Comando usado (Admin)",
+      "regular": "💬 Comando usado"
+    },
+    "bots": {
+      "activity": "🤖 Actividad de bot"
+    },
+    "invites": {
+      "created": "🔗 Invitación creada",
+      "used": "{user} usó la invitación {code} (Uso #{uses})"
+    }
+  },
+
+
+  
+  "invitesStandalone": {
+    "created": "🔗 Invitación creada",
+    "used": "{user} usó la invitación {code} (Uso #{uses})"
+  },
+
+
+  
+  "clearCommand": {
+    "massDelete": "🗑️ Eliminación masiva de mensajes",
+    "delete": "🗑️ Mensajes eliminados"
+  },
+
+
+  
+  "moderation": {
+    "contentDetected": {
+      "title": "⚠️ Contenido Sospechoso Detectado",
+      "description": "Se ha detectado contenido inapropiado y el usuario ha sido aislado automáticamente.\n\n**Acciones del Staff:**\n• Revisar el contenido y análisis\n• Decidir: Ban, expulsión o pasar",
+      "userField": "Usuario",
+      "contentTypeField": "Tipo de contenido",
+      "detectionField": "Detección IA",
+      "actionField": "Acción automática",
+      "actionValue": "Timeout de {duration} minutos"
+    },
+
+
+    
+    "imageAnalysis": {
+      "title": "📸 Análisis de imagen",
+      "contentField": "Descripción del contenido",
+      "nsfwField": "NSFW detectado",
+      "violenceField": "Violencia detectada",
+      "confidenceField": "Nivel de confianza"
+    },
+
+
+    
+    "videoAnalysis": {
+      "title": "🎥 Análisis de Video",
+      "transcriptionField": "Transcripción del vídeo",
+      "contentField": "Descripción del contenido",
+      "warningField": "Advertencias detectadas"
+    },
+
+
+    
+    "linkAnalysis": {
+      "title": "🔗 Análisis de enlace",
+      "urlField": "URL detectada",
+      "contentField": "Contenido del enlace"
+    },
+
+
+    
+    "staffActions": {
+      "kick": {
+        "title": "🦶 Usuario Expulsado (Kick)",
+        "moderatorField": "Moderador",
+        "userField": "Usuario Expulsado",
+        "reasonField": "Motivo",
+        "dmSent": "DM Enviado"
+      },
+
+
+      
+      "ban": {
+        "title": "🔨 Usuario Baneado",
+        "moderatorField": "Moderador",
+        "userField": "Usuario Baneado",
+        "reasonField": "Motivo",
+        "durationField": "Duración",
+        "permanentDuration": "Permanente",
+        "temporalDuration": "{hours} horas",
+        "dmSent": "DM Enviado"
+      },
+
+
+      
+      "unban": {
+        "title": "🔓 Usuario Desbaneado",
+        "moderatorField": "Moderador",
+        "userField": "Usuario Desbaneado",
+        "reasonField": "Motivo",
+        "dmSent": "DM Enviado"
+      },
+
+
+      
+      "timeout": {
+        "title": "⏱️ Timeout Aplicado",
+        "moderatorField": "Moderador",
+        "userField": "Usuario",
+        "reasonField": "Motivo",
+        "durationField": "Duración",
+        "dmSent": "DM Enviado"
+      }
+    },
+
+
+    
+    "userMessages": {
+      "kick": {
+        "title": "🦶 Has sido expulsado de {serverName}",
+        "description": "Has sido expulsado del servidor **{serverName}**.\n\n**Motivo:**\n{reason}\n\nPuedes volver a unirte al servidor si lo deseas.",
+        "dmSent": "DM Enviado"
+      },
+
+
+      
+      "ban": {
+        "title": "🔨 Has sido baneado de {serverName}",
+        "description": "Has sido baneado del servidor **{serverName}**.\n\n**Motivo:**\n{reason}\n\n**Duración:** {duration}",
+        "permanentNote": "\n\n⚠️ Este baneo es permanente.",
+        "dmSent": "DM Enviado"
+      }
+    },
+
+
+
+    "errors": {
+      "noPermission": "❌ No tienes permisos para usar este comando.",
+      "userNotFound": "❌ No se pudo encontrar al usuario.",
+      "cannotModerate": "❌ No puedo moderar a este usuario (puede tener un rol superior).",
+      "alreadyBanned": "❌ Este usuario ya está baneado.",
+      "notBanned": "❌ Este usuario no está baneado.",
+      "dmFailed": "⚠️ No se pudo enviar DM al usuario.",
+      "aiError": "❌ Error al analizar el contenido con IA."
+    },
+
+
+    
+    "antiSpam": {
+      "dmTitle": "⚠️ Advertencia de Spam",
+      "spamWarning": "Has enviado demasiados mensajes en poco tiempo.\n\nTus mensajes han sido eliminados automáticamente.\nPor favor, modera la velocidad de tus mensajes.",
+      "duplicateWarning": "Has enviado el mismo mensaje varias veces.\n\nTus mensajes duplicados han sido eliminados automáticamente.\nPor favor, evita repetir el mismo contenido."
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "verification-bot",
+  "version": "1.0.0",
+  "description": "Bot de verificación para Discord con sistema de roles",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": ["discord", "bot", "verification", "roles"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^14.14.1"
+  }
+}

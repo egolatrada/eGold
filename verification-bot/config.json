@@ -1,0 +1,27 @@
+{
+  "_comment": "Este archivo ya no se usa - La funcionalidad de verificación ha sido integrada en el bot principal",
+  "_comment2": "ARCHIVO DEPRECADO - NO UTILIZAR",
+  "botToken": "DEPRECADO - Token eliminado por seguridad",
+  "guildId": "1268867413814939680",
+
+  "roles": {
+    "unverified": "1435572743193104494",
+    "sinWhitelist": "1427116249128636456"
+  },
+
+  "channels": {
+    "verification": "1435556297234841752"
+  },
+
+  "existingMessageId": "1435580254268952639",
+
+  "messages": {
+    "embedTitle": "🔐 Verificación del Servidor",
+    "embedDescription": "¡Bienvenido a **Strangers RP**!\n\nPara acceder al servidor, debes verificarte haciendo clic en el botón de abajo.\n\nUna vez verificado, podrás ver más canales y pretarar tu formulario de acceso.",
+    "embedColor": "#5865F2",
+    "buttonLabel": "✅ Verificarme",
+    "verifiedMessage": "¡Has sido verificado correctamente! Ahora puedes ver más canales y estar un paso más cerca de completar tu formulario de acceso.",
+    "alreadyVerifiedMessage": "Ya estás verificado.",
+    "errorMessage": "Hubo un error al verificarte. Por favor, contacta a un administrador."
+  }
+}

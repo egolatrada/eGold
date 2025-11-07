@@ -1,0 +1,43 @@
+# Node modules
+node_modules/
+package-lock.json
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Data files (contienen información del servidor específico)
+src/data/*.json
+
+# Logs
+*.log
+npm-debug.log*
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Replit
+.replit
+.config/
+.upm/
+.cache/
+.local/
+
+# Temporary files
+*.tmp
+*.bak
+*.old
+
+# Build files
+dist/
+build/
+config.json
