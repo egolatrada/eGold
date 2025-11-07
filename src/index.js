@@ -2,6 +2,9 @@
 // Autor: @egolatrada
 // Versión modular optimizada
 
+// Cargar variables de entorno
+require('dotenv').config();
+
 const { createClient } = require('./client');
 const { config, messages, validateConfig } = require('./config');
 const { registerCommands } = require('./handlers/command-loader');
