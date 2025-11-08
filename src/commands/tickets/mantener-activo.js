@@ -9,9 +9,17 @@ module.exports = {
     
     async execute(interaction, context) {
         const channel = interaction.channel;
+        const { config } = require('../../config');
 
         // Verificar que estamos en un canal de ticket
-        if (!channel.name.startsWith('ticket-')) {
+        // Opción 1: Nombre empieza con "ticket-" (tickets creados por comando)
+        const isCommandTicket = channel.name.startsWith('ticket-');
+        
+        // Opción 2: Canal está en una categoría de tickets
+        const ticketCategories = Object.values(config.tickets?.categories || {});
+        const isPanelTicket = ticketCategories.some(cat => cat.categoryId === channel.parentId);
+        
+        if (!isCommandTicket && !isPanelTicket) {
             return await interaction.reply({
                 content: '❌ Este comando solo puede usarse en canales de tickets.',
                 ephemeral: true

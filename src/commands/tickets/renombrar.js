@@ -5,31 +5,18 @@ const logger = require('../../utils/logger');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('renombrar')
-        .setDescription('✏️ [TICKETS] Renombra el ticket actual según prioridad')
-        .addStringOption(option =>
-            option
-                .setName('prioridad')
-                .setDescription('Nivel de prioridad del ticket')
-                .setRequired(true)
-                .addChoices(
-                    { name: '🔴 Urgente', value: 'urgente' },
-                    { name: '🟠 Medio Urgente', value: 'medio' },
-                    { name: '🟡 Sin Mucha Prisa', value: 'baja' },
-                    { name: '🟢 No Corre Prisa', value: 'ninguna' }
-                )
-        )
+        .setDescription('✏️ [TICKETS] Renombra el ticket (mantiene el emoji original)')
         .addStringOption(option =>
             option
                 .setName('nombre')
-                .setDescription('Nombre personalizado para el ticket (opcional)')
-                .setRequired(false)
+                .setDescription('Nuevo nombre para el ticket (sin emoji ni separador)')
+                .setRequired(true)
         ),
     
     async execute(interaction, context) {
         try {
             const channel = interaction.channel;
-            const priority = interaction.options.getString('prioridad');
-            const customName = interaction.options.getString('nombre');
+            const newName = interaction.options.getString('nombre');
             const staffRoleId = config.tickets?.staffRoleId;
 
             if (!staffRoleId || !interaction.member.roles.cache.has(staffRoleId)) {
@@ -39,22 +26,21 @@ module.exports = {
                 });
             }
 
-            // Extraer el número y categoría del nombre actual
-            // Soportar formato nuevo: (emoji)┃(categoría)-(número)
-            // Y formato legacy: ticket-(número)-usuario
-            let ticketCategory, ticketNumber;
+            // Extraer el emoji, separador y número del nombre actual
+            // Formato esperado: (emoji)┃(nombre)-(número)
+            const emojiSeparatorMatch = channel.name.match(/^(.+?)┃(.+)-(\d+)$/);
+            const legacyFormatMatch = channel.name.match(/^ticket-(\d+)/);
             
-            const newFormatMatch = channel.name.match(/┃(.+)-(\d+)$/);
-            const legacyFormatMatch = channel.name.match(/ticket-(\d+)/);
+            let emojiPart, ticketNumber;
             
-            if (newFormatMatch) {
-                // Formato nuevo
-                ticketCategory = newFormatMatch[1];
-                ticketNumber = newFormatMatch[2];
+            if (emojiSeparatorMatch) {
+                // Formato nuevo con emoji: 🔧┃soporte-dudas-12
+                emojiPart = emojiSeparatorMatch[1]; // 🔧
+                ticketNumber = emojiSeparatorMatch[3]; // 12
             } else if (legacyFormatMatch) {
-                // Formato legacy
+                // Formato legacy sin emoji: ticket-0012
+                emojiPart = null;
                 ticketNumber = legacyFormatMatch[1];
-                ticketCategory = 'ticket'; // Categoría por defecto para legacy
             } else {
                 return await interaction.reply({
                     content: '❌ Este comando solo funciona en canales de tickets.',
@@ -62,15 +48,6 @@ module.exports = {
                 });
             }
 
-            const priorityConfig = {
-                urgente: { emoji: '🔴', color: '#ED4245' },
-                medio: { emoji: '🟠', color: '#F26522' },
-                baja: { emoji: '🟡', color: '#FEE75C' },
-                ninguna: { emoji: '🟢', color: '#57F287' }
-            };
-
-            const { emoji, color } = priorityConfig[priority];
-            
             // Función de sanitización para nombres de canales
             const sanitizeName = (name) => {
                 return name
@@ -81,23 +58,24 @@ module.exports = {
                     .replace(/^-+|-+$/g, ''); // Remover guiones al inicio y final
             };
             
-            let newName;
-            if (customName) {
-                // Si hay nombre personalizado, sanitizarlo y reemplazar la parte después de ┃
-                const sanitizedCustomName = sanitizeName(customName);
-                newName = `${emoji}┃${sanitizedCustomName}-${ticketNumber}`;
+            const sanitizedNewName = sanitizeName(newName);
+            
+            // Construir el nuevo nombre preservando el emoji original
+            let finalName;
+            if (emojiPart) {
+                // Mantener emoji y separador original
+                finalName = `${emojiPart}┃${sanitizedNewName}-${ticketNumber}`;
             } else {
-                // Si no hay nombre personalizado, sanitizar y mantener la categoría original
-                const sanitizedCategory = sanitizeName(ticketCategory);
-                newName = `${emoji}┃${sanitizedCategory}-${ticketNumber}`;
+                // Formato legacy
+                finalName = `ticket-${ticketNumber}-${sanitizedNewName}`;
             }
 
             const oldName = channel.name;
-            await channel.setName(newName);
+            await channel.setName(finalName);
 
-            // Confirmar acción sin mensaje público
+            // Confirmar acción
             await interaction.reply({
-                content: `✅ Ticket renombrado a **${newName}** con prioridad ${emoji}`,
+                content: `✅ Ticket renombrado a **${finalName}**`,
                 ephemeral: true
             });
 
@@ -106,13 +84,12 @@ module.exports = {
                     const logChannel = await interaction.guild.channels.fetch(config.logs.channels.tickets);
                     
                     const logEmbed = new EmbedBuilder()
-                        .setColor(color)
-                        .setTitle('✏️ Ticket Renombrado con Prioridad')
+                        .setColor('#5865F2')
+                        .setTitle('✏️ Ticket Renombrado')
                         .addFields(
                             { name: 'Ticket', value: `${channel}`, inline: false },
                             { name: 'Nombre Anterior', value: `\`${oldName}\``, inline: true },
-                            { name: 'Nombre Nuevo', value: `\`${newName}\``, inline: true },
-                            { name: 'Prioridad', value: `${emoji} ${priority.toUpperCase()}`, inline: true },
+                            { name: 'Nombre Nuevo', value: `\`${finalName}\``, inline: true },
                             { name: 'Renombrado por', value: `${interaction.user} (${interaction.user.tag})`, inline: false },
                             { name: 'Canal ID', value: channel.id, inline: false }
                         )
@@ -124,7 +101,7 @@ module.exports = {
                 }
             }
 
-            logger.info(`✏️ ${interaction.user.tag} renombró ticket de "${oldName}" a "${newName}" con prioridad ${priority}`);
+            logger.info(`✏️ ${interaction.user.tag} renombró ticket de "${oldName}" a "${finalName}"`);
 
         } catch (error) {
             logger.error('Error al renombrar ticket', error);
