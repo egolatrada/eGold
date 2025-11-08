@@ -270,10 +270,10 @@ class SocialMediaMonitorSystem {
                     titleEmoji: '🎬',
                     name: 'YOUTUBE',
                     color: 0xFF0000,
-                    subtitle: '🚨 Strangers RP tiene contenido fresco para la comunidad.',
+                    subtitle: '**Strangers RP** tiene contenido fresco para la comunidad. 🔥',
                     videoEmoji: '🎥',
-                    descriptionText: '🕹️ Descubre el nuevo contenido que preparamos para ti.',
                     watchText: '📺 **Míralo aquí:**',
+                    watchLabel: 'Ver video',
                     cta: '📢 ¡Comparte tu opinión en los comentarios y dinos qué te pareció!',
                     closingMessage: '🔥 Cada video nos acerca más al estreno oficial del servidor. ¿Estás listo para formar parte de la historia?',
                     accountUrl: `https://youtube.com/@StrangersRP`
@@ -282,10 +282,10 @@ class SocialMediaMonitorSystem {
                     titleEmoji: '🎵',
                     name: 'TIKTOK',
                     color: 0x000000,
-                    subtitle: '🚨 Strangers RP tiene nuevo contenido en TikTok.',
+                    subtitle: '**Strangers RP** tiene nuevo contenido en TikTok. 🔥',
                     videoEmoji: '📱',
-                    descriptionText: '🕹️ No te pierdas lo último del servidor.',
                     watchText: '🔗 **Míralo aquí:**',
+                    watchLabel: 'Ver video',
                     cta: '💬 ¡Comenta y comparte con tu crew!',
                     closingMessage: '🔥 El roleplay más épico de FiveM te espera. ¿Estás listo?',
                     accountUrl: `https://tiktok.com/@${account.username}`
@@ -294,10 +294,10 @@ class SocialMediaMonitorSystem {
                     titleEmoji: '🐦',
                     name: 'TWITTER/X',
                     color: 0x1DA1F2,
-                    subtitle: '🚨 Nueva actualización de Strangers RP.',
+                    subtitle: '**Strangers RP** tiene novedades importantes. 🔥',
                     videoEmoji: '📢',
-                    descriptionText: '🕹️ Mantente informado sobre las novedades del servidor.',
                     watchText: '🔗 **Lee el tweet:**',
+                    watchLabel: 'Ver tweet',
                     cta: '💬 ¡Interactúa y comparte tu opinión!',
                     closingMessage: '🔥 La comunidad de roleplay más activa te espera. ¿Te unes?',
                     accountUrl: `https://x.com/${account.username}`
@@ -315,14 +315,26 @@ class SocialMediaMonitorSystem {
                 minute: '2-digit'
             });
 
+            // Extraer descripción breve del contenido
+            let videoDescription = '🕹️ Descubre el nuevo contenido que preparamos para ti.';
+            if (post.description && post.description.length > 0) {
+                const cleanDesc = post.description
+                    .replace(/<[^>]*>/g, '') // Remover HTML
+                    .replace(/\n/g, ' ')     // Remover saltos de línea
+                    .trim();
+                if (cleanDesc.length > 0) {
+                    videoDescription = `🕹️ ${cleanDesc.substring(0, 150)}${cleanDesc.length > 150 ? '...' : ''}`;
+                }
+            }
+
             // Construir descripción del embed
             let description = `${platform.subtitle}\n\n`;
             description += `${platform.videoEmoji} ${post.title}\n`;
-            description += `${platform.descriptionText}\n\n`;
-            description += `${platform.watchText} [Ver publicación](${post.url})\n`;
-            description += `${platform.cta}\n\n`;
-            description += `🕒 **Publicado el:** ${fecha}\n`;
-            description += `📱 **Canal oficial:** [@StrangersRP](${platform.accountUrl})`;
+            description += `${videoDescription}\n\n`;
+            description += `> ${platform.watchText} [${platform.watchLabel}](${post.url})\n`;
+            description += `> ${platform.cta}\n\n`;
+            description += `> 🕒 **Publicado el:** ${fecha}\n`;
+            description += `> 📱 **Canal oficial:** [@StrangersRP](${platform.accountUrl})`;
 
             const embed = new EmbedBuilder()
                 .setColor(platform.color)
@@ -336,7 +348,7 @@ class SocialMediaMonitorSystem {
 
             // Enviar mensaje con título separado + embed
             await channel.send({
-                content: `${platform.titleEmoji} **¡NUEVA PUBLICACIÓN DE ${platform.name}!**`,
+                content: `${platform.titleEmoji} ¡NUEVA PUBLICACIÓN DE ${platform.name}!`,
                 embeds: [embed]
             });
             console.log(`📤 Notificación enviada: ${account.platform}/${account.username} - ${post.title}`);
