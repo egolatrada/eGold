@@ -18,10 +18,6 @@ module.exports = {
             option.setName('link_o_usuario')
                 .setDescription('Link del canal o nombre de usuario (ej: twitch.tv/canal o canal)')
                 .setRequired(true))
-        .addChannelOption(option =>
-            option.setName('canal')
-                .setDescription('Canal donde se enviarán las notificaciones')
-                .setRequired(true))
         .addUserOption(option =>
             option.setName('discord')
                 .setDescription('Usuario de Discord vinculado (opcional)')
@@ -41,20 +37,14 @@ module.exports = {
             const platform = interaction.options.getString('plataforma');
             const username = interaction.options.getString('link_o_usuario');
             const user = interaction.options.getUser('discord');
-            const channel = interaction.options.getChannel('canal');
             
-            if (!channel.isTextBased()) {
-                return await interaction.reply({
-                    content: '❌ El canal seleccionado debe ser un canal de texto.',
-                    ephemeral: true
-                });
-            }
+            const notificationChannelId = '1425955813645881404';
             
             const result = socialLinksSystem.addLink(
                 user?.id || 'no_user',
                 platform,
                 username,
-                channel.id
+                notificationChannelId
             );
             
             if (result.success) {
@@ -67,7 +57,7 @@ module.exports = {
                 const discordInfo = user ? `\n💬 **Discord:** ${user}` : '';
                 
                 await interaction.reply({
-                    content: `✅ **Streamer añadido correctamente**\n\n${platformEmojis[platform]} **Plataforma:** ${platform.charAt(0).toUpperCase() + platform.slice(1)}\n👤 **Canal:** ${username}${discordInfo}\n📢 **Notificaciones:** ${channel}\n\n*Se enviará una notificación automática cuando ${username} esté en directo.*`,
+                    content: `✅ **Streamer añadido correctamente**\n\n${platformEmojis[platform]} **Plataforma:** ${platform.charAt(0).toUpperCase() + platform.slice(1)}\n👤 **Canal:** ${username}${discordInfo}\n\n*Se enviará una notificación automática cuando ${username} esté en directo.*`,
                     ephemeral: true
                 });
             } else {
