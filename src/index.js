@@ -118,7 +118,7 @@ client.once('ready', async () => {
         streamMonitorSystem.start();
         
         // Iniciar sistema de monitoreo de redes sociales
-        await socialMediaMonitorSystem.init();
+        // await socialMediaMonitorSystem.init(); // DESACTIVADO - Enviaba notificaciones cada 2 min
         
         // Setup event handlers
         setupEventHandlers(client, {
