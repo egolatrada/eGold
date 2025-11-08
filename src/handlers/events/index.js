@@ -43,6 +43,9 @@ function setupEventHandlers(client, context) {
             await context.logsSystem.handleMemberJoin(member);
             await context.invitesSystem.handleMemberJoin(member);
             await context.verificationSystem.assignUnverifiedRole(member);
+            if (context.welcomeSystem) {
+                await context.welcomeSystem.sendWelcome(member);
+            }
             if (context.serverStatsSystem) {
                 await context.serverStatsSystem.handleMemberUpdate();
             }
