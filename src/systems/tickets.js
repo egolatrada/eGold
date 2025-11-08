@@ -361,7 +361,8 @@ class TicketsSystem {
         const staffRoleId = config.tickets.staffRoleId;
 
         // Formato: (emoji)┃(categoría)-(número)
-        // Sanitizar nombre de categoría para Discord (minúsculas, sin espacios, sin acentos)
+        // Ejemplo: 🎫┃ticket-apelación-5
+        // Sanitización: minúsculas, sin espacios, sin acentos
         const sanitizedCategoryName = category.name
             .toLowerCase()
             .normalize('NFD')
