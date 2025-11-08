@@ -38,14 +38,7 @@ class SocialLinksSystem {
         return {
             twitch: { name: "Twitch", icon: "🎮", color: "#9146FF", urlPattern: "twitch.tv/" },
             kick: { name: "Kick", icon: "⚡", color: "#53FC18", urlPattern: "kick.com/" },
-            youtube: { name: "YouTube", icon: "📺", color: "#FF0000", urlPattern: "youtube.com/" },
-            instagram: { name: "Instagram", icon: "📷", color: "#E4405F", urlPattern: "instagram.com/" },
-            twitter: { name: "X (Twitter)", icon: "🐦", color: "#1DA1F2", urlPattern: "twitter.com/" },
-            x: { name: "X (Twitter)", icon: "✖️", color: "#000000", urlPattern: "x.com/" },
-            threads: { name: "Threads", icon: "🧵", color: "#000000", urlPattern: "threads.net/" },
-            tiktok: { name: "TikTok", icon: "🎵", color: "#000000", urlPattern: "tiktok.com/" },
-            facebook: { name: "Facebook", icon: "👥", color: "#1877F2", urlPattern: "facebook.com/" },
-            discord: { name: "Discord", icon: "💬", color: "#5865F2", urlPattern: "discord.gg/" }
+            youtube: { name: "YouTube", icon: "📺", color: "#FF0000", urlPattern: "youtube.com/" }
         };
     }
 
