@@ -265,41 +265,63 @@ class SocialMediaMonitorSystem {
         try {
             const channel = await this.client.channels.fetch(this.notificationChannelId);
             
-            const platformEmojis = {
-                youtube: '📺',
-                tiktok: '🎵',
-                twitter: '🐦'
+            const platformData = {
+                youtube: {
+                    emoji: '🎬',
+                    icon: '📺',
+                    name: 'YouTube',
+                    color: 0xFF0000,
+                    categoryText: '🎮 Categoría: GTA Roleplay',
+                    messagePrefix: 'Strangers RP acaba de subir un nuevo video',
+                    accountUrl: `https://youtube.com/@StrangersRP`
+                },
+                tiktok: {
+                    emoji: '🎵',
+                    icon: '📱',
+                    name: 'TikTok',
+                    color: 0x000000,
+                    categoryText: '🎮 Categoría: Contenido Gaming',
+                    messagePrefix: 'Strangers RP acaba de subir un nuevo video',
+                    accountUrl: `https://tiktok.com/@${account.username}`
+                },
+                twitter: {
+                    emoji: '🐦',
+                    icon: '📱',
+                    name: 'Twitter/X',
+                    color: 0x1DA1F2,
+                    categoryText: '🎮 Categoría: Actualización del servidor',
+                    messagePrefix: 'Strangers RP acaba de publicar',
+                    accountUrl: `https://x.com/${account.username}`
+                }
             };
 
-            const platformNames = {
-                youtube: 'YouTube',
-                tiktok: 'TikTok',
-                twitter: 'Twitter/X'
-            };
+            const platform = platformData[account.platform];
+            
+            // Formatear fecha
+            const fecha = new Date(post.publishedAt).toLocaleDateString('es-ES', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
 
-            const platformColors = {
-                youtube: 0xFF0000,
-                tiktok: 0x000000,
-                twitter: 0x1DA1F2
-            };
+            // Construir descripción del embed
+            let description = `${platform.icon} ${platform.messagePrefix}\n\n`;
+            description += `✨ **Título:** ${post.title}\n`;
+            description += `${platform.categoryText}\n`;
+            description += `🔗 [Ver publicación](${post.url})\n\n`;
+            description += `🕒 **Publicado el:** ${fecha}\n`;
+            description += `📱 **Cuenta oficial:** [@StrangersRP](${platform.accountUrl})`;
 
             const embed = new EmbedBuilder()
-                .setColor(platformColors[account.platform])
-                .setTitle(`${platformEmojis[account.platform]} Nueva publicación en ${platformNames[account.platform]}`)
-                .setDescription(post.title)
-                .addFields(
-                    { name: '📱 Cuenta', value: `@${account.username}`, inline: true },
-                    { name: '🔗 Link', value: `[Ver publicación](${post.url})`, inline: true }
-                )
+                .setColor(platform.color)
+                .setTitle(`${platform.emoji} Nueva publicación en ${platform.name}`)
+                .setDescription(description)
                 .setTimestamp(post.publishedAt);
 
             if (post.thumbnail) {
                 embed.setImage(post.thumbnail);
-            }
-
-            if (post.description && post.description.length > 0) {
-                const desc = post.description.substring(0, 200);
-                embed.addFields({ name: '📝 Descripción', value: desc + (post.description.length > 200 ? '...' : '') });
             }
 
             await channel.send({ embeds: [embed] });
