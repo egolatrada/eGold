@@ -165,9 +165,11 @@ const RECENT_CHANGES = [
     '🔒 Bloqueo entre mismo nivel: Si Soporte A maneja ticket, Soporte B solo puede leer',
     '🤝 Colaboración entre compañeros: Menciona @usuario del mismo nivel para desbloquearlo sin escalar',
     '⚠️ Sistema de inactividad corregido: Detecta correctamente quién escribió último (staff vs usuario)',
-    '📋 Transcripciones automáticas: Tickets cerrados por inactividad guardan transcript en canal correspondiente',
-    '📢 Menciones añadidas: Mensajes de notificación de inactividad incluyen menciones a staff/usuario',
-    '🔔 Logs de canales reactivados: Creación, eliminación y modificación de canales ahora se registran'
+    '📋 Transcripciones automáticas: Tickets cerrados por inactividad guardan transcript correctamente',
+    '📢 Menciones añadidas: Notificaciones de inactividad incluyen menciones a staff/usuario',
+    '🔔 Logs de canales reactivados: Creación, eliminación y modificación de canales',
+    '🗑️ Comando /status eliminado: Optimización de recursos del bot',
+    '📊 Logs consolidados: Comandos y bots ahora se registran en canal unificado de changelog'
 ];
 
 // Sistema de changelog incremental
