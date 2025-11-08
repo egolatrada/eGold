@@ -28,6 +28,7 @@ const SuggestionsSystem = require('./systems/suggestions-system');
 const ChangelogSystem = require('./systems/changelog-system');
 const ServerStatsSystem = require('./systems/server-stats');
 const TasksSystem = require('./systems/tasks/simple-tasks-system');
+const WarnsSystem = require('./systems/warns/warns-system');
 
 // Handlers de eventos
 const { setupEventHandlers } = require('./handlers/events');
@@ -53,6 +54,7 @@ let suggestionsSystem;
 let changelogSystem;
 let serverStatsSystem;
 let tasksSystem;
+let warnsSystem;
 let commands;
 
 // Map para selecciones de roles en embeds
@@ -80,6 +82,7 @@ client.once('ready', async () => {
         changelogSystem = new ChangelogSystem(client);
         serverStatsSystem = new ServerStatsSystem(client);
         tasksSystem = new TasksSystem(client);
+        warnsSystem = new WarnsSystem(client);
         
         // Cargar datos persistentes
         ticketsSystem.loadTicketCounters();
@@ -97,6 +100,10 @@ client.once('ready', async () => {
         // Inicializar sistema de tareas (sin IA)
         await tasksSystem.initialize(null);
         client.tasksSystem = tasksSystem;
+        
+        // Inicializar sistema de advertencias
+        await warnsSystem.initialize();
+        client.warnsSystem = warnsSystem;
         
         // Registrar comandos
         const guildId = config.guildId || config.allowedGuildId;
@@ -139,6 +146,7 @@ client.once('ready', async () => {
             changelogSystem,
             serverStatsSystem,
             tasksSystem,
+            warnsSystem,
             embedRoleSelections,
             commands
         });
