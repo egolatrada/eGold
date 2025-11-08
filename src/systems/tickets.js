@@ -360,7 +360,16 @@ class TicketsSystem {
         const ticketCategoryId = category.categoryId;
         const staffRoleId = config.tickets.staffRoleId;
 
-        let ticketName = `ticket-${ticketNumber}-${user.username}`;
+        // Formato: (emoji)┃(categoría)-(número)
+        // Sanitizar nombre de categoría para Discord (minúsculas, sin espacios, sin acentos)
+        const sanitizedCategoryName = category.name
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '') // Remover acentos
+            .replace(/[^a-z0-9]+/g, '-') // Reemplazar espacios y caracteres especiales con guiones
+            .replace(/^-+|-+$/g, ''); // Remover guiones al inicio y final
+        
+        let ticketName = `${category.emoji}┃${sanitizedCategoryName}-${ticketNumber}`;
 
         // Permisos base
         const permissionOverwrites = [

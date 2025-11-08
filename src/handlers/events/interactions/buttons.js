@@ -57,6 +57,14 @@ async function handleButtonInteraction(interaction, context) {
                 ephemeral: true
             });
         }
+        // Botón de navegación a canal
+        else if (customId.startsWith('navegar_canal:')) {
+            const canalId = customId.split(':')[1];
+            await interaction.reply({
+                content: `📍 Dirígete al canal: <#${canalId}>`,
+                ephemeral: true
+            });
+        }
         else {
             logger.warn(`Botón no manejado: ${customId}`);
         }

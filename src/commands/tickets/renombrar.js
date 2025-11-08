@@ -39,8 +39,23 @@ module.exports = {
                 });
             }
 
-            const isTicketChannel = channel.name.includes('ticket-');
-            if (!isTicketChannel) {
+            // Extraer el número y categoría del nombre actual
+            // Soportar formato nuevo: (emoji)┃(categoría)-(número)
+            // Y formato legacy: ticket-(número)-usuario
+            let ticketCategory, ticketNumber;
+            
+            const newFormatMatch = channel.name.match(/┃(.+)-(\d+)$/);
+            const legacyFormatMatch = channel.name.match(/ticket-(\d+)/);
+            
+            if (newFormatMatch) {
+                // Formato nuevo
+                ticketCategory = newFormatMatch[1];
+                ticketNumber = newFormatMatch[2];
+            } else if (legacyFormatMatch) {
+                // Formato legacy
+                ticketNumber = legacyFormatMatch[1];
+                ticketCategory = 'ticket'; // Categoría por defecto para legacy
+            } else {
                 return await interaction.reply({
                     content: '❌ Este comando solo funciona en canales de tickets.',
                     ephemeral: true
@@ -55,32 +70,35 @@ module.exports = {
             };
 
             const { emoji, color } = priorityConfig[priority];
-            const ticketNumber = channel.name.match(/ticket-(\d+)/)?.[1] || '0000';
+            
+            // Función de sanitización para nombres de canales
+            const sanitizeName = (name) => {
+                return name
+                    .toLowerCase()
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '') // Remover acentos
+                    .replace(/[^a-z0-9]+/g, '-') // Reemplazar espacios y caracteres especiales con guiones
+                    .replace(/^-+|-+$/g, ''); // Remover guiones al inicio y final
+            };
             
             let newName;
             if (customName) {
-                const sanitizedName = customName.toLowerCase().replace(/[^a-z0-9-]/g, '-');
-                newName = `${emoji}-${sanitizedName}-${ticketNumber}`;
+                // Si hay nombre personalizado, sanitizarlo y reemplazar la parte después de ┃
+                const sanitizedCustomName = sanitizeName(customName);
+                newName = `${emoji}┃${sanitizedCustomName}-${ticketNumber}`;
             } else {
-                newName = `${emoji}-ticket-${ticketNumber}`;
+                // Si no hay nombre personalizado, sanitizar y mantener la categoría original
+                const sanitizedCategory = sanitizeName(ticketCategory);
+                newName = `${emoji}┃${sanitizedCategory}-${ticketNumber}`;
             }
 
             const oldName = channel.name;
             await channel.setName(newName);
 
-            const embed = new EmbedBuilder()
-                .setColor(color)
-                .setTitle('✏️ Ticket Renombrado')
-                .setDescription(`Este ticket ha sido renombrado con prioridad **${emoji} ${priority.toUpperCase()}**`)
-                .addFields(
-                    { name: 'Nombre Anterior', value: `\`${oldName}\``, inline: true },
-                    { name: 'Nombre Nuevo', value: `\`${newName}\``, inline: true },
-                    { name: 'Renombrado por', value: `${interaction.user}`, inline: false }
-                )
-                .setTimestamp();
-
+            // Confirmar acción sin mensaje público
             await interaction.reply({
-                embeds: [embed]
+                content: `✅ Ticket renombrado a **${newName}** con prioridad ${emoji}`,
+                ephemeral: true
             });
 
             if (config.logs?.enabled && config.logs.channels?.tickets) {
