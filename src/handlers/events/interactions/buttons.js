@@ -35,10 +35,6 @@ async function handleButtonInteraction(interaction, context) {
             const { handleEmbedCancelButton } = require('./embed-buttons');
             await handleEmbedCancelButton(interaction, context);
         }
-        else if (customId === 'refresh_status') {
-            const { handleRefreshStatus } = require('../../../commands/admin/status');
-            await handleRefreshStatus(interaction, context);
-        }
         // Botones de sugerencias
         else if (customId === 'suggestion-upvote' || customId === 'suggestion-downvote' || customId === 'suggestion-thread') {
             const { handleSuggestionButtons } = require('./suggestion-buttons');
