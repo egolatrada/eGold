@@ -2,11 +2,14 @@ const { Pool } = require('pg');
 const { EmbedBuilder } = require('discord.js');
 const logger = require('../../utils/logger');
 
+const WARN_CHANNELS = ['1436824228279357580', '1370611084574326784'];
+
 class WarnsSystem {
     constructor(client) {
         this.client = client;
         this.pool = null;
         this.autoRevokeCheckInterval = null;
+        this.warnChannels = WARN_CHANNELS;
     }
 
     async initialize() {
@@ -170,23 +173,53 @@ class WarnsSystem {
                     try {
                         const guild = await this.client.guilds.fetch(warning.guild_id);
                         const user = await this.client.users.fetch(warning.user_id).catch(() => null);
+                        const categoryName = this.getCategoryName(warning.category);
+                        const createdAt = Math.floor(new Date(warning.created_at).getTime() / 1000);
                         
                         if (user) {
-                            const embed = new EmbedBuilder()
+                            const dmEmbed = new EmbedBuilder()
                                 .setColor('#00FF00')
                                 .setTitle('✅ Advertencia Revocada Automáticamente')
                                 .setDescription('Una de tus advertencias ha sido revocada automáticamente por expiración del tiempo.')
                                 .addFields(
-                                    { name: '📋 Categoría', value: this.getCategoryName(warning.category), inline: true },
-                                    { name: '📅 Fecha de advertencia', value: `<t:${Math.floor(new Date(warning.created_at).getTime() / 1000)}:F>`, inline: false },
+                                    { name: '📋 Categoría', value: categoryName, inline: true },
+                                    { name: '📅 Fecha de advertencia', value: `<t:${createdAt}:F>`, inline: false },
                                     { name: '📝 Motivo original', value: warning.reason, inline: false }
                                 )
-                                .setFooter({ text: `Servidor: ${guild.name}` })
+                                .setFooter({ text: `Servidor: ${guild.name} | ID: ${warning.id}` })
                                 .setTimestamp();
 
-                            await user.send({ embeds: [embed] }).catch(() => {
+                            await user.send({ embeds: [dmEmbed] }).catch(() => {
                                 logger.warn(`No se pudo enviar DM de auto-revocación a ${warning.username}`);
                             });
+                        }
+
+                        for (const channelId of this.warnChannels) {
+                            try {
+                                const channel = await guild.channels.fetch(channelId).catch(() => null);
+                                if (channel && channel.isTextBased()) {
+                                    const publicEmbed = new EmbedBuilder()
+                                        .setColor('#00FF00')
+                                        .setTitle('⏰ Advertencia Auto-revocada')
+                                        .setDescription('Una advertencia ha sido revocada automáticamente por expiración del tiempo configurado.')
+                                        .addFields(
+                                            { name: '👤 Usuario', value: user ? `${user} (${warning.username})` : warning.username, inline: false },
+                                            { name: '🆔 ID de advertencia', value: `${warning.id}`, inline: true },
+                                            { name: '📋 Categoría', value: categoryName, inline: true },
+                                            { name: '📅 Fecha de advertencia', value: `<t:${createdAt}:F>`, inline: false },
+                                            { name: '📝 Motivo original', value: warning.reason, inline: false },
+                                            { name: '⏰ Revocada automáticamente', value: `<t:${Math.floor(Date.now() / 1000)}:F>`, inline: false }
+                                        )
+                                        .setFooter({ text: 'Sistema de Auto-revocación' })
+                                        .setTimestamp();
+
+                                    await channel.send({ embeds: [publicEmbed] });
+                                    logger.info(`✅ Mensaje de auto-revocación enviado al canal ${channel.name} (${channelId})`);
+                                    break;
+                                }
+                            } catch (channelError) {
+                                logger.warn(`No se pudo enviar mensaje al canal ${channelId}:`, channelError.message);
+                            }
                         }
                     } catch (error) {
                         logger.error(`Error al notificar auto-revocación de warning ${warning.id}`, error);

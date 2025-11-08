@@ -2,7 +2,7 @@ const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('disc
 const { config } = require('../../config');
 const logger = require('../../utils/logger');
 
-const WARN_CHANNEL_ID = '1309293942055710720';
+const WARN_CHANNELS = ['1436824228279357580', '1370611084574326784'];
 
 const TIME_UNITS = {
     'minutos': 60000,
@@ -34,14 +34,22 @@ module.exports = {
             option.setName('motivo')
                 .setDescription('Motivo de la advertencia')
                 .setRequired(true))
+        .addStringOption(option =>
+            option.setName('duracion')
+                .setDescription('Duración de la advertencia')
+                .setRequired(true)
+                .addChoices(
+                    { name: '🔒 Permanente', value: 'permanente' },
+                    { name: '⏰ Temporal', value: 'temporal' }
+                ))
         .addIntegerOption(option =>
             option.setName('auto_revocar_cantidad')
-                .setDescription('Cantidad de tiempo para auto-revocar (opcional)')
+                .setDescription('Cantidad de tiempo para auto-revocar (solo si es temporal)')
                 .setRequired(false)
                 .setMinValue(1))
         .addStringOption(option =>
             option.setName('auto_revocar_unidad')
-                .setDescription('Unidad de tiempo para auto-revocar')
+                .setDescription('Unidad de tiempo para auto-revocar (solo si es temporal)')
                 .setRequired(false)
                 .addChoices(
                     { name: 'Minutos', value: 'minutos' },
@@ -52,9 +60,9 @@ module.exports = {
                 )),
     
     async execute(interaction, context) {
-        if (interaction.channelId !== WARN_CHANNEL_ID) {
+        if (!WARN_CHANNELS.includes(interaction.channelId)) {
             return await interaction.reply({
-                content: `❌ Este comando solo puede ser usado en el canal <#${WARN_CHANNEL_ID}>`,
+                content: `❌ Este comando solo puede ser usado en los canales autorizados de moderación.`,
                 ephemeral: true
             });
         }
@@ -70,6 +78,7 @@ module.exports = {
         const targetUser = interaction.options.getUser('usuario');
         const category = interaction.options.getString('categoria');
         const reason = interaction.options.getString('motivo');
+        const duracion = interaction.options.getString('duracion');
         const autoRevokeAmount = interaction.options.getInteger('auto_revocar_cantidad');
         const autoRevokeUnit = interaction.options.getString('auto_revocar_unidad');
 
@@ -87,17 +96,16 @@ module.exports = {
             });
         }
 
-        if ((autoRevokeAmount && !autoRevokeUnit) || (!autoRevokeAmount && autoRevokeUnit)) {
-            return await interaction.reply({
-                content: '❌ Debes especificar tanto la **cantidad** como la **unidad** para la auto-revocación, o ninguna de las dos.',
-                ephemeral: true
-            });
-        }
-
         let expiresIn = null;
-        let expiresText = 'No expira';
+        let expiresText = 'Permanente';
 
-        if (autoRevokeAmount && autoRevokeUnit) {
+        if (duracion === 'temporal') {
+            if (!autoRevokeAmount || !autoRevokeUnit) {
+                return await interaction.reply({
+                    content: '❌ Para advertencias temporales debes especificar tanto la **cantidad** como la **unidad** de tiempo.',
+                    ephemeral: true
+                });
+            }
             expiresIn = autoRevokeAmount * TIME_UNITS[autoRevokeUnit];
             expiresText = `${autoRevokeAmount} ${autoRevokeUnit}`;
         }
@@ -139,6 +147,12 @@ module.exports = {
                     value: `<t:${Math.floor(expiresAt.getTime() / 1000)}:R> (${expiresText})`,
                     inline: false
                 });
+            } else {
+                dmEmbed.addFields({
+                    name: '🔒 Duración',
+                    value: 'Permanente',
+                    inline: false
+                });
             }
 
             await targetUser.send({ embeds: [dmEmbed] }).catch(() => {
@@ -167,15 +181,15 @@ module.exports = {
                 });
             } else {
                 publicEmbed.addFields({
-                    name: '⏰ Auto-revocación',
-                    value: 'No configurada',
+                    name: '🔒 Duración',
+                    value: '**Permanente** - No se revocará automáticamente',
                     inline: false
                 });
             }
 
             await interaction.editReply({ embeds: [publicEmbed] });
 
-            logger.info(`⚠️ ${interaction.user.tag} advirtió a ${targetUser.tag} - Categoría: ${category} - ID: ${warning.id}`);
+            logger.info(`⚠️ ${interaction.user.tag} advirtió a ${targetUser.tag} - Categoría: ${category} - Duración: ${expiresText} - ID: ${warning.id}`);
 
         } catch (error) {
             logger.error('Error al crear advertencia', error);

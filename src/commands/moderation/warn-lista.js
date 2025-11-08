@@ -2,7 +2,7 @@ const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('disc
 const { config } = require('../../config');
 const logger = require('../../utils/logger');
 
-const WARN_CHANNEL_ID = '1309293942055710720';
+const WARN_CHANNELS = ['1436824228279357580', '1370611084574326784'];
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -19,9 +19,9 @@ module.exports = {
                 .setRequired(false)),
     
     async execute(interaction, context) {
-        if (interaction.channelId !== WARN_CHANNEL_ID) {
+        if (!WARN_CHANNELS.includes(interaction.channelId)) {
             return await interaction.reply({
-                content: `❌ Este comando solo puede ser usado en el canal <#${WARN_CHANNEL_ID}>`,
+                content: `❌ Este comando solo puede ser usado en los canales autorizados de moderación.`,
                 ephemeral: true
             });
         }
@@ -68,8 +68,9 @@ module.exports = {
                 .setColor('#FFA500')
                 .setTitle(title)
                 .setDescription(
-                    `**Total:** ${warnings.length} advertencia(s)\n` +
-                    `**Activas:** ${activeWarnings.length} | **Revocadas:** ${revokedWarnings.length}`
+                    includeRevoked 
+                        ? `**Total:** ${warnings.length} advertencia(s)\n**Activas:** ${activeWarnings.length} | **Revocadas:** ${revokedWarnings.length}`
+                        : `**Advertencias activas:** ${activeWarnings.length}`
                 )
                 .setTimestamp();
 
