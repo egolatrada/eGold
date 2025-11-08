@@ -29,7 +29,7 @@ class LogsSystem {
     }
 
     async sendLog(channelId, embed) {
-        if (!channelId || channelId === "1269337253101179093") return;
+        if (!channelId) return;
 
         try {
             const channel = await this.client.channels.fetch(channelId);
