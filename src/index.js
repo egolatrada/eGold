@@ -161,7 +161,8 @@ client.once('ready', async () => {
 
 // Changelog de la versión actual - Actualizar aquí cuando hagas cambios
 const RECENT_CHANGES = [
-    'Comandos `/sug-aprobada` y `/sug-rechazada` ahora verifican roles de Administrador y Directiva'
+    'Sistema de tareas reactivado: `/tareas`, `/ver-tareas` y `/limpiar-tareas`',
+    'Comando `/limpiar-tareas` ahora elimina también los embeds anteriores automáticamente'
 ];
 
 // Sistema de changelog incremental

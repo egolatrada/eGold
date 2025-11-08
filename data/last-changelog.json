@@ -1,3 +1,4 @@
 [
-  "Comandos `/sug-aprobada` y `/sug-rechazada` ahora verifican roles de Administrador y Directiva"
+  "Sistema de tareas reactivado: `/tareas`, `/ver-tareas` y `/limpiar-tareas`",
+  "Comando `/limpiar-tareas` ahora elimina también los embeds anteriores automáticamente"
 ]
