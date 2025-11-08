@@ -296,7 +296,6 @@ class StreamMonitorSystem {
             }
             
             await channel.send({
-                content: `@everyone`,
                 embeds: [embed]
             });
             
