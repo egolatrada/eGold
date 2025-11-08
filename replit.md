@@ -8,6 +8,7 @@ Bot de Discord todo-en-uno con gestión de tickets, verificación automática, m
 
 ### ✨ Cambios Implementados Hoy
 
+#### SESIÓN 1: Unificación y Optimización de Comandos
 1. **`/ticket-crear` ampliado**: Ahora soporta creación de tickets para **usuarios Y roles** con dropdown de selección
 2. **Comandos unificados optimizados**:
    - `/mensaje-boton` (renombrado de `editar-mensaje-boton`)
@@ -26,6 +27,17 @@ Bot de Discord todo-en-uno con gestión de tickets, verificación automática, m
    - `CONFIG_GUIDE.md` (configuración)
    - `WATCHDOG.md` (monitoreo)
    - `LEEME-IMPORTANTE.md` (deployment)
+
+#### SESIÓN 2: Sistema de Inactividad Mejorado
+10. **Sistema de inactividad COMPLETAMENTE REDISEÑADO**:
+    - ✅ **Menciones inteligentes por rol específico**: Ahora detecta y guarda el ROL EXACTO del staff que está respondiendo (soporte/moderador/administrador/directiva)
+    - ✅ **Notificaciones bidireccionales**:
+      - Si el último mensaje es del **usuario** → Menciona al **rol específico del staff** que estaba respondiendo (no al rol genérico)
+      - Si el último mensaje es del **staff** → Menciona al **usuario/rol creador** del ticket
+    - ✅ **Soporte completo para tickets de rol**: Cuando se crea un ticket con `/crear-ticket` para un rol, detecta correctamente cuando miembros de ese rol responden
+    - ✅ **Detección de creador mejorada**: El sistema diferencia correctamente entre tickets creados para usuarios individuales vs tickets creados para roles completos
+    - ✅ **Menciones correctas**: Usa formato `<@userid>` para usuarios y `<@&roleid>` para roles en todas las notificaciones
+    - ✅ **Jerarquía de roles respetada**: Al detectar qué staff está respondiendo, prioriza el rol más alto (Directiva → Administrador → Moderador → Soporte)
 
 ---
 
