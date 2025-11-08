@@ -9,13 +9,20 @@ async function handleAutocomplete(interaction, context) {
         // Autocomplete para crear-ticket
         if (commandName === 'crear-ticket') {
             const focusedValue = interaction.options.getFocused().toLowerCase();
-            const categories = config.tickets?.categories || [];
+            const categoriesObj = config.tickets?.categories || {};
             
-            const filtered = categories
+            // Convertir el objeto de categorías en un array de opciones
+            const categoriesArray = Object.entries(categoriesObj).map(([key, cat]) => ({
+                label: cat.name,
+                value: key,
+                emoji: cat.emoji || '🎫'
+            }));
+            
+            const filtered = categoriesArray
                 .filter(cat => cat.label.toLowerCase().includes(focusedValue) || cat.value.toLowerCase().includes(focusedValue))
                 .slice(0, 25)
                 .map(cat => ({
-                    name: `${cat.emoji || '🎫'} ${cat.label}`,
+                    name: `${cat.emoji} ${cat.label}`,
                     value: cat.value
                 }));
             
