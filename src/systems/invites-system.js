@@ -177,19 +177,19 @@ class InvitesSystem {
                             .replace("{code}", `\`${usedInvite.code}\``)
                             .replace("{uses}", usedInvite.uses)
                         )
-                        .addFields(
-                            { name: "👤 Usuario", value: `${member.user}`, inline: true },
-                            { name: "🆔 ID", value: member.id, inline: true },
-                            { name: "📅 Se unió", value: `<t:${Math.floor(member.joinedTimestamp / 1000)}:R>`, inline: true },
-                            { name: "🔗 Código", value: `\`${usedInvite.code}\``, inline: true },
-                            { name: "📊 Total de usos", value: `${usedInvite.uses}`, inline: true }
-                        )
                         .setThumbnail(member.user.displayAvatarURL())
                         .setTimestamp();
 
                     if (usedInvite.inviter) {
                         embed.addFields({ name: "👤 Invitación creada por", value: `${usedInvite.inviter}`, inline: true });
                     }
+                    
+                    embed.addFields(
+                        { name: "🔗 Código", value: `\`${usedInvite.code}\``, inline: true },
+                        { name: "👤 Usuario", value: `${member.user}`, inline: true },
+                        { name: "📊 Total de usos", value: `${usedInvite.uses}`, inline: true },
+                        { name: "📅 Se unió", value: `<t:${Math.floor(member.joinedTimestamp / 1000)}:R>`, inline: true }
+                    )
 
                     if (messageId) {
                         try {
