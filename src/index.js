@@ -161,9 +161,10 @@ client.once('ready', async () => {
 
 // Changelog de la versión actual - Actualizar aquí cuando hagas cambios
 const RECENT_CHANGES = [
-    'Comando `/tareas` renovado: categoría obligatoria, sin IA, búsqueda de similitudes',
-    'Sistema anti-duplicados: "Desarrollo", "desarrollo", "DESARROLLO" se unifican automáticamente',
-    'Embeds separados por categoría con colores distintivos y actualización automática'
+    'Jerarquía de tickets ampliada: Soporte → Moderador → Admin → **Directiva** (4 niveles)',
+    'Bloqueo entre mismo nivel: Si Soporte A maneja ticket, Soporte B solo puede leer',
+    'Sistema de escalación mejorado: Menciona @rol superior para activar permisos de escritura',
+    'Categorías verificadas: Convalidar Whitelist y Dudas Generales disponibles'
 ];
 
 // Sistema de changelog incremental
