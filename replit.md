@@ -4,28 +4,29 @@ Bot de Discord todo-en-uno con gestión de tickets, verificación automática, m
 
 ## 📋 ÚLTIMA ACTUALIZACIÓN: 2025-11-08
 
-**Total de comandos: 40 comandos** (36 unificados + 4 sistema de bienvenidas)
+**Total de comandos: 39 comandos** (36 base + 3 sistema de bienvenidas optimizado)
 
 ### ✨ Cambios Implementados Hoy
 
-#### SESIÓN 3: Sistema de Bienvenidas Completo (2025-11-08)
+#### SESIÓN 3: Sistema de Bienvenidas Optimizado (2025-11-08)
 1. **Nuevo Sistema WelcomeSystem**: Sistema completo de bienvenidas personalizables con PostgreSQL
-2. **4 Nuevos Comandos**:
-   - `/bienvenida-setup`: Configurar canal, mensaje, imagen y color
-   - `/bienvenida-activar`: Activar envío automático de bienvenidas
-   - `/bienvenida-desactivar`: Desactivar temporalmente sin perder configuración
-   - `/bienvenida-test`: Enviar mensaje de prueba antes de activar
-3. **Variables Dinámicas Disponibles**:
+2. **3 Comandos Finales**:
+   - `/bienvenida-setup`: Configurar canal, mensaje y color inicialmente
+   - `/bienvenida-editar`: Editar configuración existente
+   - `/bienvenida-test`: Enviar mensaje de prueba antes de usar
+3. **Avatar Automático**: El icono del usuario que entra se muestra automáticamente en la bienvenida
+4. **Siempre Activo**: No necesita activación/desactivación - Funciona automáticamente si está configurado
+5. **Variables Dinámicas Disponibles**:
    - `{usuario}`: Mención del nuevo miembro
    - `{nombre}`: Nombre de usuario
    - `{tag}`: Tag completo (nombre#0000)
    - `{servidor}`: Nombre del servidor
    - `{miembros}`: Cantidad total de miembros
    - `{id}`: ID del usuario
-4. **Configuración Persistente**: Base de datos PostgreSQL con tabla `welcome_config`
-5. **Solo para Directiva**: Todos los comandos requieren rol de Directiva para editar
-6. **Totalmente Personalizable**: Mensaje, imagen de fondo, color del embed
-7. **Event Handler guildMemberAdd**: Envía bienvenidas automáticas cuando usuarios se unen
+6. **Configuración Persistente**: Base de datos PostgreSQL con tabla `welcome_config`
+7. **Solo para Directiva**: Todos los comandos requieren rol de Directiva para editar
+8. **Totalmente Personalizable**: Mensaje personalizado y color del embed
+9. **Event Handler guildMemberAdd**: Envía bienvenidas automáticas cuando usuarios se unen
 
 #### SESIÓN 1: Unificación y Optimización de Comandos
 1. **`/ticket-crear` ampliado**: Ahora soporta creación de tickets para **usuarios Y roles** con dropdown de selección
@@ -649,25 +650,25 @@ Sistema completo de mensajes de bienvenida totalmente personalizables para nuevo
 - ✅ **Activar/Desactivar**: Control total sin perder la configuración
 - ✅ **Sistema de pruebas**: Comando `/bienvenida-test` para verificar antes de activar
 
-### Comandos (Solo Directiva)
-1. **`/bienvenida-setup`** - Configurar sistema de bienvenidas
+### Comandos (Solo Directiva - 3 comandos)
+1. **`/bienvenida-setup`** - Configuración inicial del sistema
    - **canal** (opcional): Canal donde se enviarán las bienvenidas
    - **mensaje** (opcional): Texto personalizado con variables dinámicas
-   - **imagen** (opcional): URL de imagen para el fondo del embed
    - **color** (opcional): Color hexadecimal del embed (ej: #5865F2)
    - **Requiere al menos un parámetro**
+   - Respuesta efímera solo para el ejecutor
 
-2. **`/bienvenida-activar`** - Activar envío automático de bienvenidas
-   - Verifica que el canal esté configurado antes de activar
-   - Envía confirmación al ejecutor
+2. **`/bienvenida-editar`** - Editar configuración existente
+   - **canal** (opcional): Cambiar canal de bienvenidas
+   - **mensaje** (opcional): Cambiar mensaje personalizado
+   - **color** (opcional): Cambiar color del embed
+   - **Requiere al menos un parámetro**
+   - Respuesta efímera solo para el ejecutor
 
-3. **`/bienvenida-desactivar`** - Desactivar temporalmente
-   - No borra la configuración, solo desactiva el envío
-   - Útil para mantenimiento o eventos especiales
-
-4. **`/bienvenida-test`** - Enviar mensaje de prueba
+3. **`/bienvenida-test`** - Enviar mensaje de prueba
    - Simula un mensaje de bienvenida en el canal configurado
    - Marcado claramente como "MENSAJE DE PRUEBA"
+   - Usa el avatar del ejecutor para la prueba
    - Solo el ejecutor recibe confirmación efímera
 
 ### Variables Disponibles
@@ -682,52 +683,55 @@ Sistema completo de mensajes de bienvenida totalmente personalizables para nuevo
 
 ### Ejemplo de Uso
 ```
-1. Configurar el canal:
-   /bienvenida-setup canal: #bienvenidas
+1. Configurar el canal y mensaje inicial:
+   /bienvenida-setup canal: #bienvenidas mensaje: ¡Bienvenido {usuario} a **{servidor}**! 🎉
+   
+2. Configurar el color del embed:
+   /bienvenida-setup color: #5865F2
 
-2. Configurar mensaje personalizado:
-   /bienvenida-setup mensaje: ¡Bienvenido {usuario} al servidor {servidor}! 
-   Ahora somos {miembros} miembros. Tu ID es: {id}
-
-3. Configurar imagen y color:
-   /bienvenida-setup imagen: https://i.imgur.com/ejemplo.png color: #5865F2
-
-4. Probar antes de activar:
+3. Probar el mensaje:
    /bienvenida-test
 
-5. Activar el sistema:
-   /bienvenida-activar
+4. Si necesitas editar algo:
+   /bienvenida-editar mensaje: ¡Hola {usuario}! Bienvenido a {servidor}. Somos {miembros} miembros.
+
+5. ¡Listo! El sistema funciona automáticamente cuando alguien se une.
+   El avatar del usuario se mostrará automáticamente en la bienvenida.
 ```
 
 ### Funcionamiento Automático
 1. **Usuario se une al servidor** → Bot detecta evento `guildMemberAdd`
-2. **Verifica configuración** → Comprueba si está activado y canal configurado
-3. **Procesa variables** → Reemplaza {usuario}, {nombre}, etc. con valores reales
-4. **Envía embed** → Mensaje personalizado con mención automática al usuario
+2. **Verifica configuración** → Comprueba si hay canal configurado
+3. **Obtiene avatar del usuario** → Extrae el icono/avatar del nuevo miembro automáticamente
+4. **Procesa variables** → Reemplaza {usuario}, {nombre}, etc. con valores reales
+5. **Envía embed** → Mensaje personalizado con mención + avatar del usuario
 
 ### Base de Datos
 Tabla: `welcome_config`
-- **enabled**: Estado del sistema (activado/desactivado)
+- **guild_id**: ID del servidor (clave primaria)
 - **channel_id**: ID del canal de bienvenidas
 - **message**: Texto personalizado con variables
-- **image_url**: URL de imagen de fondo
-- **color**: Color hexadecimal del embed
+- **embed_color**: Color hexadecimal del embed
+- **updated_at**: Última actualización de configuración
+
+**Nota**: El avatar del usuario se obtiene dinámicamente, no se almacena en la base de datos
 
 ### Archivos Clave
-- `src/systems/welcome/welcome-system.js`: Sistema principal con PostgreSQL
-- `src/commands/configuracion/bienvenida-setup.js`: Comando de configuración
-- `src/commands/configuracion/bienvenida-activar.js`: Comando de activación
-- `src/commands/configuracion/bienvenida-desactivar.js`: Comando de desactivación
+- `src/systems/welcome/welcome-system.js`: Sistema principal con PostgreSQL y obtención de avatar
+- `src/commands/configuracion/bienvenida-setup.js`: Comando de configuración inicial
+- `src/commands/configuracion/bienvenida-editar.js`: Comando de edición
 - `src/commands/configuracion/bienvenida-test.js`: Comando de prueba
 - `src/handlers/events/guildMemberAdd.js`: Event handler para envío automático
 - `config.json`: directivaRoleId configurado (1435808275739181110)
 
 ## Cambios Recientes
-- 2025-11-08: **👋 SISTEMA DE BIENVENIDAS** - Sistema completo de mensajes personalizables para nuevos miembros
-- 2025-11-08: 4 nuevos comandos de bienvenidas (setup, activar, desactivar, test) solo para Directiva
+- 2025-11-08: **👋 SISTEMA DE BIENVENIDAS OPTIMIZADO** - Sistema simplificado con avatar automático del usuario
+- 2025-11-08: 3 comandos de bienvenidas (setup, editar, test) solo para Directiva
+- 2025-11-08: Avatar automático: El icono del usuario se muestra automáticamente en la bienvenida
+- 2025-11-08: Sistema siempre activo: No necesita activación/desactivación manual
 - 2025-11-08: Variables dinámicas: {usuario}, {nombre}, {tag}, {servidor}, {miembros}, {id}
-- 2025-11-08: Base de datos PostgreSQL con tabla welcome_config
-- 2025-11-08: Total de 40 comandos (36 base + 4 bienvenidas)
+- 2025-11-08: Base de datos PostgreSQL con tabla welcome_config (sin campos enabled/image_url)
+- 2025-11-08: Total de 39 comandos (36 base + 3 bienvenidas optimizadas)
 - 2025-11-07: **📊 SISTEMA DE ESTADÍSTICAS DE SERVIDOR** - Contadores automáticos de miembros en canales de voz (similar a ServerStats Bot)
 - 2025-11-07: 3 canales de voz configurados: Whitelisted, No Whitelisted, Ciudadanos
 - 2025-11-07: Rate limiting inteligente con sistema de cola (10 min entre actualizaciones)
