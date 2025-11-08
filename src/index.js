@@ -167,7 +167,7 @@ const RECENT_CHANGES = [
     '⚠️ Sistema de inactividad corregido: Detecta correctamente quién escribió último (staff vs usuario)',
     '📋 Transcripciones automáticas: Tickets cerrados por inactividad guardan transcript en canal correspondiente',
     '📢 Menciones añadidas: Mensajes de notificación de inactividad incluyen menciones a staff/usuario',
-    '🔕 Logs de canales desactivados por solicitud del usuario'
+    '🔔 Logs de canales reactivados: Creación, eliminación y modificación de canales ahora se registran'
 ];
 
 // Sistema de changelog incremental
