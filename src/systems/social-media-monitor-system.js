@@ -322,21 +322,23 @@ class SocialMediaMonitorSystem {
             description += `${platform.watchText} [Ver publicación](${post.url})\n`;
             description += `${platform.cta}\n\n`;
             description += `🕒 **Publicado el:** ${fecha}\n`;
-            description += `📱 **Canal oficial:** [@StrangersRP](${platform.accountUrl})\n\n`;
-            description += `⸻\n\n`;
-            description += `${platform.closingMessage}`;
+            description += `📱 **Canal oficial:** [@StrangersRP](${platform.accountUrl})`;
 
             const embed = new EmbedBuilder()
                 .setColor(platform.color)
-                .setTitle(`${platform.titleEmoji} ¡NUEVA PUBLICACIÓN DE ${platform.name}!`)
                 .setDescription(description)
+                .setFooter({ text: platform.closingMessage })
                 .setTimestamp(post.publishedAt);
 
             if (post.thumbnail) {
                 embed.setImage(post.thumbnail);
             }
 
-            await channel.send({ embeds: [embed] });
+            // Enviar mensaje con título separado + embed
+            await channel.send({
+                content: `${platform.titleEmoji} **¡NUEVA PUBLICACIÓN DE ${platform.name}!**`,
+                embeds: [embed]
+            });
             console.log(`📤 Notificación enviada: ${account.platform}/${account.username} - ${post.title}`);
         } catch (error) {
             console.error(`Error enviando notificación:`, error);
