@@ -67,7 +67,7 @@ module.exports = {
                 const discordInfo = user ? `\n💬 **Discord:** ${user}` : '';
                 
                 await interaction.reply({
-                    content: `✅ **Streamer añadido correctamente**\n\n${platformEmojis[platform]} **Plataforma:** ${platform.charAt(0).toUpperCase() + platform.slice(1)}\n👤 **Usuario:** ${username}${discordInfo}\n📢 **Canal de notificaciones:** ${channel}\n🆔 **ID:** \`${result.linkId}\`\n\n*Las notificaciones se enviarán automáticamente cuando ${username} esté en directo.*`,
+                    content: `✅ **Streamer añadido correctamente**\n\n${platformEmojis[platform]} **Plataforma:** ${platform.charAt(0).toUpperCase() + platform.slice(1)}\n👤 **Canal:** ${username}${discordInfo}\n📢 **Notificaciones:** ${channel}\n\n*Se enviará una notificación automática cuando ${username} esté en directo.*`,
                     ephemeral: true
                 });
             } else {
