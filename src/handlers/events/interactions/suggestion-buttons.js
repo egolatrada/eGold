@@ -77,7 +77,7 @@ async function handleSuggestionButtons(interaction, context) {
                 reason: `Hilo de discusión creado por ${interaction.user.tag}`
             });
 
-            await thread.send(`💬 **Hilo de discusión abierto**\n\nParticipa en la discusión sobre esta sugerencia. Todos los comentarios son bienvenidos.`);
+            await thread.send(`💬 **Hilo de discusión abierto**\n\nComenta con respeto. El staff decidirá aprobar o denegar la sugerencia.`);
 
             await interaction.reply({
                 content: `💬 He creado un hilo para discutir esta sugerencia: ${thread}`,
