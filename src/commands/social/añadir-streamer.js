@@ -15,8 +15,8 @@ module.exports = {
                     { name: '📺 YouTube', value: 'youtube' }
                 ))
         .addStringOption(option =>
-            option.setName('usuario')
-                .setDescription('Nombre de usuario en la plataforma (ej: nombre_canal)')
+            option.setName('link')
+                .setDescription('Link del canal o nombre de usuario (ej: twitch.tv/canal o canal)')
                 .setRequired(true))
         .addUserOption(option =>
             option.setName('discord')
@@ -39,7 +39,7 @@ module.exports = {
         
         try {
             const platform = interaction.options.getString('plataforma');
-            const username = interaction.options.getString('usuario');
+            const username = interaction.options.getString('link');
             const user = interaction.options.getUser('discord');
             const channel = interaction.options.getChannel('canal');
             
