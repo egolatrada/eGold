@@ -53,7 +53,7 @@ async function handleButtonInteraction(interaction, context) {
         else if (customId.startsWith('copy_role_id_')) {
             const roleId = customId.split('_')[3];
             await interaction.reply({
-                content: `📋 **ID del Rol:**\n\n\`\`\`\n${roleId}\n\`\`\`\n\n💡 **Cómo copiar:**\n• **Móvil:** Mantén presionado el ID de arriba y selecciona "Copiar texto"\n• **PC:** Haz clic en el ID de arriba para copiarlo automáticamente`,
+                content: `📋 **ID del Rol:**\n\`\`\`\n${roleId}\n\`\`\``,
                 ephemeral: true
             });
         }
