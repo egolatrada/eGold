@@ -45,65 +45,123 @@ class TicketHierarchy {
         const member = message.member;
         
         const hierarchyRoles = config.tickets.hierarchy;
-        const soporteRoleId = hierarchyRoles.soporte.roleId;
-        const moderadorRoleId = hierarchyRoles.moderador.roleId;
-        const administradorRoleId = hierarchyRoles.administrador.roleId;
+        const soporteRoleId = hierarchyRoles.soporte?.roleId;
+        const moderadorRoleId = hierarchyRoles.moderador?.roleId;
+        const administradorRoleId = hierarchyRoles.administrador?.roleId;
+        const directivaRoleId = hierarchyRoles.directiva?.roleId;
 
-        const hasSoporteRole = member.roles.cache.has(soporteRoleId);
-        const hasModeradorRole = member.roles.cache.has(moderadorRoleId);
-        const hasAdministradorRole = member.roles.cache.has(administradorRoleId);
+        const hasSoporteRole = soporteRoleId && member.roles.cache.has(soporteRoleId);
+        const hasModeradorRole = moderadorRoleId && member.roles.cache.has(moderadorRoleId);
+        const hasAdministradorRole = administradorRoleId && member.roles.cache.has(administradorRoleId);
+        const hasDirectivaRole = directivaRoleId && member.roles.cache.has(directivaRoleId);
 
-        const isStaff = hasSoporteRole || hasModeradorRole || hasAdministradorRole;
+        const isStaff = hasSoporteRole || hasModeradorRole || hasAdministradorRole || hasDirectivaRole;
         
         if (!isStaff) return;
 
         let ticketData = this.activeTickets.get(channel.id);
 
         if (!ticketData) {
-            // Determinar el rol del staff que está respondiendo
+            // Determinar el rol del staff que está respondiendo (nivel más bajo primero)
             let staffRole = null;
             if (hasSoporteRole) staffRole = 'soporte';
             else if (hasModeradorRole) staffRole = 'moderador';
             else if (hasAdministradorRole) staffRole = 'administrador';
+            else if (hasDirectivaRole) staffRole = 'directiva';
 
             if (staffRole) {
                 await this.lockTicketForRole(channel, member.id, staffRole);
                 logger.info(`🔒 Ticket ${channel.name} bloqueado por ${staffRole}: ${member.user.tag}`);
             }
         } else {
+            // Verificar si el staff que escribe tiene el mismo rol que maneja el ticket
+            const currentHandlingRole = ticketData.role;
+            let writerRole = null;
+            
+            if (hasSoporteRole) writerRole = 'soporte';
+            else if (hasModeradorRole) writerRole = 'moderador';
+            else if (hasAdministradorRole) writerRole = 'administrador';
+            else if (hasDirectivaRole) writerRole = 'directiva';
+
+            // BLOQUEO ENTRE MISMO NIVEL: Si otro usuario del mismo nivel intenta escribir
+            if (writerRole === currentHandlingRole && ticketData.handledBy !== member.id) {
+                // Bloquear a este usuario específico del mismo nivel
+                await channel.permissionOverwrites.edit(member.id, {
+                    ViewChannel: true,
+                    SendMessages: false,
+                    ReadMessageHistory: true,
+                });
+                
+                await message.delete().catch(() => {});
+                await member.send(`⛔ **Ticket bloqueado**: El ticket \`${channel.name}\` ya está siendo manejado por otro ${currentHandlingRole}. Si necesitas ayuda, menciona al rango superior.`).catch(() => {});
+                
+                logger.info(`🚫 ${member.user.tag} (${writerRole}) bloqueado - ticket ya manejado por ${ticketData.handledBy}`);
+                return;
+            }
+
             await this.handleRoleMentions(message, channel, ticketData);
         }
     }
 
     async lockTicketForRole(channel, userId, role) {
         const hierarchyRoles = config.tickets.hierarchy;
-        const soporteRoleId = hierarchyRoles.soporte.roleId;
-        const moderadorRoleId = hierarchyRoles.moderador.roleId;
-        const administradorRoleId = hierarchyRoles.administrador.roleId;
+        const soporteRoleId = hierarchyRoles.soporte?.roleId;
+        const moderadorRoleId = hierarchyRoles.moderador?.roleId;
+        const administradorRoleId = hierarchyRoles.administrador?.roleId;
+        const directivaRoleId = hierarchyRoles.directiva?.roleId;
 
         try {
             // Determinar qué roles bloquear según quién esté manejando el ticket
             if (role === 'soporte') {
-                // Soporte maneja → bloquear Moderador y Administrador
-                await channel.permissionOverwrites.edit(moderadorRoleId, {
-                    ViewChannel: true,
-                    SendMessages: false,
-                    ReadMessageHistory: true,
-                });
-                await channel.permissionOverwrites.edit(administradorRoleId, {
-                    ViewChannel: true,
-                    SendMessages: false,
-                    ReadMessageHistory: true,
-                });
+                // Soporte maneja → bloquear Moderador, Administrador y Directiva
+                if (moderadorRoleId) {
+                    await channel.permissionOverwrites.edit(moderadorRoleId, {
+                        ViewChannel: true,
+                        SendMessages: false,
+                        ReadMessageHistory: true,
+                    });
+                }
+                if (administradorRoleId) {
+                    await channel.permissionOverwrites.edit(administradorRoleId, {
+                        ViewChannel: true,
+                        SendMessages: false,
+                        ReadMessageHistory: true,
+                    });
+                }
+                if (directivaRoleId) {
+                    await channel.permissionOverwrites.edit(directivaRoleId, {
+                        ViewChannel: true,
+                        SendMessages: false,
+                        ReadMessageHistory: true,
+                    });
+                }
             } else if (role === 'moderador') {
-                // Moderador maneja → bloquear solo Administrador
-                await channel.permissionOverwrites.edit(administradorRoleId, {
-                    ViewChannel: true,
-                    SendMessages: false,
-                    ReadMessageHistory: true,
-                });
+                // Moderador maneja → bloquear Administrador y Directiva
+                if (administradorRoleId) {
+                    await channel.permissionOverwrites.edit(administradorRoleId, {
+                        ViewChannel: true,
+                        SendMessages: false,
+                        ReadMessageHistory: true,
+                    });
+                }
+                if (directivaRoleId) {
+                    await channel.permissionOverwrites.edit(directivaRoleId, {
+                        ViewChannel: true,
+                        SendMessages: false,
+                        ReadMessageHistory: true,
+                    });
+                }
+            } else if (role === 'administrador') {
+                // Administrador maneja → bloquear solo Directiva
+                if (directivaRoleId) {
+                    await channel.permissionOverwrites.edit(directivaRoleId, {
+                        ViewChannel: true,
+                        SendMessages: false,
+                        ReadMessageHistory: true,
+                    });
+                }
             }
-            // Si es administrador, no hay nadie por encima para bloquear
+            // Si es directiva, no hay nadie por encima para bloquear
 
             this.activeTickets.set(channel.id, {
                 handledBy: userId,
@@ -114,25 +172,28 @@ class TicketHierarchy {
             
             this.saveHierarchyData();
 
-            logger.info(`🔐 Permisos actualizados: Moderador y Administrador solo lectura`);
+            logger.info(`🔐 Permisos actualizados para ${role}: rangos superiores en solo lectura`);
         } catch (error) {
-            logger.error('Error al bloquear ticket para soporte', error);
+            logger.error(`Error al bloquear ticket para ${role}`, error);
         }
     }
 
     async handleRoleMentions(message, channel, ticketData) {
         const hierarchyRoles = config.tickets.hierarchy;
-        const soporteRoleId = hierarchyRoles.soporte.roleId;
-        const moderadorRoleId = hierarchyRoles.moderador.roleId;
-        const administradorRoleId = hierarchyRoles.administrador.roleId;
+        const soporteRoleId = hierarchyRoles.soporte?.roleId;
+        const moderadorRoleId = hierarchyRoles.moderador?.roleId;
+        const administradorRoleId = hierarchyRoles.administrador?.roleId;
+        const directivaRoleId = hierarchyRoles.directiva?.roleId;
 
-        const mentionedModeradorRole = message.mentions.roles.has(moderadorRoleId);
-        const mentionedAdministradorRole = message.mentions.roles.has(administradorRoleId);
+        const mentionedModeradorRole = moderadorRoleId && message.mentions.roles.has(moderadorRoleId);
+        const mentionedAdministradorRole = administradorRoleId && message.mentions.roles.has(administradorRoleId);
+        const mentionedDirectivaRole = directivaRoleId && message.mentions.roles.has(directivaRoleId);
 
         const member = message.member;
-        const hasSoporteRole = member.roles.cache.has(soporteRoleId);
-        const hasModeradorRole = member.roles.cache.has(moderadorRoleId);
-        const hasAdministradorRole = member.roles.cache.has(administradorRoleId);
+        const hasSoporteRole = soporteRoleId && member.roles.cache.has(soporteRoleId);
+        const hasModeradorRole = moderadorRoleId && member.roles.cache.has(moderadorRoleId);
+        const hasAdministradorRole = administradorRoleId && member.roles.cache.has(administradorRoleId);
+        const hasDirectivaRole = directivaRoleId && member.roles.cache.has(directivaRoleId);
 
         // Lógica de escalación según el rol que maneja el ticket
         const handlingRole = ticketData.role;
@@ -153,7 +214,7 @@ class TicketHierarchy {
             }
         }
 
-        // Moderador puede escalar a Administrador (tanto si maneja el ticket como si ya fue escalado)
+        // Moderador puede escalar a Administrador
         if (mentionedAdministradorRole && hasModeradorRole && (handlingRole === 'soporte' || handlingRole === 'moderador')) {
             if (!ticketData.escalatedTo.includes('administrador')) {
                 await this.grantWritePermission(channel, administradorRoleId, 'Administrador');
@@ -166,6 +227,22 @@ class TicketHierarchy {
                 });
                 
                 logger.info(`📈 Ticket ${channel.name} escalado a Administrador por ${member.user.tag}`);
+            }
+        }
+
+        // Administrador puede escalar a Directiva
+        if (mentionedDirectivaRole && hasAdministradorRole && (handlingRole === 'soporte' || handlingRole === 'moderador' || handlingRole === 'administrador')) {
+            if (!ticketData.escalatedTo.includes('directiva')) {
+                await this.grantWritePermission(channel, directivaRoleId, 'Directiva');
+                ticketData.escalatedTo.push('directiva');
+                this.saveHierarchyData();
+                
+                await message.reply({
+                    content: `✅ **Directiva** ahora puede escribir en este ticket.`,
+                    allowedMentions: { parse: [] }
+                });
+                
+                logger.info(`📈 Ticket ${channel.name} escalado a Directiva por ${member.user.tag}`);
             }
         }
     }
