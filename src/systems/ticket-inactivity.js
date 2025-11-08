@@ -233,7 +233,7 @@ class TicketInactivity {
             const embed = new EmbedBuilder()
                 .setColor('#FFA500')
                 .setTitle('⏰ Ticket sin respuesta del soporte')
-                .setDescription(`Han pasado **6 horas** sin respuesta del equipo de soporte.\n\nEl ticket ha sido desbloqueado para que cualquier miembro del equipo pueda responder.`)
+                .setDescription(`${roleMentions}\n\nHan pasado **6 horas** sin respuesta del equipo de soporte.\n\nEl ticket ha sido desbloqueado para que cualquier miembro del equipo pueda responder.`)
                 .setTimestamp();
 
             await channel.send({
@@ -325,26 +325,151 @@ class TicketInactivity {
             const embed = new EmbedBuilder()
                 .setColor('#FF0000')
                 .setTitle('🔒 Ticket cerrado por inactividad')
-                .setDescription(`Este ticket ha sido cerrado automáticamente debido a **7 horas de inactividad** por parte del usuario.\n\nSe guardará una transcripción completa del ticket.`)
+                .setDescription(`<@${activity.creatorId}>\n\nEste ticket ha sido cerrado automáticamente debido a **7 horas de inactividad** por parte del usuario.\n\nSe guardará una transcripción completa del ticket.`)
                 .setTimestamp();
 
-            await channel.send({ embeds: [embed] });
+            await channel.send({ 
+                content: `<@${activity.creatorId}>`,
+                embeds: [embed] 
+            });
 
-            // Esperar un momento antes de cerrar
+            // Esperar un momento antes de generar transcripción y cerrar
             setTimeout(async () => {
-                // Generar transcripción y cerrar
-                const ticketsSystem = this.client.ticketsSystem;
-                if (ticketsSystem) {
-                    // Aquí se ejecutaría la lógica de cierre del ticket-buttons.js
-                    // Por ahora solo eliminamos el canal
-                    logger.info(`🔒 Ticket ${channel.name} cerrado automáticamente por inactividad`);
+                try {
+                    const ticketsSystem = this.client.ticketsSystem;
+                    if (!ticketsSystem) {
+                        logger.error('Sistema de tickets no disponible para cierre automático');
+                        return;
+                    }
+
+                    // Obtener metadata del ticket
+                    const metadata = ticketsSystem.getTicketMetadata(channel.id);
+                    if (!metadata) {
+                        logger.error(`No se encontró metadata para el ticket ${channel.name}`);
+                        await channel.delete();
+                        return;
+                    }
+
+                    // Fetch todos los mensajes del ticket
+                    let allMessages = [];
+                    let lastMessageId = null;
+
+                    while (true) {
+                        const options = { limit: 100 };
+                        if (lastMessageId) {
+                            options.before = lastMessageId;
+                        }
+
+                        const fetchedMessages = await channel.messages.fetch(options);
+                        if (fetchedMessages.size === 0) break;
+
+                        allMessages.push(...fetchedMessages.values());
+                        lastMessageId = fetchedMessages.last().id;
+
+                        if (fetchedMessages.size < 100) break;
+                    }
+
+                    const sortedMessages = allMessages.reverse();
+                    const category = config.tickets.categories[metadata.type];
+
+                    if (!category || !category.transcriptChannelId) {
+                        logger.error(`Categoría o canal de transcripciones no configurado para ${metadata.type}`);
+                        await channel.delete();
+                        return;
+                    }
+
+                    const transcriptChannel = await channel.guild.channels.fetch(category.transcriptChannelId).catch(() => null);
+                    if (!transcriptChannel) {
+                        logger.error(`Canal de transcripciones no encontrado: ${category.transcriptChannelId}`);
+                        await channel.delete();
+                        return;
+                    }
+
+                    // Generar lista de participantes
+                    const participantIds = new Set();
+                    sortedMessages.forEach((msg) => {
+                        if (!msg.author.bot) {
+                            participantIds.add(msg.author.id);
+                        }
+                    });
+
+                    const participantMentions = Array.from(participantIds)
+                        .map((id) => `<@${id}>`)
+                        .join(", ");
+
+                    // Crear embed de transcripción
+                    const transcriptEmbed = new EmbedBuilder()
+                        .setColor("#FF0000")
+                        .setTitle(`📋 Transcripción de Ticket - ${channel.name} (Cerrado por Inactividad)`)
+                        .setDescription(
+                            `**Creador:** ${metadata.creatorTag} (<@${metadata.creator}>)\n\n` +
+                            `**Creado:** <t:${Math.floor(metadata.createdAt / 1000)}:F>\n` +
+                            `**Cerrado:** <t:${Math.floor(Date.now() / 1000)}:F>\n` +
+                            `**Motivo:** Inactividad del usuario (7 horas)\n\n` +
+                            `**Participantes:** ${participantMentions}`
+                        );
+
+                    // Generar transcripción completa en texto
+                    let fullTranscript = `=== TRANSCRIPCIÓN COMPLETA ===\n`;
+                    fullTranscript += `Tipo: ${metadata.categoryName}\n`;
+                    fullTranscript += `Canal: ${channel.name}\n`;
+                    fullTranscript += `Creador: ${metadata.creatorTag} (${metadata.creator})\n`;
+                    fullTranscript += `Número: #${metadata.ticketNumber}\n`;
+                    fullTranscript += `Cerrado por: Inactividad automática (7 horas)\n`;
+                    fullTranscript += `Fecha de cierre: ${new Date().toLocaleString("es-ES")}\n`;
+                    fullTranscript += `${"=".repeat(50)}\n\n`;
+
+                    for (const msg of sortedMessages) {
+                        const timestamp = msg.createdAt.toLocaleString("es-ES");
+                        const author = `${msg.author.tag} (${msg.author.id})`;
+                        fullTranscript += `[${timestamp}] ${author}:\n${msg.content}\n`;
+
+                        if (msg.embeds.length > 0) {
+                            fullTranscript += `  [Embed: ${msg.embeds[0].title || "Sin título"}]\n`;
+                        }
+
+                        if (msg.attachments.size > 0) {
+                            msg.attachments.forEach((att) => {
+                                fullTranscript += `  [Adjunto: ${att.url}]\n`;
+                            });
+                        }
+
+                        fullTranscript += "\n";
+                    }
+
+                    // Enviar transcripción al canal correspondiente
+                    const buffer = Buffer.from(fullTranscript, "utf-8");
+                    await transcriptChannel.send({
+                        embeds: [transcriptEmbed],
+                        files: [
+                            {
+                                attachment: buffer,
+                                name: `${channel.name}_inactivity_${Date.now()}.txt`,
+                            },
+                        ],
+                    });
+
+                    logger.success(`✅ Transcripción guardada para ticket ${channel.name} (${sortedMessages.length} mensajes) - Cerrado por inactividad`);
                     
                     // Limpiar tracking
                     this.ticketActivity.delete(channel.id);
                     this.saveActivityData();
+
+                    // Eliminar metadata del ticket
+                    ticketsSystem.deleteTicketMetadata(channel.id);
                     
                     // Eliminar canal
                     await channel.delete();
+                    logger.info(`🔒 Ticket ${channel.name} cerrado automáticamente por inactividad`);
+
+                } catch (error) {
+                    logger.error('Error al generar transcripción y cerrar ticket', error);
+                    // Intentar eliminar el canal de todos modos
+                    try {
+                        await channel.delete();
+                    } catch (deleteError) {
+                        logger.error('Error al eliminar canal después de fallo en transcripción', deleteError);
+                    }
                 }
             }, 5000);
 
