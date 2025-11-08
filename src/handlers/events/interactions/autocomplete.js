@@ -49,45 +49,64 @@ async function handleAutocomplete(interaction, context) {
                     userId = null;
                 }
                 
-                if (!userId) {
-                    await interaction.respond([{
-                        name: 'Por favor, selecciona primero el usuario de Discord',
-                        value: 'select_user_first'
-                    }]);
-                    return;
-                }
-                
-                const userLinks = context.socialLinksSystem.getUserLinks(userId);
-                
-                if (userLinks.length === 0) {
-                    await interaction.respond([{
-                        name: 'Este usuario no tiene streamers configurados',
-                        value: 'no_streamers'
-                    }]);
-                    return;
-                }
-                
                 const platformEmojis = {
                     twitch: '🎮',
                     kick: '⚡',
                     youtube: '📺'
                 };
                 
-                const filtered = userLinks
-                    .filter(link => 
-                        link.username.toLowerCase().includes(focusedValue) ||
-                        link.platform.toLowerCase().includes(focusedValue)
-                    )
-                    .slice(0, 25)
-                    .map(link => ({
-                        name: `${platformEmojis[link.platform]} ${link.platform.toUpperCase()} - ${link.username}`,
-                        value: link.linkId
-                    }));
+                let linksToShow;
                 
-                await interaction.respond(filtered.length > 0 ? filtered : userLinks.slice(0, 25).map(link => ({
-                    name: `${platformEmojis[link.platform]} ${link.platform.toUpperCase()} - ${link.username}`,
-                    value: link.linkId
-                })));
+                if (userId) {
+                    linksToShow = context.socialLinksSystem.getUserLinks(userId);
+                    
+                    if (linksToShow.length === 0) {
+                        await interaction.respond([{
+                            name: 'Este usuario no tiene streamers configurados',
+                            value: 'no_streamers'
+                        }]);
+                        return;
+                    }
+                } else {
+                    linksToShow = context.socialLinksSystem.getAllLinks();
+                    
+                    if (linksToShow.length === 0) {
+                        await interaction.respond([{
+                            name: 'No hay streamers configurados',
+                            value: 'no_streamers'
+                        }]);
+                        return;
+                    }
+                }
+                
+                const filtered = linksToShow
+                    .filter(link => {
+                        const searchText = focusedValue;
+                        return link.username.toLowerCase().includes(searchText) ||
+                               link.platform.toLowerCase().includes(searchText) ||
+                               link.url.toLowerCase().includes(searchText);
+                    })
+                    .slice(0, 25)
+                    .map(link => {
+                        const userTag = link.userId ? ` (@usuario)` : ` (sin usuario)`;
+                        return {
+                            name: `${platformEmojis[link.platform]} ${link.username}${userTag}`,
+                            value: link.linkId
+                        };
+                    });
+                
+                if (filtered.length > 0) {
+                    await interaction.respond(filtered);
+                } else {
+                    const allOptions = linksToShow.slice(0, 25).map(link => {
+                        const userTag = link.userId ? ` (@usuario)` : ` (sin usuario)`;
+                        return {
+                            name: `${platformEmojis[link.platform]} ${link.username}${userTag}`,
+                            value: link.linkId
+                        };
+                    });
+                    await interaction.respond(allOptions);
+                }
             } catch (autocompleteError) {
                 logger.error('Error en autocomplete de eliminar-streamer:', autocompleteError);
                 await interaction.respond([{

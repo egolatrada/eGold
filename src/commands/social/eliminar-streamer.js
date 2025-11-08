@@ -5,15 +5,15 @@ module.exports = {
         .setName('eliminar-streamer')
         .setDescription('🗑️ Elimina un streamer de las notificaciones automáticas')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-        .addUserOption(option =>
-            option.setName('discord')
-                .setDescription('Usuario de Discord del streamer')
-                .setRequired(true))
         .addStringOption(option =>
             option.setName('streamer')
                 .setDescription('Selecciona el streamer a eliminar')
                 .setRequired(true)
-                .setAutocomplete(true)),
+                .setAutocomplete(true))
+        .addUserOption(option =>
+            option.setName('discord')
+                .setDescription('Filtrar por usuario de Discord (opcional)')
+                .setRequired(false)),
     
     async execute(interaction, context) {
         const { socialLinksSystem } = context;
@@ -26,8 +26,8 @@ module.exports = {
         }
         
         try {
-            const user = interaction.options.getUser('discord');
             const linkId = interaction.options.getString('streamer');
+            const user = interaction.options.getUser('discord');
             
             const link = socialLinksSystem.getAllLinks().find(l => l.linkId === linkId);
             
@@ -38,7 +38,7 @@ module.exports = {
                 });
             }
             
-            if (link.userId !== user.id) {
+            if (user && link.userId !== user.id) {
                 return await interaction.reply({
                     content: `❌ El streamer seleccionado no pertenece a ${user}.`,
                     ephemeral: true
