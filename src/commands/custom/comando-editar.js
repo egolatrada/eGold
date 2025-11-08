@@ -2,12 +2,12 @@ const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('eliminar-comando')
-        .setDescription('🗑️ Elimina un comando personalizado')
+        .setName('comando-editar')
+        .setDescription('✏️ Edita un comando personalizado existente')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .addStringOption(option =>
             option.setName('comando')
-                .setDescription('Nombre del comando a eliminar')
+                .setDescription('Nombre del comando a editar')
                 .setRequired(true)
                 .setAutocomplete(true)),
     
@@ -22,13 +22,13 @@ module.exports = {
 
         if (!context.customCommandsSystem.hasStaffPermission(interaction.member)) {
             await interaction.reply({
-                content: '❌ No tienes permisos para eliminar comandos personalizados.',
+                content: '❌ No tienes permisos para editar comandos personalizados.',
                 ephemeral: true
             });
             return;
         }
 
         const commandName = interaction.options.getString('comando');
-        await context.customCommandsSystem.deleteCommand(interaction, commandName);
+        await context.customCommandsSystem.showEditPanel(interaction, commandName);
     }
 };
