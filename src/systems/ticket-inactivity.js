@@ -81,13 +81,26 @@ class TicketInactivity {
     /**
      * Actualiza actividad cuando el usuario responde
      */
-    updateUserActivity(channelId, userId) {
+    async updateUserActivity(channelId, userId, member = null) {
         const activity = this.ticketActivity.get(channelId);
         if (!activity) return;
 
-        if (userId === activity.creatorId) {
+        let isCreator = false;
+
+        if (activity.creatorType === 'usuario') {
+            // Ticket creado para un usuario específico
+            isCreator = (userId === activity.creatorId);
+        } else if (activity.creatorType === 'rol') {
+            // Ticket creado para un rol - verificar si el usuario tiene ese rol
+            if (member && member.roles.cache.has(activity.creatorId)) {
+                isCreator = true;
+            }
+        }
+
+        if (isCreator) {
             activity.lastUserResponse = Date.now();
             activity.userWarned = false; // Reset advertencia
+            activity.supportNotified = false; // Reset notificación al staff
             this.saveActivityData();
         }
     }
@@ -364,14 +377,18 @@ class TicketInactivity {
      */
     async autoCloseTicket(channel, activity) {
         try {
+            const creatorMention = activity.creatorType === 'usuario' 
+                ? `<@${activity.creatorId}>`
+                : `<@&${activity.creatorId}>`;
+
             const embed = new EmbedBuilder()
                 .setColor('#FF0000')
                 .setTitle('🔒 Ticket cerrado por inactividad')
-                .setDescription(`<@${activity.creatorId}>\n\nEste ticket ha sido cerrado automáticamente debido a **7 horas de inactividad** por parte del usuario.\n\nSe guardará una transcripción completa del ticket.`)
+                .setDescription(`${creatorMention}\n\nEste ticket ha sido cerrado automáticamente debido a **7 horas de inactividad** por parte del usuario.\n\nSe guardará una transcripción completa del ticket.`)
                 .setTimestamp();
 
             await channel.send({ 
-                content: `<@${activity.creatorId}>`,
+                content: creatorMention,
                 embeds: [embed] 
             });
 

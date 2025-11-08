@@ -58,7 +58,7 @@ async function handleMessageCreate(message, context) {
                 if (isStaff) {
                     ticketInactivity.updateStaffActivity(message.channel.id, message.author.id, staffRoleId);
                 } else {
-                    ticketInactivity.updateUserActivity(message.channel.id, message.author.id);
+                    ticketInactivity.updateUserActivity(message.channel.id, message.author.id, member);
                 }
             }
         } catch (error) {
