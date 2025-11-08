@@ -197,11 +197,6 @@ async function sendBotStatusMessage(client, status, error = null, commandsMap = 
             .setColor(config_status.color)
             .setTitle(`${config_status.emoji} ${config_status.title}`)
             .setDescription(config_status.description)
-            .addFields(
-                { name: '🕐 Hora', value: `<t:${Math.floor(Date.now() / 1000)}:F>`, inline: true },
-                { name: '📊 Estado', value: status === 'success' ? 'Operacional' : status === 'error' ? 'Con Errores' : 'Detenido', inline: true },
-                { name: '💻 Proceso', value: `PID: ${process.pid}`, inline: true }
-            )
             .setTimestamp();
 
         if (status === 'success') {
