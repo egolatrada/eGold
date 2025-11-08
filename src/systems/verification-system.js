@@ -192,6 +192,13 @@ class VerificationSystem {
                 return;
             }
 
+            // Verificar si el mensaje fue creado por este bot
+            if (message.author.id !== this.client.user.id) {
+                console.log("ℹ️ El mensaje de verificación existe pero fue creado por otro usuario/bot. No se puede editar.");
+                console.log("ℹ️ Asegúrate de que el mensaje ya tenga el botón de verificación configurado manualmente.");
+                return;
+            }
+
             const button = new ButtonBuilder()
                 .setCustomId("verify_user")
                 .setLabel(this.config.messages.buttonLabel)

@@ -6,8 +6,8 @@ async function handleButtonInteraction(interaction, context) {
     
     try {
         // Botón de verificación
-        if (customId === 'verify_button') {
-            await context.verificationSystem.handleVerifyButton(interaction);
+        if (customId === 'verify_user') {
+            await context.verificationSystem.handleVerification(interaction);
         }
         // Botones de tickets (cerrar, reabrir, transcript, voice support, etc.)
         else if (customId.startsWith('close_ticket_') || customId === 'close_ticket') {

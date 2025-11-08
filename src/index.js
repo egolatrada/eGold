@@ -97,7 +97,9 @@ client.once('ready', async () => {
         commands = await registerCommands(client, guildId);
         logger.success('Comandos slash registrados');
         
-        // Los sistemas ya se inicializan en sus constructores
+        // Inicializar sistemas que requieren init()
+        verificationSystem.init();
+        await verificationSystem.setupVerificationMessage();
         
         // Cargar comandos personalizados
         customCommandsSystem.loadCommands();
