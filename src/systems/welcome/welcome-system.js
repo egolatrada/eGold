@@ -20,6 +20,7 @@ class WelcomeSystem {
                     guild_id VARCHAR(32) PRIMARY KEY,
                     channel_id VARCHAR(32),
                     message TEXT DEFAULT 'Bienvenido {usuario} a **{servidor}**! 🎉',
+                    image_url TEXT,
                     embed_color VARCHAR(7) DEFAULT '#5865F2',
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
@@ -116,6 +117,10 @@ class WelcomeSystem {
                 .setThumbnail(member.user.displayAvatarURL({ dynamic: true, size: 512 }))
                 .setFooter({ text: `Miembro #${member.guild.memberCount}` })
                 .setTimestamp();
+
+            if (config.image_url) {
+                embed.setImage(config.image_url);
+            }
 
             await channel.send({ 
                 content: `${member}`,

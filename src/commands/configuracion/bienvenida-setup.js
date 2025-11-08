@@ -16,6 +16,10 @@ module.exports = {
                 .setDescription('Mensaje de bienvenida (variables: {usuario}, {nombre}, {servidor}, {miembros})')
                 .setRequired(false))
         .addStringOption(option =>
+            option.setName('imagen')
+                .setDescription('URL de imagen de fondo para la bienvenida')
+                .setRequired(false))
+        .addStringOption(option =>
             option.setName('color')
                 .setDescription('Color del embed en hexadecimal (ej: #5865F2)')
                 .setRequired(false)),
@@ -40,9 +44,10 @@ module.exports = {
 
         const canal = interaction.options.getChannel('canal');
         const mensaje = interaction.options.getString('mensaje');
+        const imagen = interaction.options.getString('imagen');
         const color = interaction.options.getString('color');
 
-        if (!canal && !mensaje && !color) {
+        if (!canal && !mensaje && !imagen && !color) {
             return await interaction.reply({
                 content: '❌ Debes especificar al menos un parámetro para configurar.',
                 ephemeral: true
@@ -63,6 +68,23 @@ module.exports = {
             });
         }
 
+        if (imagen) {
+            try {
+                const url = new URL(imagen);
+                if (!url.protocol.match(/^https?:$/)) {
+                    return await interaction.reply({
+                        content: '❌ La URL de la imagen debe usar protocolo HTTP o HTTPS.',
+                        ephemeral: true
+                    });
+                }
+            } catch (error) {
+                return await interaction.reply({
+                    content: '❌ La URL de la imagen no es válida.',
+                    ephemeral: true
+                });
+            }
+        }
+
         await interaction.deferReply({ ephemeral: true });
 
         try {
@@ -70,6 +92,7 @@ module.exports = {
             
             if (canal) updates.channel_id = canal.id;
             if (mensaje) updates.message = mensaje;
+            if (imagen) updates.image_url = imagen;
             if (color) updates.embed_color = color;
 
             await welcomeSystem.updateConfig(interaction.guildId, updates);
@@ -101,6 +124,14 @@ module.exports = {
                 });
             }
 
+            if (imagen) {
+                embed.addFields({ 
+                    name: '🖼️ Imagen de Fondo', 
+                    value: `[Ver imagen](${imagen})`, 
+                    inline: true 
+                });
+            }
+
             if (color) {
                 embed.addFields({ 
                     name: '🎨 Color del Embed', 
@@ -111,7 +142,7 @@ module.exports = {
 
             embed.addFields({
                 name: 'ℹ️ Avatar del Usuario',
-                value: 'El icono del usuario se mostrará automáticamente en la bienvenida',
+                value: 'El avatar del usuario se mostrará automáticamente sobre la imagen de fondo',
                 inline: false
             });
 

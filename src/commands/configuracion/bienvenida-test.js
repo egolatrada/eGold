@@ -58,6 +58,10 @@ module.exports = {
                 .setFooter({ text: `Miembro #${interaction.guild.memberCount} | 🧪 PRUEBA` })
                 .setTimestamp();
 
+            if (currentConfig.image_url) {
+                embed.setImage(currentConfig.image_url);
+            }
+
             await channel.send({ 
                 content: `${interaction.member} **[PRUEBA]**`,
                 embeds: [embed] 
