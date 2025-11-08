@@ -42,16 +42,22 @@ module.exports = {
             });
         }
 
-        const canal = interaction.options.getChannel('canal');
+        const DEFAULT_CHANNEL_ID = '1425955729541697688';
+        
+        let canal = interaction.options.getChannel('canal');
         const mensaje = interaction.options.getString('mensaje');
         const imagen = interaction.options.getString('imagen');
         const color = interaction.options.getString('color');
 
         if (!canal && !mensaje && !imagen && !color) {
-            return await interaction.reply({
-                content: '❌ Debes especificar al menos un parámetro para configurar.',
-                ephemeral: true
-            });
+            try {
+                canal = await interaction.guild.channels.fetch(DEFAULT_CHANNEL_ID);
+            } catch (error) {
+                return await interaction.reply({
+                    content: '❌ Debes especificar al menos un parámetro para configurar.',
+                    ephemeral: true
+                });
+            }
         }
 
         if (canal && !canal.isTextBased()) {

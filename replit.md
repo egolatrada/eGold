@@ -42,7 +42,12 @@ Bot de Discord todo-en-uno con gestión de tickets, verificación automática, m
      - Seguridad y firewall
      - Monitoreo y troubleshooting
 
-5. **Estado Final del Proyecto**:
+5. **Canal Predefinido de Bienvenidas**:
+   - Canal por defecto configurado: `1425955729541697688`
+   - Cuando se usa `/bienvenida-setup` sin especificar canal, usa automáticamente este canal
+   - Permite configuración rápida sin necesidad de buscar el ID del canal
+
+6. **Estado Final del Proyecto**:
    - Tamaño total: 229MB (reducido de ~280MB)
    - 80 archivos JavaScript (sin contar node_modules)
    - Estructura limpia y optimizada
