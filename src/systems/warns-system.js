@@ -1,6 +1,6 @@
 const { Pool } = require('pg');
 const { EmbedBuilder } = require('discord.js');
-const logger = require('../../utils/logger');
+const logger = require('../utils/logger');
 
 const WARN_CHANNELS = ['1436824228279357580', '1370611084574326784'];
 

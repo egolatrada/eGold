@@ -1,6 +1,6 @@
 const { Pool } = require('pg');
 const { EmbedBuilder } = require('discord.js');
-const logger = require('../../utils/logger');
+const logger = require('../utils/logger');
 
 class SimpleTasksSystem {
     constructor(client) {

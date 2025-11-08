@@ -8,6 +8,47 @@ Bot de Discord todo-en-uno con gestión de tickets, verificación automática, m
 
 ### ✨ Cambios Implementados Hoy
 
+#### SESIÓN 4: Limpieza Masiva y Preparación para VPS (2025-11-08)
+1. **Limpieza Completa de Archivos Temporales**:
+   - Eliminado directorio `attached_assets/` (47MB de imágenes temporales de prueba)
+   - Eliminado directorio `verification-bot/` (bot de prueba antiguo)
+   - Eliminado directorio `old-files/` (archivos antiguos)
+   - Limpiados logs temporales de `/tmp/logs`
+   - Total de espacio recuperado: ~50MB
+
+2. **Optimización de Estructura de Código**:
+   - Movidos sistemas de subdirectorios al directorio principal: `warns-system.js`, `simple-tasks-system.js`, `welcome-system.js`
+   - Eliminados directorios vacíos: `src/systems/warns/`, `src/systems/tasks/`, `src/systems/welcome/`
+   - Reorganizado `invite-cache.json` de `src/systems/` a `src/data/`
+   - Actualizadas todas las rutas relativas en `index.js` y sistemas
+   - Corregidas referencias de `require()` para logger después de reestructuración
+
+3. **Simplificación de Documentación**:
+   - Eliminados archivos markdown duplicados: `CONFIG_GUIDE.md`, `WATCHDOG.md`, `LEEME-IMPORTANTE.md`, `DEPLOY-INSTRUCTIONS.txt`
+   - Solo quedan 4 archivos de documentación esenciales:
+     - `README.md` - Documentación principal
+     - `replit.md` - Estado del proyecto y memoria
+     - `DEPLOYMENT.md` - Guía completa de deployment para VPS
+     - `deploy-vps.sh` - Script automático de deployment
+
+4. **Scripts de Deployment para VPS**:
+   - Creado `deploy-vps.sh`: Script bash automatizado para deployment en Digital Ocean VPS
+   - Creado `DEPLOYMENT.md`: Guía completa con instrucciones paso a paso para:
+     - Configuración inicial del VPS (Ubuntu 20.04+)
+     - Instalación de Node.js 18+ y PM2
+     - Configuración de variables de entorno
+     - Comandos PM2 para gestión del bot
+     - Configuración de PostgreSQL local
+     - Seguridad y firewall
+     - Monitoreo y troubleshooting
+
+5. **Estado Final del Proyecto**:
+   - Tamaño total: 229MB (reducido de ~280MB)
+   - 80 archivos JavaScript (sin contar node_modules)
+   - Estructura limpia y optimizada
+   - ✅ Bot funcionando correctamente después de limpieza
+   - ✅ Todos los sistemas iniciados sin errores
+
 #### SESIÓN 3: Sistema de Bienvenidas Optimizado (2025-11-08)
 1. **Nuevo Sistema WelcomeSystem**: Sistema completo de bienvenidas personalizables con PostgreSQL
 2. **3 Comandos Finales**:
@@ -63,16 +104,22 @@ Bot de Discord todo-en-uno con gestión de tickets, verificación automática, m
 
 ---
 
-## 🚀 DEPLOYMENT 24/7 GRATIS
+## 🚀 DEPLOYMENT EN VPS (DIGITAL OCEAN)
 
-**⚠️ IMPORTANTE**: Este bot funciona en Replit, pero se duerme cuando cierras la pestaña.
+**⚠️ PRODUCCIÓN**: Este bot está configurado para deployment dual-environment:
+- **Desarrollo**: Replit (testing y desarrollo)
+- **Producción**: VPS Digital Ocean con PM2 (99.99% uptime)
 
-Para mantenerlo **24/7 GRATIS**, lee: **`LEEME-IMPORTANTE.md`**
+### 📖 Guía de Deployment
 
-- ✅ Railway.app ofrece $5/mes gratis (suficiente para el bot)
-- ✅ El bot nunca se duerme
-- ✅ Deploy en 10 minutos
-- ✅ Instrucciones completas en `DEPLOY-INSTRUCTIONS.txt`
+Lee la guía completa en **`DEPLOYMENT.md`** que incluye:
+- ✅ Configuración completa de VPS Ubuntu 20.04+
+- ✅ Instalación de Node.js 18+, PM2 y PostgreSQL
+- ✅ Script automatizado de deployment (`deploy-vps.sh`)
+- ✅ Configuración de variables de entorno
+- ✅ Comandos PM2 para gestión del bot
+- ✅ Seguridad, monitoreo y troubleshooting
+- ✅ Sistema de auto-restart y logs rotativos
 
 ---
 
