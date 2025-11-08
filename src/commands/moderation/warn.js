@@ -87,6 +87,13 @@ module.exports = {
             });
         }
 
+        if ((autoRevokeAmount && !autoRevokeUnit) || (!autoRevokeAmount && autoRevokeUnit)) {
+            return await interaction.reply({
+                content: '❌ Debes especificar tanto la **cantidad** como la **unidad** para la auto-revocación, o ninguna de las dos.',
+                ephemeral: true
+            });
+        }
+
         let expiresIn = null;
         let expiresText = 'No expira';
 

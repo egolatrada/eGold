@@ -240,5 +240,44 @@ client.login(process.env.DISCORD_DEV_BOT_TOKEN).catch(error => {
     process.exit(1);
 });
 
+// Cleanup al detener el bot
+async function gracefulShutdown(signal) {
+    logger.info(`⏹️ Señal ${signal} recibida, cerrando bot de manera limpia...`);
+    
+    try {
+        if (warnsSystem) {
+            await warnsSystem.cleanup();
+            logger.info('✅ Sistema de advertencias cerrado');
+        }
+        
+        if (tasksSystem && tasksSystem.pool) {
+            await tasksSystem.pool.end();
+            logger.info('✅ Pool de tareas cerrado');
+        }
+        
+        if (healthSystem) {
+            healthSystem.stop();
+        }
+        
+        if (ticketInactivity) {
+            ticketInactivity.stopInactivityCheck();
+        }
+        
+        if (client) {
+            client.destroy();
+            logger.info('✅ Cliente de Discord desconectado');
+        }
+        
+        logger.success('👋 Bot cerrado correctamente');
+        process.exit(0);
+    } catch (error) {
+        logger.error('Error durante el cierre', error);
+        process.exit(1);
+    }
+}
+
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+
 // Exportar cliente y sistemas para uso externo
 module.exports = { client, ticketsSystem, healthSystem };
