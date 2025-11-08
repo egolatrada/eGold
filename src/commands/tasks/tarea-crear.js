@@ -2,7 +2,7 @@ const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('tareas')
+        .setName('tarea-crear')
         .setDescription('✅ [TAREAS] Crea una lista de tareas organizadas por categoría')
         .addStringOption(option =>
             option.setName('lista')

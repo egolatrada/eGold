@@ -5,12 +5,16 @@ const logger = require('../../utils/logger');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('ticket-crear')
-        .setDescription('🎫 [TICKETS] Crea un ticket en nombre de otro usuario')
-        .addUserOption(option =>
+        .setDescription('🎫 [TICKETS] Crea un ticket en nombre de un usuario o rol')
+        .addStringOption(option =>
             option
-                .setName('usuario')
-                .setDescription('Usuario para quien se creará el ticket')
+                .setName('tipo')
+                .setDescription('Tipo de creación (Usuario o Rol)')
                 .setRequired(true)
+                .addChoices(
+                    { name: '👤 Usuario', value: 'usuario' },
+                    { name: '👥 Rol', value: 'rol' }
+                )
         )
         .addStringOption(option =>
             option
@@ -19,11 +23,25 @@ module.exports = {
                 .setRequired(true)
                 .setAutocomplete(true)
         )
+        .addUserOption(option =>
+            option
+                .setName('usuario')
+                .setDescription('Usuario para quien se creará el ticket')
+                .setRequired(false)
+        )
+        .addRoleOption(option =>
+            option
+                .setName('rol')
+                .setDescription('Rol para quien se creará el ticket')
+                .setRequired(false)
+        )
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels),
     
     async execute(interaction, context) {
         try {
+            const tipo = interaction.options.getString('tipo');
             const targetUser = interaction.options.getUser('usuario');
+            const targetRole = interaction.options.getRole('rol');
             let selectedCategory = interaction.options.getString('categoria');
             const { ticketCounters, ticketInactivity, ticketHierarchy } = context;
 
@@ -34,7 +52,20 @@ module.exports = {
                 });
             }
 
-            // Validar que la categoría sea válida
+            if (tipo === 'usuario' && !targetUser) {
+                return await interaction.reply({
+                    content: '❌ Debes seleccionar un usuario cuando el tipo es "Usuario".',
+                    ephemeral: true
+                });
+            }
+
+            if (tipo === 'rol' && !targetRole) {
+                return await interaction.reply({
+                    content: '❌ Debes seleccionar un rol cuando el tipo es "Rol".',
+                    ephemeral: true
+                });
+            }
+
             if (!selectedCategory) {
                 return await interaction.editReply({
                     content: '❌ Debes proporcionar una categoría válida.'
@@ -44,12 +75,15 @@ module.exports = {
             await interaction.deferReply({ ephemeral: true });
 
             const guild = interaction.guild;
-            const member = await guild.members.fetch(targetUser.id).catch(() => null);
             
-            if (!member) {
-                return await interaction.editReply({
-                    content: '❌ No se pudo encontrar al usuario en este servidor.'
-                });
+            if (tipo === 'usuario') {
+                const member = await guild.members.fetch(targetUser.id).catch(() => null);
+                
+                if (!member) {
+                    return await interaction.editReply({
+                        content: '❌ No se pudo encontrar al usuario en este servidor.'
+                    });
+                }
             }
 
             const categoryConfig = config.tickets?.categories?.[selectedCategory];
@@ -88,12 +122,20 @@ module.exports = {
                 {
                     id: guild.id,
                     deny: ['ViewChannel']
-                },
-                {
-                    id: targetUser.id,
-                    allow: ['ViewChannel', 'SendMessages', 'ReadMessageHistory', 'AttachFiles', 'EmbedLinks']
                 }
             ];
+
+            if (tipo === 'usuario') {
+                permissionOverwrites.push({
+                    id: targetUser.id,
+                    allow: ['ViewChannel', 'SendMessages', 'ReadMessageHistory', 'AttachFiles', 'EmbedLinks']
+                });
+            } else {
+                permissionOverwrites.push({
+                    id: targetRole.id,
+                    allow: ['ViewChannel', 'SendMessages', 'ReadMessageHistory', 'AttachFiles', 'EmbedLinks']
+                });
+            }
 
             if (hierarchyPerms) {
                 hierarchyPerms.forEach(perm => permissionOverwrites.push(perm));
@@ -113,18 +155,24 @@ module.exports = {
                 parent: category.id,
                 topic: JSON.stringify({
                     ticketType: selectedCategory,
-                    creatorId: targetUser.id,
+                    creatorId: tipo === 'usuario' ? targetUser.id : targetRole.id,
+                    creatorType: tipo,
                     createdAt: Date.now(),
                     ticketNumber: ticketNumber
                 }),
                 permissionOverwrites: permissionOverwrites
             });
 
+            const createdForValue = tipo === 'usuario' 
+                ? `${targetUser}` 
+                : `<@&${targetRole.id}>`;
+            const createdForIcon = tipo === 'usuario' ? '👤' : '👥';
+
             const welcomeEmbed = new EmbedBuilder()
                 .setColor('#5865F2')
                 .setTitle(`${categoryConfig.emoji || '🎫'} ${categoryConfig.name}`)
                 .setDescription(categoryConfig.channelDescription || `Gracias por abrir un ticket. El staff te atenderá pronto.`)
-                .addFields({ name: '👤 Creado para', value: `${targetUser}`, inline: true })
+                .addFields({ name: `${createdForIcon} Creado para`, value: createdForValue, inline: true })
                 .setFooter({ text: `Ticket #${ticketNumber.toString().padStart(4, '0')}` })
                 .setTimestamp();
 
@@ -142,27 +190,30 @@ module.exports = {
             );
 
             const staffRoleId = categoryConfig.staffRoleId || config.tickets.staffRoleId;
-            const mentionText = staffRoleId ? `<@&${staffRoleId}>` : '';
+            const mentionText = tipo === 'usuario' 
+                ? `${targetUser} ${staffRoleId ? `<@&${staffRoleId}>` : ''}` 
+                : `<@&${targetRole.id}> ${staffRoleId ? `<@&${staffRoleId}>` : ''}`;
 
             await ticketChannel.send({
-                content: `${targetUser} ${mentionText}`,
+                content: mentionText,
                 embeds: [welcomeEmbed],
                 components: [row]
             });
 
-            if (ticketInactivity) {
+            if (ticketInactivity && tipo === 'usuario') {
                 ticketInactivity.trackTicket(ticketChannel.id, targetUser.id, selectedCategory);
             }
 
-            if (hierarchyPerms && ticketHierarchy) {
+            if (hierarchyPerms && ticketHierarchy && tipo === 'usuario') {
                 ticketHierarchy.initializeTicket(ticketChannel.id, targetUser.id, selectedCategory);
             }
 
+            const targetName = tipo === 'usuario' ? targetUser.tag : targetRole.name;
             await interaction.editReply({
-                content: `✅ Ticket creado exitosamente para ${targetUser}: ${ticketChannel}`
+                content: `✅ Ticket creado exitosamente para ${tipo === 'usuario' ? targetUser : `**@${targetRole.name}**`}: ${ticketChannel}`
             });
 
-            logger.info(`🎫 ${interaction.user.tag} creó ticket ${ticketChannelName} para ${targetUser.tag} en categoría ${selectedCategory}`);
+            logger.info(`🎫 ${interaction.user.tag} creó ticket ${ticketChannelName} para ${tipo} "${targetName}" en categoría ${selectedCategory}`);
 
         } catch (error) {
             logger.error('Error al crear ticket', error);

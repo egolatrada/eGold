@@ -159,46 +159,7 @@ client.once('ready', async () => {
     }
 });
 
-// Changelog de la versión actual - Actualizar aquí cuando hagas cambios
-const RECENT_CHANGES = [
-    '🎯 Jerarquía de tickets ampliada: Soporte → Moderador → Admin → **Directiva** (4 niveles)',
-    '🔒 Bloqueo entre mismo nivel: Si Soporte A maneja ticket, Soporte B solo puede leer',
-    '🤝 Colaboración entre compañeros: Menciona @usuario del mismo nivel para desbloquearlo sin escalar',
-    '⚠️ Sistema de inactividad corregido: Detecta correctamente quién escribió último (staff vs usuario)',
-    '📋 Transcripciones automáticas: Tickets cerrados por inactividad guardan transcript correctamente',
-    '📢 Menciones añadidas: Notificaciones de inactividad incluyen menciones a staff/usuario',
-    '🔔 Logs de canales reactivados: Creación, eliminación y modificación de canales',
-    '🗑️ Comando /status eliminado: Optimización de recursos del bot',
-    '📊 Logs consolidados: Comandos y bots ahora se registran en canal unificado de changelog'
-];
-
-// Sistema de changelog incremental
-const fs = require('fs').promises;
-const path = require('path');
-const CHANGELOG_FILE = path.join(__dirname, '../data/last-changelog.json');
-
-async function loadLastChangelog() {
-    try {
-        const data = await fs.readFile(CHANGELOG_FILE, 'utf8');
-        return JSON.parse(data);
-    } catch (error) {
-        return [];
-    }
-}
-
-async function saveLastChangelog(changes) {
-    try {
-        const dataDir = path.dirname(CHANGELOG_FILE);
-        await fs.mkdir(dataDir, { recursive: true });
-        await fs.writeFile(CHANGELOG_FILE, JSON.stringify(changes, null, 2), 'utf8');
-    } catch (error) {
-        logger.error('Error al guardar changelog', error);
-    }
-}
-
-function getNewChanges(currentChanges, lastChanges) {
-    return currentChanges.filter(change => !lastChanges.includes(change));
-}
+// Sistema de changelog removido - Los changelogs se envían directamente a Discord sin archivos
 
 // Función para enviar mensaje de estado del bot
 async function sendBotStatusMessage(client, status, error = null, commandsMap = null, ticketsSys = null) {
@@ -213,16 +174,16 @@ async function sendBotStatusMessage(client, status, error = null, commandsMap = 
         
         const statusConfig = {
             success: {
-                color: Colors.Green,
+                color: '#5865F2',
                 emoji: '✅',
-                title: 'Bot Activo',
-                description: 'El bot se ha iniciado correctamente y está funcionando sin problemas.'
+                title: 'Mantenimiento Realizado',
+                description: 'Mantenimiento realizado por **egolatrada** - Estado: **EXITOSO**'
             },
             error: {
                 color: Colors.Red,
                 emoji: '❌',
-                title: 'Bot Detenido por Errores',
-                description: 'El bot encontró errores críticos durante la inicialización y se detuvo.'
+                title: 'Mantenimiento Realizado',
+                description: 'Mantenimiento realizado por **egolatrada** - Estado: **FALLO**'
             },
             stopped: {
                 color: Colors.Orange,
@@ -247,23 +208,8 @@ async function sendBotStatusMessage(client, status, error = null, commandsMap = 
             embed.addFields(
                 { name: '📝 Comandos', value: `${commandCount} comandos cargados`, inline: true },
                 { name: '🎫 Tickets', value: `${ticketCount} tickets activos`, inline: true },
-                { name: '🔄 Uptime', value: '<t:' + Math.floor(Date.now() / 1000) + ':R>', inline: true }
+                { name: '🔄 Reinicio', value: '<t:' + Math.floor(Date.now() / 1000) + ':R>', inline: true }
             );
-            
-            // Obtener solo cambios nuevos desde el último reinicio
-            const lastChangelog = await loadLastChangelog();
-            const newChanges = getNewChanges(RECENT_CHANGES, lastChangelog);
-            
-            if (newChanges && newChanges.length > 0) {
-                const changesList = newChanges.map((change, index) => `${index + 1}. ${change}`).join('\n');
-                embed.addFields({
-                    name: '📋 Cambios Recientes',
-                    value: changesList,
-                    inline: false
-                });
-                
-                await saveLastChangelog(RECENT_CHANGES);
-            }
         }
 
         if (error) {

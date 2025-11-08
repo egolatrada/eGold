@@ -2,7 +2,7 @@ const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('añadir-streamer')
+        .setName('streamer-añadir')
         .setDescription('📱 [SOCIAL] Añade un streamer para recibir notificaciones automáticas')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .addStringOption(option =>

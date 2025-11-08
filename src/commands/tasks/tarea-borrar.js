@@ -2,7 +2,7 @@ const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('limpiar-tareas')
+        .setName('tarea-borrar')
         .setDescription('✅ [TAREAS] Elimina TODAS las tareas del servidor (¡cuidado!)')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 

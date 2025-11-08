@@ -2,6 +2,33 @@
 
 Bot de Discord todo-en-uno con gestión de tickets, verificación automática, moderación con IA, logs completos y Q&A inteligente.
 
+## 📋 ÚLTIMA ACTUALIZACIÓN: 2025-11-08
+
+**Total de comandos: 33 (optimizado desde 34)**
+
+### ✨ Cambios Implementados Hoy
+
+1. **`/ticket-crear` ampliado**: Ahora soporta creación de tickets para **usuarios Y roles** con dropdown de selección
+2. **Comandos unificados optimizados**:
+   - `/mensaje-boton` (renombrado de `editar-mensaje-boton`)
+   - `/ticket-añadir` y `/ticket-eliminar` ya unificados desde sesión anterior
+3. **`/comandos` rediseñado**: Ahora muestra **TODOS** los 33 comandos del bot organizados por categoría (no solo comandos personalizados)
+4. **`/bot-info` completamente renovado**: 8 embeds con todas las funcionalidades, usos y comandos
+5. **Comandos reordenados**:
+   - Streamers: `/streamer-añadir`, `/streamer-eliminar`, `/streamer-lista`
+   - Tareas: `/tarea-crear`, `/tarea-borrar`, `/tarea-ver`
+6. **Sugerencias unificadas**: `/sug-responder` con dropdown (Aprobada/Rechazada) y razón opcional
+7. **Sistema de changelog simplificado**: Envío directo a Discord sin archivos intermedios
+8. **Mensaje de reinicio mejorado**: "Mantenimiento realizado por **egolatrada**" con indicador de ÉXITO/FALLO
+9. **Documentación consolidada**: 16 archivos .md eliminados, manteniendo solo los esenciales:
+   - `replit.md` (principal)
+   - `README.md` (GitHub)
+   - `CONFIG_GUIDE.md` (configuración)
+   - `WATCHDOG.md` (monitoreo)
+   - `LEEME-IMPORTANTE.md` (deployment)
+
+---
+
 ## 🚀 DEPLOYMENT 24/7 GRATIS
 
 **⚠️ IMPORTANTE**: Este bot funciona en Replit, pero se duerme cuando cierras la pestaña.

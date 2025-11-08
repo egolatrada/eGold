@@ -7,8 +7,18 @@ const SUGGESTIONS_CHANNEL_ID = '1425955815885504646';
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('sug-rechazada')
-        .setDescription('🔧 [ADMIN] Marca una sugerencia como rechazada')
+        .setName('sug-responder')
+        .setDescription('🔧 [ADMIN] Responde a una sugerencia (aprobar o rechazar)')
+        .addStringOption(option =>
+            option
+                .setName('veredicto')
+                .setDescription('Veredicto de la sugerencia')
+                .setRequired(true)
+                .addChoices(
+                    { name: '✅ Aprobada', value: 'aprobada' },
+                    { name: '❌ Rechazada', value: 'rechazada' }
+                )
+        )
         .addStringOption(option =>
             option
                 .setName('mensaje-id')
@@ -18,7 +28,7 @@ module.exports = {
         .addStringOption(option =>
             option
                 .setName('razon')
-                .setDescription('Razón del rechazo (opcional)')
+                .setDescription('Razón del veredicto (opcional)')
                 .setRequired(false)
         ),
     
@@ -31,7 +41,7 @@ module.exports = {
 
             if (!hasAdminRole && !hasDirectivaRole) {
                 return await interaction.reply({
-                    content: '❌ Solo los administradores y directiva pueden rechazar sugerencias.',
+                    content: '❌ Solo los administradores y directiva pueden responder sugerencias.',
                     ephemeral: true
                 });
             }
@@ -43,6 +53,7 @@ module.exports = {
                 });
             }
 
+            const veredicto = interaction.options.getString('veredicto');
             const messageId = interaction.options.getString('mensaje-id');
             const reason = interaction.options.getString('razon');
 
@@ -73,17 +84,24 @@ module.exports = {
                 });
             }
 
-            suggestionsSystem.resolveSuggestion(messageId, 'rejected', interaction.user.id);
+            const isApproved = veredicto === 'aprobada';
+            const status = isApproved ? 'approved' : 'rejected';
+            
+            suggestionsSystem.resolveSuggestion(messageId, status, interaction.user.id);
 
             const oldEmbed = message.embeds[0];
             const votes = suggestionsSystem.getVoteCounts(messageId);
 
+            const color = isApproved ? '#57F287' : '#ED4245';
+            const statusText = isApproved ? '✅ **APROBADA**' : '❌ **RECHAZADA**';
+            const actionText = isApproved ? 'Aprobada' : 'Rechazada';
+
             const newEmbed = EmbedBuilder.from(oldEmbed)
-                .setColor('#ED4245')
+                .setColor(color)
                 .setFields(
                     { name: '✅ A Favor', value: `\`${votes.upvotes}\``, inline: true },
                     { name: '❌ En Contra', value: `\`${votes.downvotes}\``, inline: true },
-                    { name: '📊 Estado', value: '❌ **RECHAZADA**', inline: true }
+                    { name: '📊 Estado', value: statusText, inline: true }
                 );
 
             if (reason) {
@@ -95,7 +113,7 @@ module.exports = {
             }
 
             newEmbed.addFields({
-                name: '👤 Rechazada por',
+                name: `👤 ${actionText} por`,
                 value: `${interaction.user}`,
                 inline: false
             });
@@ -105,17 +123,18 @@ module.exports = {
                 components: []
             });
 
+            const emoji = isApproved ? '✅' : '❌';
             await interaction.reply({
-                content: `❌ Sugerencia marcada como **RECHAZADA**.`,
+                content: `${emoji} Sugerencia marcada como **${actionText.toUpperCase()}**.`,
                 ephemeral: true
             });
 
-            logger.info(`❌ ${interaction.user.tag} rechazó la sugerencia ${messageId}`);
+            logger.info(`${emoji} ${interaction.user.tag} ${actionText.toLowerCase()} la sugerencia ${messageId}`);
 
         } catch (error) {
-            logger.error('Error al rechazar sugerencia', error);
+            logger.error('Error al responder sugerencia', error);
             await interaction.reply({
-                content: '❌ Ocurrió un error al rechazar la sugerencia.',
+                content: '❌ Ocurrió un error al responder la sugerencia.',
                 ephemeral: true
             }).catch(() => {});
         }
