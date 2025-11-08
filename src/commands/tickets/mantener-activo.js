@@ -3,7 +3,7 @@ const logger = require('../../utils/logger');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('ticket-mantener-activo')
+        .setName('mantener-activo')
         .setDescription('🔒 [TICKETS] Marca el ticket como activo permanentemente (solo se puede cerrar manualmente)')
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
     
