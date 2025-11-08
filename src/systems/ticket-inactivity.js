@@ -270,23 +270,24 @@ class TicketInactivity {
             return; // Soporte nunca respondió, no penalizar al usuario
         }
 
-        // Si el usuario respondió DESPUÉS de que el soporte respondió, usar lastUserResponse
-        // Si el usuario NO ha respondido desde que el soporte respondió, usar lastStaffResponse
-        const referenceTime = activity.lastUserResponse > activity.lastStaffResponse 
-            ? activity.lastUserResponse 
-            : activity.lastStaffResponse;
+        // CORRECCIÓN: Solo verificar inactividad del usuario si el STAFF escribió último
+        // Si el usuario escribió último, es turno del staff de responder
+        if (activity.lastUserResponse && activity.lastUserResponse > activity.lastStaffResponse) {
+            return; // Usuario ya respondió, es turno del staff
+        }
 
-        const timeSinceUserResponse = now - referenceTime;
+        // El staff escribió último → Contar desde que el staff escribió
+        const timeSinceStaffResponse = now - activity.lastStaffResponse;
 
         // 6 horas → Advertencia
-        if (timeSinceUserResponse >= this.USER_WARNING_TIME && !activity.userWarned) {
+        if (timeSinceStaffResponse >= this.USER_WARNING_TIME && !activity.userWarned) {
             await this.warnUser(channel, activity);
             activity.userWarned = true;
             this.saveActivityData();
         }
 
         // 7 horas → Cierre automático
-        if (timeSinceUserResponse >= this.USER_CLOSE_TIME && activity.userWarned) {
+        if (timeSinceStaffResponse >= this.USER_CLOSE_TIME && activity.userWarned) {
             await this.autoCloseTicket(channel, activity);
         }
     }

@@ -36,10 +36,12 @@ async function handleMessageCreate(message, context) {
                 const soporteRoleId = hierarchyRoles.soporte?.roleId;
                 const moderadorRoleId = hierarchyRoles.moderador?.roleId;
                 const administradorRoleId = hierarchyRoles.administrador?.roleId;
+                const directivaRoleId = hierarchyRoles.directiva?.roleId;
                 
-                const isStaff = member.roles.cache.has(soporteRoleId) || 
-                               member.roles.cache.has(moderadorRoleId) || 
-                               member.roles.cache.has(administradorRoleId);
+                const isStaff = (soporteRoleId && member.roles.cache.has(soporteRoleId)) || 
+                               (moderadorRoleId && member.roles.cache.has(moderadorRoleId)) || 
+                               (administradorRoleId && member.roles.cache.has(administradorRoleId)) ||
+                               (directivaRoleId && member.roles.cache.has(directivaRoleId));
                 
                 if (isStaff) {
                     ticketInactivity.updateStaffActivity(message.channel.id, message.author.id);
