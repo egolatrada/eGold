@@ -8,8 +8,10 @@ class TicketsSystem {
         this.client = client;
         this.ticketCounters = new Map();
         this.voiceSupportUsage = new Map();
+        this.ticketMetadata = new Map(); // Almacena metadata de tickets (channelId -> metadata)
         this.TICKET_DATA_FILE = './src/data/ticket-data.json';
         this.VOICE_SUPPORT_FILE = './src/data/voice-support-data.json';
+        this.TICKET_METADATA_FILE = './src/data/ticket-metadata.json';
     }
 
     /**
@@ -92,6 +94,56 @@ class TicketsSystem {
         } catch (error) {
             logger.error('Error al guardar datos de canales de voz', error);
         }
+    }
+
+    /**
+     * Carga la metadata de tickets desde archivo
+     */
+    loadTicketMetadata() {
+        try {
+            const data = readJSONLegacy(this.TICKET_METADATA_FILE);
+            if (data) {
+                this.ticketMetadata = new Map(Object.entries(data));
+                logger.success('Metadata de tickets cargada desde archivo');
+            }
+        } catch (error) {
+            logger.error('Error al cargar metadata de tickets', error);
+        }
+    }
+
+    /**
+     * Guarda la metadata de tickets en archivo
+     */
+    saveTicketMetadata() {
+        try {
+            const data = Object.fromEntries(this.ticketMetadata);
+            writeJSONLegacy(this.TICKET_METADATA_FILE, data);
+        } catch (error) {
+            logger.error('Error al guardar metadata de tickets', error);
+        }
+    }
+
+    /**
+     * Obtiene la metadata de un ticket
+     */
+    getTicketMetadata(channelId) {
+        return this.ticketMetadata.get(channelId) || null;
+    }
+
+    /**
+     * Establece la metadata de un ticket
+     */
+    setTicketMetadata(channelId, metadata) {
+        this.ticketMetadata.set(channelId, metadata);
+        this.saveTicketMetadata();
+    }
+
+    /**
+     * Elimina la metadata de un ticket
+     */
+    deleteTicketMetadata(channelId) {
+        this.ticketMetadata.delete(channelId);
+        this.saveTicketMetadata();
     }
 
     /**

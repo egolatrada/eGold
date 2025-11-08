@@ -39,15 +39,28 @@ module.exports = {
                 createdAt: Date.now()
             };
 
-            if (channel.topic) {
-                try {
-                    const metadataMatch = channel.topic.match(/Metadata: ({.*})/);
-                    if (metadataMatch) {
-                        ticketData = JSON.parse(metadataMatch[1]);
+            // Obtener metadata del sistema en lugar del topic
+            const { ticketsSystem } = context;
+            const metadata = ticketsSystem.getTicketMetadata(channel.id);
+            if (metadata) {
+                ticketData = metadata;
+            } else {
+                // Fallback: intentar leer del topic (para tickets antiguos)
+                if (channel.topic) {
+                    try {
+                        const metadataMatch = channel.topic.match(/Metadata: ({.*})/);
+                        if (metadataMatch) {
+                            ticketData = JSON.parse(metadataMatch[1]);
+                        }
+                    } catch (e) {
+                        logger.warn('No se pudo parsear metadata del topic, usando datos por defecto');
                     }
-                } catch (e) {
-                    logger.warn('No se pudo parsear metadata del topic, usando datos por defecto');
                 }
+            }
+
+            // Normalizar campo creator/creatorId para compatibilidad con tickets antiguos
+            if (!ticketData.creator && ticketData.creatorId) {
+                ticketData.creator = ticketData.creatorId;
             }
 
             const category = config.tickets.categories[ticketData.type];

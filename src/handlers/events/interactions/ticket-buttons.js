@@ -26,15 +26,27 @@ async function handleCloseTicketButton(interaction, context) {
             creatorTag: "Desconocido",
         };
 
-        if (channel.topic) {
-            try {
-                const metadataMatch = channel.topic.match(/Metadata: ({.*})/);
-                if (metadataMatch) {
-                    ticketData = JSON.parse(metadataMatch[1]);
+        // Obtener metadata del sistema en lugar del topic
+        const metadata = ticketsSystem.getTicketMetadata(channel.id);
+        if (metadata) {
+            ticketData = metadata;
+        } else {
+            // Fallback: intentar leer del topic (para tickets antiguos)
+            if (channel.topic) {
+                try {
+                    const metadataMatch = channel.topic.match(/Metadata: ({.*})/);
+                    if (metadataMatch) {
+                        ticketData = JSON.parse(metadataMatch[1]);
+                    }
+                } catch (e) {
+                    logger.warn('No se pudo parsear metadata del topic, usando datos por defecto');
                 }
-            } catch (e) {
-                logger.warn('No se pudo parsear metadata del topic, usando datos por defecto');
             }
+        }
+
+        // Normalizar campo creator/creatorId para compatibilidad con tickets antiguos
+        if (!ticketData.creator && ticketData.creatorId) {
+            ticketData.creator = ticketData.creatorId;
         }
 
         if (ticketData.ticketNumber) {
@@ -206,6 +218,8 @@ async function handleCloseTicketButton(interaction, context) {
 
         setTimeout(async () => {
             try {
+                // Eliminar metadata del ticket antes de eliminar el canal
+                ticketsSystem.deleteTicketMetadata(channel.id);
                 await channel.delete();
             } catch (error) {
                 logger.error('Error al eliminar canal', error);

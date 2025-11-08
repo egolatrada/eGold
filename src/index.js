@@ -78,6 +78,7 @@ client.once('ready', async () => {
         // Cargar datos persistentes
         ticketsSystem.loadTicketCounters();
         await ticketsSystem.loadVoiceSupportData();
+        ticketsSystem.loadTicketMetadata();
         ticketHierarchy.loadHierarchyData();
         ticketInactivity.loadActivityData();
         suggestionsSystem.loadSuggestions();

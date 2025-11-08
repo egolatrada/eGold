@@ -34,12 +34,25 @@ module.exports = {
                 });
             }
 
-            let topicData = null;
-            try {
-                topicData = JSON.parse(channel.topic || '{}');
-            } catch {}
+            // Obtener metadata del sistema
+            const { ticketsSystem } = context;
+            let ticketData = ticketsSystem.getTicketMetadata(channel.id);
 
-            if (topicData && topicData.creatorId === targetUser.id) {
+            // Fallback: intentar leer del topic (para tickets antiguos)
+            if (!ticketData && channel.topic) {
+                try {
+                    const metadataMatch = channel.topic.match(/Metadata: ({.*})/);
+                    if (metadataMatch) {
+                        ticketData = JSON.parse(metadataMatch[1]);
+                    }
+                } catch (e) {
+                    logger.warn('No se pudo parsear metadata del topic en eliminar-usuario');
+                }
+            }
+
+            // Verificar si el usuario es el creador (soportar tanto 'creator' como 'creatorId' para compatibilidad)
+            const creatorId = ticketData?.creator || ticketData?.creatorId;
+            if (creatorId && creatorId === targetUser.id) {
                 return await interaction.reply({
                     content: '❌ No puedes eliminar al creador del ticket. Usa el botón "Cerrar Ticket" para cerrar el ticket.',
                     ephemeral: true

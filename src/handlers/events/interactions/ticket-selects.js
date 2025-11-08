@@ -51,9 +51,12 @@ async function handleTicketCategorySelect(interaction, context) {
             createdAt: Date.now()
         };
 
-        const channelTopic = `${category.channelDescription || `Ticket de ${category.name}`}`;
-        const channelTopicWithMetadata = `${channelTopic} | Metadata: ${JSON.stringify(ticketMetadata)}`;
-        await channel.setTopic(channelTopicWithMetadata);
+        // Guardar metadata en el sistema (no en el topic visible)
+        ticketsSystem.setTicketMetadata(channel.id, ticketMetadata);
+
+        // Establecer solo la descripción limpia en el topic (sin JSON)
+        const channelTopic = category.channelDescription || `Para temas del cuerpo médico: altas, bajas, dudas o gestiones internas.`;
+        await channel.setTopic(channelTopic);
 
         const welcomeDescription = messages.ticketWelcome.description
             .replace('{emoji}', category.emoji)
