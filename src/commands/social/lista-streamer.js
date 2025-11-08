@@ -3,7 +3,7 @@ const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('disc
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('lista-streamer')
-        .setDescription('📋 Lista todos los streamers configurados')
+        .setDescription('📱 [SOCIAL] Lista todos los streamers configurados')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .addUserOption(option =>
             option.setName('usuario')

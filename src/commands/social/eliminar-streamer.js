@@ -3,7 +3,7 @@ const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('eliminar-streamer')
-        .setDescription('🗑️ Elimina un streamer de las notificaciones automáticas')
+        .setDescription('📱 [SOCIAL] Elimina un streamer de las notificaciones automáticas')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .addStringOption(option =>
             option.setName('streamer')

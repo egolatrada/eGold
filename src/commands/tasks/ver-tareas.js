@@ -3,7 +3,7 @@ const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('ver-tareas')
-        .setDescription('Muestra todas las tareas actuales organizadas por categorías')
+        .setDescription('✅ [TAREAS] Muestra todas las tareas actuales organizadas por categorías')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
     async execute(interaction) {
