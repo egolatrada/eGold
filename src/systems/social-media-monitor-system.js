@@ -267,30 +267,39 @@ class SocialMediaMonitorSystem {
             
             const platformData = {
                 youtube: {
-                    emoji: '🎬',
-                    icon: '📺',
-                    name: 'YouTube',
+                    titleEmoji: '🎬',
+                    name: 'YOUTUBE',
                     color: 0xFF0000,
-                    categoryText: '🎮 Categoría: GTA Roleplay',
-                    messagePrefix: 'Strangers RP acaba de subir un nuevo video',
+                    subtitle: '🚨 Strangers RP tiene contenido fresco para la comunidad.',
+                    videoEmoji: '🎥',
+                    descriptionText: '🕹️ Descubre el nuevo contenido que preparamos para ti.',
+                    watchText: '📺 **Míralo aquí:**',
+                    cta: '📢 ¡Comparte tu opinión en los comentarios y dinos qué te pareció!',
+                    closingMessage: '🔥 Cada video nos acerca más al estreno oficial del servidor. ¿Estás listo para formar parte de la historia?',
                     accountUrl: `https://youtube.com/@StrangersRP`
                 },
                 tiktok: {
-                    emoji: '🎵',
-                    icon: '📱',
-                    name: 'TikTok',
+                    titleEmoji: '🎵',
+                    name: 'TIKTOK',
                     color: 0x000000,
-                    categoryText: '🎮 Categoría: Contenido Gaming',
-                    messagePrefix: 'Strangers RP acaba de subir un nuevo video',
+                    subtitle: '🚨 Strangers RP tiene nuevo contenido en TikTok.',
+                    videoEmoji: '📱',
+                    descriptionText: '🕹️ No te pierdas lo último del servidor.',
+                    watchText: '🔗 **Míralo aquí:**',
+                    cta: '💬 ¡Comenta y comparte con tu crew!',
+                    closingMessage: '🔥 El roleplay más épico de FiveM te espera. ¿Estás listo?',
                     accountUrl: `https://tiktok.com/@${account.username}`
                 },
                 twitter: {
-                    emoji: '🐦',
-                    icon: '📱',
-                    name: 'Twitter/X',
+                    titleEmoji: '🐦',
+                    name: 'TWITTER/X',
                     color: 0x1DA1F2,
-                    categoryText: '🎮 Categoría: Actualización del servidor',
-                    messagePrefix: 'Strangers RP acaba de publicar',
+                    subtitle: '🚨 Nueva actualización de Strangers RP.',
+                    videoEmoji: '📢',
+                    descriptionText: '🕹️ Mantente informado sobre las novedades del servidor.',
+                    watchText: '🔗 **Lee el tweet:**',
+                    cta: '💬 ¡Interactúa y comparte tu opinión!',
+                    closingMessage: '🔥 La comunidad de roleplay más activa te espera. ¿Te unes?',
                     accountUrl: `https://x.com/${account.username}`
                 }
             };
@@ -307,16 +316,19 @@ class SocialMediaMonitorSystem {
             });
 
             // Construir descripción del embed
-            let description = `${platform.icon} ${platform.messagePrefix}\n\n`;
-            description += `✨ **Título:** ${post.title}\n`;
-            description += `${platform.categoryText}\n`;
-            description += `🔗 [Ver publicación](${post.url})\n\n`;
+            let description = `${platform.subtitle}\n\n`;
+            description += `${platform.videoEmoji} ${post.title}\n`;
+            description += `${platform.descriptionText}\n\n`;
+            description += `${platform.watchText} [Ver publicación](${post.url})\n`;
+            description += `${platform.cta}\n\n`;
             description += `🕒 **Publicado el:** ${fecha}\n`;
-            description += `📱 **Cuenta oficial:** [@StrangersRP](${platform.accountUrl})`;
+            description += `📱 **Canal oficial:** [@StrangersRP](${platform.accountUrl})\n\n`;
+            description += `⸻\n\n`;
+            description += `${platform.closingMessage}`;
 
             const embed = new EmbedBuilder()
                 .setColor(platform.color)
-                .setTitle(`${platform.emoji} Nueva publicación en ${platform.name}`)
+                .setTitle(`${platform.titleEmoji} ¡NUEVA PUBLICACIÓN DE ${platform.name}!`)
                 .setDescription(description)
                 .setTimestamp(post.publishedAt);
 
