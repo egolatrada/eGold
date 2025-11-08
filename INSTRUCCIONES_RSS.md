@@ -19,42 +19,52 @@
 
 ---
 
-## 🔧 Cómo Configurar TikTok y Twitter
+## 🔧 Cómo Configurar Twitter y TikTok
 
-### **Paso 1: Crear cuenta en RSS.app**
+### **📌 IMPORTANTE: SERVICIOS QUE SÍ FUNCIONAN**
 
-1. Ve a: https://rss.app
-2. Haz clic en "Sign Up" (es gratis)
-3. Completa el registro
+#### **Para Twitter/X (100% Gratis - TwitRSS.me)** ✅
+**URL**: https://www.twitrss.me
 
----
+**Pasos**:
+1. Ve a: **https://www.twitrss.me**
+2. En el campo de texto, escribe: `strangersrp_` (sin la @)
+3. Haz clic en **"Get RSS Feed"**
+4. **Copia la URL completa** (será algo como: `https://www.twitrss.me/twitter_user_to_rss/?user=strangersrp_`)
 
-### **Paso 2: Generar RSS Feed para TikTok**
-
-1. Una vez dentro de RSS.app, busca la opción "Create RSS Feed"
-2. Selecciona "TikTok"
-3. Pega el link: `https://www.tiktok.com/@strangersrp_`
-4. Haz clic en "Generate Feed"
-5. **Copia la URL del RSS Feed** (algo como: `https://rss.app/feeds/xxx.xml`)
-
----
-
-### **Paso 3: Generar RSS Feed para Twitter**
-
-1. En RSS.app, crea otro feed
-2. Selecciona "Twitter/X"
-3. Pega el link: `https://x.com/strangersrp_`
-4. Haz clic en "Generate Feed"
-5. **Copia la URL del RSS Feed**
+**Alternativas**:
+- **https://www.twitrss.org** (igual de fácil)
+- **https://rss.app** (requiere cuenta pero también funciona)
 
 ---
 
-### **Paso 4: Actualizar la Configuración del Bot**
+#### **Para TikTok (Más Complejo)** ⚠️
+TikTok **NO** tiene soluciones RSS gratuitas simples. Opciones:
 
-Una vez que tengas las 2 URLs de RSS.app, edita el archivo:
+**Opción 1: RSS.app (Requiere Suscripción)**
+- URL: https://rss.app
+- Requiere plan de pago
+- Es la más simple pero no es gratis
+
+**Opción 2: GitHub Actions (Gratis pero técnico)**
+- Repositorio: https://github.com/conoro/tiktok-rss-flat
+- Requiere configuración técnica
+- Actualiza cada 4 horas
+- 100% gratis
+
+**Opción 3: Dejarlo para más adelante**
+- Enfocarse solo en YouTube + Twitter por ahora
+- TikTok se puede agregar manualmente cuando sea necesario
+
+---
+
+### **Paso Final: Actualizar la Configuración del Bot**
+
+Una vez que tengas las URLs de los RSS feeds, edita el archivo:
 
 **Archivo**: `data/social-media-accounts.json`
 
+**Ejemplo de Twitter con TwitRSS.me**:
 ```json
 [
   {
@@ -66,33 +76,33 @@ Una vez que tengas las 2 URLs de RSS.app, edita el archivo:
     "addedAt": "2025-11-08T00:00:00.000Z"
   },
   {
-    "id": "tiktok_strangersrp_",
-    "platform": "tiktok",
-    "username": "strangersrp_",
-    "url": "https://www.tiktok.com/@strangersrp_",
-    "rssFeedUrl": "PEGAR_AQUI_LA_URL_DE_TIKTOK",
-    "addedAt": "2025-11-08T00:00:00.000Z"
-  },
-  {
     "id": "twitter_strangersrp_",
     "platform": "twitter",
     "username": "strangersrp_",
     "url": "https://x.com/strangersrp_",
-    "rssFeedUrl": "PEGAR_AQUI_LA_URL_DE_TWITTER",
+    "rssFeedUrl": "https://www.twitrss.me/twitter_user_to_rss/?user=strangersrp_",
+    "addedAt": "2025-11-08T00:00:00.000Z"
+  },
+  {
+    "id": "tiktok_strangersrp_",
+    "platform": "tiktok",
+    "username": "strangersrp_",
+    "url": "https://www.tiktok.com/@strangersrp_",
+    "rssFeedUrl": "PEGAR_AQUI_LA_URL_DE_TIKTOK_CUANDO_LA_TENGAS",
     "addedAt": "2025-11-08T00:00:00.000Z"
   }
 ]
 ```
 
 **Reemplaza**:
-- `"PEGAR_AQUI_LA_URL_DE_TIKTOK"` → URL del RSS feed de TikTok
-- `"PEGAR_AQUI_LA_URL_DE_TWITTER"` → URL del RSS feed de Twitter
+- La URL de Twitter si es diferente a la de ejemplo
+- `"PEGAR_AQUI_LA_URL_DE_TIKTOK_CUANDO_LA_TENGAS"` → URL del RSS feed de TikTok cuando la consigas
 
 ---
 
-### **Paso 5: Reiniciar el Bot**
+### **¿Cómo Reiniciar el Bot?**
 
-Después de editar el archivo, simplemente espera unos segundos. El bot detectará automáticamente las nuevas configuraciones.
+El bot se reinicia automáticamente cuando detecta cambios en los archivos. Espera unos 30 segundos después de guardar el archivo.
 
 ---
 
