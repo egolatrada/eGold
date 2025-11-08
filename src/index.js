@@ -159,6 +159,13 @@ client.once('ready', async () => {
     }
 });
 
+// Changelog de la versión actual - Actualizar aquí cuando hagas cambios
+const RECENT_CHANGES = [
+    'Comando `/staff-status` renovado: entrada manual de tiempo (unidad + cantidad)',
+    'Mensaje de estado del bot simplificado: eliminada información técnica innecesaria',
+    'Sistema de monitoreo de redes sociales desactivado (enviaba notificaciones cada 2 min)'
+];
+
 // Función para enviar mensaje de estado del bot
 async function sendBotStatusMessage(client, status, error = null, commandsMap = null, ticketsSys = null) {
     try {
@@ -208,6 +215,16 @@ async function sendBotStatusMessage(client, status, error = null, commandsMap = 
                 { name: '🎫 Tickets', value: `${ticketCount} tickets activos`, inline: true },
                 { name: '🔄 Uptime', value: '<t:' + Math.floor(Date.now() / 1000) + ':R>', inline: true }
             );
+            
+            // Agregar changelog si hay cambios recientes
+            if (RECENT_CHANGES && RECENT_CHANGES.length > 0) {
+                const changesList = RECENT_CHANGES.map((change, index) => `${index + 1}. ${change}`).join('\n');
+                embed.addFields({
+                    name: '📋 Cambios Recientes',
+                    value: changesList,
+                    inline: false
+                });
+            }
         }
 
         if (error) {
