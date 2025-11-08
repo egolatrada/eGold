@@ -1,0 +1,26 @@
+[
+  {
+    "id": "youtube_strangersrp",
+    "platform": "youtube",
+    "username": "StrangersRP",
+    "url": "https://www.youtube.com/channel/UCtxfmJ-MaymwVKiL4oIH3Tw",
+    "channelId": "UCtxfmJ-MaymwVKiL4oIH3Tw",
+    "addedAt": "2025-11-08T00:00:00.000Z"
+  },
+  {
+    "id": "tiktok_strangersrp_",
+    "platform": "tiktok",
+    "username": "strangersrp_",
+    "url": "https://www.tiktok.com/@strangersrp_",
+    "rssFeedUrl": "",
+    "addedAt": "2025-11-08T00:00:00.000Z"
+  },
+  {
+    "id": "twitter_strangersrp_",
+    "platform": "twitter",
+    "username": "strangersrp_",
+    "url": "https://x.com/strangersrp_",
+    "rssFeedUrl": "",
+    "addedAt": "2025-11-08T00:00:00.000Z"
+  }
+]

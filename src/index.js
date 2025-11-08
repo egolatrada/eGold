@@ -22,6 +22,7 @@ const ModerationSystem = require('./systems/moderation-system');
 const VerificationSystem = require('./systems/verification-system');
 const SocialLinksSystem = require('./systems/social-links-system');
 const StreamMonitorSystem = require('./systems/stream-monitor-system');
+const SocialMediaMonitorSystem = require('./systems/social-media-monitor-system');
 const CustomCommandsSystem = require('./systems/custom-commands-system');
 const SuggestionsSystem = require('./systems/suggestions-system');
 const ChangelogSystem = require('./systems/changelog-system');
@@ -46,6 +47,7 @@ let moderationSystem;
 let verificationSystem;
 let socialLinksSystem;
 let streamMonitorSystem;
+let socialMediaMonitorSystem;
 let customCommandsSystem;
 let suggestionsSystem;
 let changelogSystem;
@@ -72,6 +74,7 @@ client.once('ready', async () => {
         verificationSystem = new VerificationSystem(client, config);
         socialLinksSystem = new SocialLinksSystem(client, config);
         streamMonitorSystem = new StreamMonitorSystem(client, config, socialLinksSystem);
+        socialMediaMonitorSystem = new SocialMediaMonitorSystem(client);
         customCommandsSystem = new CustomCommandsSystem(client, config);
         suggestionsSystem = new SuggestionsSystem();
         changelogSystem = new ChangelogSystem(client);
@@ -114,6 +117,9 @@ client.once('ready', async () => {
         // Iniciar sistema de monitoreo de streams
         streamMonitorSystem.start();
         
+        // Iniciar sistema de monitoreo de redes sociales
+        await socialMediaMonitorSystem.init();
+        
         // Setup event handlers
         setupEventHandlers(client, {
             ticketsSystem,
@@ -127,6 +133,7 @@ client.once('ready', async () => {
             verificationSystem,
             socialLinksSystem,
             streamMonitorSystem,
+            socialMediaMonitorSystem,
             customCommandsSystem,
             suggestionsSystem,
             changelogSystem,
