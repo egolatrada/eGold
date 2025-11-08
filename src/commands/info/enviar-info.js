@@ -3,7 +3,7 @@ const { SlashCommandBuilder, EmbedBuilder, MessageFlags, PermissionFlagsBits } =
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('enviar-info')
-        .setDescription('📋 Envía información completa del bot al canal configurado')
+        .setDescription('ℹ️ [INFO] Envía información completa del bot al canal configurado')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
     
     async execute(interaction, context) {

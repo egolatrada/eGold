@@ -4,8 +4,8 @@ const logger = require('../../utils/logger');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('transcript')
-        .setDescription('📋 Genera una transcripción del ticket actual (máximo 50 mensajes)')
+        .setName('ticket-transcript')
+        .setDescription('📋 [TICKETS] Genera una transcripción del ticket actual (máximo 50 mensajes)')
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
         .addIntegerOption(option =>
             option

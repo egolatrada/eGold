@@ -6,7 +6,7 @@ const ALLOWED_USER_ID = '1064937728896159814'; // egolatrada
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('restart')
-        .setDescription('🔄 Reinicia el bot (solo fundadores)'),
+        .setDescription('🔧 [ADMIN] Reinicia el bot (solo fundadores)'),
     
     async execute(interaction, context) {
         // Verificar si el usuario tiene el rol de fundador o es egolatrada

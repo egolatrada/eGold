@@ -5,7 +5,7 @@ const logger = require('../../utils/logger');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('panel-tickets')
-        .setDescription('🎫 Crea o actualiza el panel de tickets')
+        .setDescription('🎫 [TICKETS] Crea o actualiza el panel de tickets')
         .addStringOption(option =>
             option
                 .setName('tipo')
@@ -33,7 +33,8 @@ module.exports = {
             const panelConfigs = {
                 whitelist: {
                     title: '🎫 Sistema de Tickets — Strangers RP',
-                    description: 'Antes de abrir un ticket, asegúrate de seleccionar la categoría correcta, ya que nos ayudará a atenderte más rápido y mantener el orden dentro del servidor. 🎭\n\n📌 El staff revisará tu caso lo antes posible. • <t:' + Math.floor(Date.now() / 1000) + ':R>',
+                    description: 'Antes de abrir un ticket, asegúrate de seleccionar la categoría correcta, ya que nos ayudará a atenderte más rápido y mantener el orden dentro del servidor. 🎭',
+                    footer: 'El staff revisará tu caso lo antes posible.',
                     categories: [
                         'soporte-dudas',
                         'bugs-fallos',
@@ -52,8 +53,9 @@ module.exports = {
                     ]
                 },
                 no_whitelist: {
-                    title: '🎫 Panel de Acceso — Strangers RP',
-                    description: '¡Bienvenido a Strangers RP! Selecciona el tipo de ticket según tu situación:\n\n📋 **Convalidar Whitelist**: Si vienes de otro servidor autorizado\n❓ **Dudas**: Preguntas generales sobre el servidor\n\n📌 El staff te atenderá lo antes posible.',
+                    title: '🎫 Sistema de Acceso — Strangers RP',
+                    description: '¡Bienvenido a Strangers RP! Selecciona el tipo de ticket según tu situación:\n\n📋 **Convalidar Whitelist**: Si vienes de otro servidor autorizado\n❓ **Dudas**: Preguntas generales sobre el servidor',
+                    footer: 'El staff te atenderá lo antes posible.',
                     categories: [
                         'convalidar-whitelist',
                         'dudas-generales'
@@ -97,6 +99,7 @@ module.exports = {
                 .setColor('#5865F2')
                 .setTitle(panelConfig.title)
                 .setDescription(panelConfig.description)
+                .setFooter({ text: panelConfig.footer })
                 .setTimestamp();
 
             // Crear el menú desplegable

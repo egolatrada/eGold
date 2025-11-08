@@ -4,8 +4,8 @@ const logger = require('../../utils/logger');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('embed')
-        .setDescription('📝 Crea un embed personalizado')
+        .setName('ticket-embed')
+        .setDescription('📝 [TICKETS] Crea un embed personalizado')
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
         .addChannelOption(option =>
             option.setName('canal')

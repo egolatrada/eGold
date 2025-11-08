@@ -4,8 +4,8 @@ const logger = require('../../utils/logger');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('renombrar')
-        .setDescription('✏️ Renombra el ticket actual según prioridad')
+        .setName('ticket-renombrar')
+        .setDescription('✏️ [TICKETS] Renombra el ticket actual según prioridad')
         .addStringOption(option =>
             option
                 .setName('prioridad')

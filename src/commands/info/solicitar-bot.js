@@ -4,7 +4,7 @@ const logger = require('../../utils/logger');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('solicitar-bot')
-        .setDescription('🤖 Solicita los servicios de configuración y mantenimiento de Discord - Egolatrada'),
+        .setDescription('ℹ️ [INFO] Solicita los servicios de configuración y mantenimiento de Discord - Egolatrada'),
     
     async execute(interaction, context) {
         try {

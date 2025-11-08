@@ -8,7 +8,7 @@ const SUGGESTIONS_CHANNEL_ID = '1425955815885504646';
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('sug-rechazada')
-        .setDescription('❌ Marca una sugerencia como rechazada')
+        .setDescription('🔧 [ADMIN] Marca una sugerencia como rechazada')
         .addStringOption(option =>
             option
                 .setName('mensaje-id')

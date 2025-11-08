@@ -3,7 +3,7 @@ const { SlashCommandBuilder, PermissionFlagsBits, MessageFlags } = require('disc
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('kick')
-        .setDescription('👢 Expulsa a un usuario del servidor')
+        .setDescription('🛡️ [MODERACIÓN] Expulsa a un usuario del servidor')
         .setDefaultMemberPermissions(PermissionFlagsBits.KickMembers)
         .addUserOption(option =>
             option.setName('usuario')

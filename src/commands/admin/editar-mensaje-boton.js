@@ -4,7 +4,7 @@ const logger = require('../../utils/logger');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('editar-mensaje-boton')
-        .setDescription('📝 Añade un botón a un mensaje existente')
+        .setDescription('🔧 [ADMIN] Añade un botón a un mensaje existente')
         .addStringOption(option =>
             option
                 .setName('mensaje_id')

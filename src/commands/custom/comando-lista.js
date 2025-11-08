@@ -3,7 +3,7 @@ const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('comando-lista')
-        .setDescription('📋 Lista todos los comandos personalizados')
+        .setDescription('📝 [COMANDOS] Lista todos los comandos personalizados')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
     
     async execute(interaction, context) {

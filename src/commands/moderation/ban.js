@@ -3,7 +3,7 @@ const { SlashCommandBuilder, PermissionFlagsBits, MessageFlags } = require('disc
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('ban')
-        .setDescription('🔨 Banea a un usuario del servidor')
+        .setDescription('🛡️ [MODERACIÓN] Banea a un usuario del servidor')
         .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
         .addUserOption(option =>
             option.setName('usuario')

@@ -5,7 +5,7 @@ const { config } = require('../../config');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('staff-status')
-        .setDescription('📊 Muestra estadísticas de actividad del staff')
+        .setDescription('🔧 [ADMIN] Muestra estadísticas de actividad del staff')
         .addStringOption(option =>
             option
                 .setName('unidad')

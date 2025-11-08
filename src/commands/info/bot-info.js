@@ -5,7 +5,7 @@ const { version } = require('../../../package.json');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('bot-info')
-        .setDescription('📚 Muestra toda la información y comandos del bot'),
+        .setDescription('ℹ️ [INFO] Muestra toda la información y comandos del bot'),
     
     async execute(interaction, context) {
         try {

@@ -5,7 +5,7 @@ const logger = require('../../utils/logger');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('clear')
-        .setDescription('🗑️ Elimina mensajes del canal')
+        .setDescription('🛡️ [MODERACIÓN] Elimina mensajes del canal')
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
         .addIntegerOption(option =>
             option.setName('cantidad')

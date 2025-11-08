@@ -4,7 +4,7 @@ const logger = require('../../utils/logger');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('rol-id')
-        .setDescription('🔍 Obtiene el ID de un rol')
+        .setDescription('ℹ️ [INFO] Obtiene el ID de un rol')
         .addRoleOption(option =>
             option
                 .setName('rol')

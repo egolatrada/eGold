@@ -4,8 +4,8 @@ const logger = require('../../utils/logger');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('eliminar-rol')
-        .setDescription('🚫 Elimina un rol del ticket actual')
+        .setName('ticket-eliminar-rol')
+        .setDescription('🚫 [TICKETS] Elimina un rol del ticket actual')
         .addRoleOption(option =>
             option
                 .setName('rol')

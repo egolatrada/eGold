@@ -3,7 +3,7 @@ const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('comando-eliminar')
-        .setDescription('🗑️ Elimina un comando personalizado')
+        .setDescription('📝 [COMANDOS] Elimina un comando personalizado')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .addStringOption(option =>
             option.setName('comando')

@@ -4,8 +4,8 @@ const logger = require('../../utils/logger');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('crear-ticket')
-        .setDescription('🎫 Crea un ticket en nombre de otro usuario')
+        .setName('ticket-crear')
+        .setDescription('🎫 [TICKETS] Crea un ticket en nombre de otro usuario')
         .addUserOption(option =>
             option
                 .setName('usuario')

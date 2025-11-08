@@ -3,7 +3,7 @@ const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('comando-editar')
-        .setDescription('✏️ Edita un comando personalizado existente')
+        .setDescription('📝 [COMANDOS] Edita un comando personalizado existente')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .addStringOption(option =>
             option.setName('comando')

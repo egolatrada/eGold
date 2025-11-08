@@ -4,8 +4,8 @@ const logger = require('../../utils/logger');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('añadir-rol')
-        .setDescription('👥 Añade un rol al ticket actual')
+        .setName('ticket-añadir-rol')
+        .setDescription('👥 [TICKETS] Añade un rol al ticket actual')
         .addRoleOption(option =>
             option
                 .setName('rol')

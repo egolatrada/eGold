@@ -4,8 +4,8 @@ const logger = require('../../utils/logger');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('eliminar-usuario')
-        .setDescription('🚫 Elimina un usuario del ticket actual')
+        .setName('ticket-eliminar-usuario')
+        .setDescription('🚫 [TICKETS] Elimina un usuario del ticket actual')
         .addUserOption(option =>
             option
                 .setName('usuario')

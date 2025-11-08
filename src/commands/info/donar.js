@@ -3,7 +3,7 @@ const { SlashCommandBuilder, EmbedBuilder, MessageFlags } = require('discord.js'
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('donar')
-        .setDescription('💖 Información sobre donaciones al proyecto'),
+        .setDescription('ℹ️ [INFO] Información sobre donaciones al proyecto'),
     
     async execute(interaction, context) {
         const embed = new EmbedBuilder()

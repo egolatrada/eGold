@@ -6,7 +6,7 @@ const SUGGESTIONS_CHANNEL_ID = '1425955815885504646';
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('sugerir')
-        .setDescription('💡 Envía una sugerencia para mejorar el servidor')
+        .setDescription('ℹ️ [INFO] Envía una sugerencia para mejorar el servidor')
         .addStringOption(option =>
             option
                 .setName('sugerencia')

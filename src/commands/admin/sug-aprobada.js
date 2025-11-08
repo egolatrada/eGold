@@ -8,7 +8,7 @@ const SUGGESTIONS_CHANNEL_ID = '1425955815885504646';
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('sug-aprobada')
-        .setDescription('✅ Marca una sugerencia como aprobada')
+        .setDescription('🔧 [ADMIN] Marca una sugerencia como aprobada')
         .addStringOption(option =>
             option
                 .setName('mensaje-id')
