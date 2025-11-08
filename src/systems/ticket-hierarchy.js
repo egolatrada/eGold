@@ -74,17 +74,38 @@ class TicketHierarchy {
                 logger.info(`🔒 Ticket ${channel.name} bloqueado por ${staffRole}: ${member.user.tag}`);
             }
         } else {
-            // Verificar si el staff que escribe tiene el mismo rol que maneja el ticket
-            const currentHandlingRole = ticketData.role;
+            // Determinar el rol del staff que escribe
             let writerRole = null;
+            let writerLevel = 0;
             
-            if (hasSoporteRole) writerRole = 'soporte';
-            else if (hasModeradorRole) writerRole = 'moderador';
-            else if (hasAdministradorRole) writerRole = 'administrador';
-            else if (hasDirectivaRole) writerRole = 'directiva';
+            if (hasSoporteRole) {
+                writerRole = 'soporte';
+                writerLevel = 1;
+            } else if (hasModeradorRole) {
+                writerRole = 'moderador';
+                writerLevel = 2;
+            } else if (hasAdministradorRole) {
+                writerRole = 'administrador';
+                writerLevel = 3;
+            } else if (hasDirectivaRole) {
+                writerRole = 'directiva';
+                writerLevel = 4;
+            }
 
+            const currentHandlingRole = ticketData.role;
+            const currentHandlingLevel = this.getRoleLevel(currentHandlingRole);
+
+            // Si es un nivel superior que ya fue escalado, toma el control del ticket
+            if (writerLevel > currentHandlingLevel && ticketData.escalatedTo.includes(writerRole)) {
+                // Actualizar el control del ticket al nuevo nivel
+                ticketData.handledBy = member.id;
+                ticketData.role = writerRole;
+                this.saveHierarchyData();
+                
+                logger.info(`📈 Control del ticket ${channel.name} transferido de ${currentHandlingRole} a ${writerRole} (${member.user.tag})`);
+            }
             // BLOQUEO ENTRE MISMO NIVEL: Si otro usuario del mismo nivel intenta escribir
-            if (writerRole === currentHandlingRole && ticketData.handledBy !== member.id) {
+            else if (writerRole === currentHandlingRole && ticketData.handledBy !== member.id) {
                 // Bloquear a este usuario específico del mismo nivel
                 await channel.permissionOverwrites.edit(member.id, {
                     ViewChannel: true,
@@ -245,6 +266,14 @@ class TicketHierarchy {
                 logger.info(`📈 Ticket ${channel.name} escalado a Directiva por ${member.user.tag}`);
             }
         }
+    }
+
+    getRoleLevel(roleName) {
+        const hierarchyRoles = config.tickets.hierarchy;
+        if (hierarchyRoles[roleName]) {
+            return hierarchyRoles[roleName].level;
+        }
+        return 0;
     }
 
     async grantWritePermission(channel, roleId, roleName) {
