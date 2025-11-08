@@ -29,7 +29,7 @@ async function handleAutocomplete(interaction, context) {
             await interaction.respond(filtered);
         }
         // Autocomplete para comandos personalizados
-        else if (commandName === 'crear-comando') {
+        else if (commandName === 'crear-comando' || commandName === 'editar-comando' || commandName === 'eliminar-comando') {
             await context.customCommandsSystem.handleAutocomplete(interaction);
         }
         // Autocomplete para eliminar-streamer
