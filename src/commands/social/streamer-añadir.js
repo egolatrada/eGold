@@ -38,7 +38,7 @@ module.exports = {
             const username = interaction.options.getString('link_o_usuario');
             const user = interaction.options.getUser('discord');
             
-            const notificationChannelId = '1425955813645881404';
+            const notificationChannelId = '1427179199336284210';
             
             const result = socialLinksSystem.addLink(
                 user?.id || 'no_user',
