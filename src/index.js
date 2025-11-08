@@ -164,8 +164,37 @@ const RECENT_CHANGES = [
     'Comandos personalizados renombrados: `/comando-crear`, `/comando-editar`, `/comando-eliminar`, `/comando-lista`',
     'Comando `/staff-status` renovado: entrada manual de tiempo (unidad + cantidad)',
     'Mensaje de estado del bot con changelog automático de cambios recientes',
-    'Sistema de monitoreo de redes sociales desactivado'
+    'Sistema de monitoreo de redes sociales desactivado',
+    'Changelog incremental: ahora solo muestra cambios nuevos desde el último reinicio'
 ];
+
+// Sistema de changelog incremental
+const fs = require('fs').promises;
+const path = require('path');
+const CHANGELOG_FILE = path.join(__dirname, '../data/last-changelog.json');
+
+async function loadLastChangelog() {
+    try {
+        const data = await fs.readFile(CHANGELOG_FILE, 'utf8');
+        return JSON.parse(data);
+    } catch (error) {
+        return [];
+    }
+}
+
+async function saveLastChangelog(changes) {
+    try {
+        const dataDir = path.dirname(CHANGELOG_FILE);
+        await fs.mkdir(dataDir, { recursive: true });
+        await fs.writeFile(CHANGELOG_FILE, JSON.stringify(changes, null, 2), 'utf8');
+    } catch (error) {
+        logger.error('Error al guardar changelog', error);
+    }
+}
+
+function getNewChanges(currentChanges, lastChanges) {
+    return currentChanges.filter(change => !lastChanges.includes(change));
+}
 
 // Función para enviar mensaje de estado del bot
 async function sendBotStatusMessage(client, status, error = null, commandsMap = null, ticketsSys = null) {
@@ -217,14 +246,19 @@ async function sendBotStatusMessage(client, status, error = null, commandsMap = 
                 { name: '🔄 Uptime', value: '<t:' + Math.floor(Date.now() / 1000) + ':R>', inline: true }
             );
             
-            // Agregar changelog si hay cambios recientes
-            if (RECENT_CHANGES && RECENT_CHANGES.length > 0) {
-                const changesList = RECENT_CHANGES.map((change, index) => `${index + 1}. ${change}`).join('\n');
+            // Obtener solo cambios nuevos desde el último reinicio
+            const lastChangelog = await loadLastChangelog();
+            const newChanges = getNewChanges(RECENT_CHANGES, lastChangelog);
+            
+            if (newChanges && newChanges.length > 0) {
+                const changesList = newChanges.map((change, index) => `${index + 1}. ${change}`).join('\n');
                 embed.addFields({
                     name: '📋 Cambios Recientes',
                     value: changesList,
                     inline: false
                 });
+                
+                await saveLastChangelog(RECENT_CHANGES);
             }
         }
 
