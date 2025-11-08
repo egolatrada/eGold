@@ -161,11 +161,7 @@ client.once('ready', async () => {
 
 // Changelog de la versión actual - Actualizar aquí cuando hagas cambios
 const RECENT_CHANGES = [
-    'Comandos personalizados renombrados: `/comando-crear`, `/comando-editar`, `/comando-eliminar`, `/comando-lista`',
-    'Comando `/staff-status` renovado: entrada manual de tiempo (unidad + cantidad)',
-    'Mensaje de estado del bot con changelog automático de cambios recientes',
-    'Sistema de monitoreo de redes sociales desactivado',
-    'Changelog incremental: ahora solo muestra cambios nuevos desde el último reinicio'
+    'Comandos `/sug-aprobada` y `/sug-rechazada` ahora verifican roles de Administrador y Directiva'
 ];
 
 // Sistema de changelog incremental

@@ -2,6 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const logger = require('../../utils/logger');
 
 const ADMIN_ROLE_ID = '1425955470236975186';
+const DIRECTIVA_ROLE_ID = '1435808275739181110';
 const SUGGESTIONS_CHANNEL_ID = '1425955815885504646';
 
 module.exports = {
@@ -25,9 +26,12 @@ module.exports = {
         try {
             const { suggestionsSystem } = context;
 
-            if (!interaction.member.roles.cache.has(ADMIN_ROLE_ID)) {
+            const hasAdminRole = interaction.member.roles.cache.has(ADMIN_ROLE_ID);
+            const hasDirectivaRole = interaction.member.roles.cache.has(DIRECTIVA_ROLE_ID);
+
+            if (!hasAdminRole && !hasDirectivaRole) {
                 return await interaction.reply({
-                    content: '❌ Solo los administradores pueden aprobar sugerencias.',
+                    content: '❌ Solo los administradores y directiva pueden aprobar sugerencias.',
                     ephemeral: true
                 });
             }
