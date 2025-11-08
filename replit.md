@@ -277,16 +277,16 @@ Una vez creado un comando con `/crear-comando nuevo`, simplemente escribe el com
 
 📖 **Ver [CUSTOM-COMMANDS-README.md](CUSTOM-COMMANDS-README.md) para documentación completa y ejemplos**
 
-## 🎯 Sistema de Jerarquía de Tickets (NUEVO)
+## 🎯 Sistema de Jerarquía de Tickets (ACTUALIZADO 2025-11-08)
 
-Sistema jerárquico de permisos en tickets con escalación controlada entre niveles de staff.
+Sistema jerárquico de permisos en tickets con escalación controlada entre niveles de staff y bloqueo entre usuarios del mismo nivel.
 
 ### Características
-- ✅ **Jerarquía de 3 niveles**: Soporte → Moderador → Administrador
-- ✅ **Fallback automático**: Si no hay Soporte en una categoría, Moderador puede responder
-- ✅ **Bloqueo dinámico**: El nivel que responde primero bloquea niveles superiores
-- ✅ **Escalación por menciones**: @Moderador o @Administrador desbloquea su acceso
-- ✅ **Persistencia**: Tracking de quién maneja cada ticket y quién fue escalado
+- ✅ **Jerarquía de 4 niveles**: Soporte → Moderador → Administrador → **Directiva**
+- ✅ **Bloqueo entre mismo nivel**: Si Soporte A maneja el ticket, Soporte B solo puede leer
+- ✅ **Transferencia de control**: Cuando un nivel superior responde después de escalación, toma el control del ticket
+- ✅ **Escalación por menciones**: @Moderador, @Administrador o @Directiva desbloquea su acceso
+- ✅ **Persistencia**: Tracking de quién maneja cada ticket y a qué niveles se escaló
 - ✅ **Limpieza automática**: Datos se eliminan al cerrar tickets
 
 ### Configuración
@@ -294,28 +294,39 @@ Ver `config.json` → `tickets.hierarchy`:
 ```json
 {
   "hierarchyEnabled": true,
-  "soporte": { "roleId": "1425955479737077760" },
-  "moderador": { "roleId": "1425955473240363082" },
-  "administrador": { "roleId": "1425955470236975186" }
+  "soporte": { "roleId": "1425955479737077760", "level": 1 },
+  "moderador": { "roleId": "1425955473240363082", "level": 2 },
+  "administrador": { "roleId": "1425955470236975186", "level": 3 },
+  "directiva": { "roleId": "1435808275739181110", "level": 4 }
 }
 ```
 
-### Flujo de Escalación
+### Flujo de Escalación con Transferencia de Control
 1. **Ticket se crea** → Permisos basados en roles disponibles en categoría
-2. **Soporte responde** → Moderador/Admin bloqueados (solo lectura)
-3. **Soporte menciona @Moderador** → Moderador gana permisos de escritura
-4. **Moderador menciona @Administrador** → Administrador gana permisos de escritura
-5. **Ticket se cierra** → Datos de jerarquía se limpian
+2. **Soporte A responde** → Toma control del ticket, otros Soportes bloqueados (solo lectura)
+3. **Soporte A menciona @Moderador** → Moderador gana permisos de escritura
+4. **Moderador B responde** → **Toma control del ticket**, otros Moderadores bloqueados
+5. **Moderador B menciona @Administrador** → Administrador gana permisos de escritura
+6. **Administrador C responde** → **Toma control del ticket**, otros Administradores bloqueados
+7. **Administrador C menciona @Directiva** → Directiva gana permisos de escritura
+8. **Directiva D responde** → **Toma control del ticket**, otros miembros de Directiva bloqueados
+9. **Ticket se cierra** → Datos de jerarquía se limpian
+
+### Bloqueo Entre Mismo Nivel (NUEVO)
+- Si **Soporte A** escribe primero → **Soporte B, C, D...** solo pueden leer
+- Si **Soporte B** intenta escribir → Su mensaje se elimina + recibe DM con aviso
+- Para ayudar, **Soporte B** debe mencionar al nivel superior (@Moderador)
+- El mismo comportamiento aplica a **todos los niveles** (Moderador, Admin, Directiva)
 
 ### Fallback Jerárquico
 - Si categoría tiene Soporte → Solo Soporte escribe inicialmente
 - Si NO tiene Soporte pero tiene Moderador → Moderador escribe inicialmente
 - Si solo tiene Administrador → Administrador escribe inicialmente
-- Roles no jerárquicos (Directiva, departamentos) siempre tienen permisos completos
+- Si solo tiene Directiva → Directiva escribe inicialmente
 
 ### Archivos Clave
-- `config.json`: Configuración de jerarquía
-- `src/systems/ticket-hierarchy.js`: Sistema de tracking y permisos
+- `config.json`: Configuración de jerarquía con 4 niveles
+- `src/systems/ticket-hierarchy.js`: Sistema de tracking, permisos y transferencia de control
 - `src/systems/tickets.js`: Creación de tickets con fallback
 - `src/data/ticket-hierarchy.json`: Persistencia de datos (se crea automáticamente)
 
