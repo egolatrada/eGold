@@ -16,6 +16,14 @@ module.exports = {
         try {
             const targetRole = interaction.options.getRole('rol');
 
+            // Obtener todos los miembros del servidor para tener datos actualizados
+            await interaction.guild.members.fetch();
+            
+            // Contar miembros con el rol
+            const membersWithRole = interaction.guild.members.cache.filter(
+                member => member.roles.cache.has(targetRole.id)
+            ).size;
+
             const embed = new EmbedBuilder()
                 .setColor(targetRole.color || '#5865F2')
                 .setTitle('🔍 ID de Rol')
@@ -23,7 +31,7 @@ module.exports = {
                     { name: '🏷️ Nombre', value: targetRole.name, inline: false },
                     { name: '🆔 ID', value: `\`${targetRole.id}\``, inline: false },
                     { name: '🎨 Color', value: targetRole.hexColor, inline: true },
-                    { name: '👥 Miembros', value: `${targetRole.members.size}`, inline: true }
+                    { name: '👥 Miembros', value: `${membersWithRole}`, inline: true }
                 )
                 .setTimestamp();
 
@@ -40,7 +48,7 @@ module.exports = {
                 ephemeral: true
             });
 
-            logger.info(`🔍 ${interaction.user.tag} consultó ID del rol ${targetRole.name} (${targetRole.id})`);
+            logger.info(`🔍 ${interaction.user.tag} consultó ID del rol ${targetRole.name} (${targetRole.id}) - ${membersWithRole} miembros`);
 
         } catch (error) {
             logger.error('Error al obtener ID de rol', error);
