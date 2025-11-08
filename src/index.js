@@ -163,8 +163,9 @@ client.once('ready', async () => {
 const RECENT_CHANGES = [
     'Jerarquía de tickets ampliada: Soporte → Moderador → Admin → **Directiva** (4 niveles)',
     'Bloqueo entre mismo nivel: Si Soporte A maneja ticket, Soporte B solo puede leer',
-    'Sistema de escalación mejorado: Menciona @rol superior para activar permisos de escritura',
-    'Categorías verificadas: Convalidar Whitelist y Dudas Generales disponibles'
+    '🤝 **Colaboración entre compañeros**: Menciona a @usuario del mismo nivel para desbloquearlo',
+    'Sistema de escalación mejorado: Menciona @rol superior para escalar sin desbloquear mismo nivel',
+    'Niveles superiores se mantienen bloqueados al colaborar entre mismo nivel'
 ];
 
 // Sistema de changelog incremental

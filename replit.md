@@ -312,11 +312,21 @@ Ver `config.json` → `tickets.hierarchy`:
 8. **Directiva D responde** → **Toma control del ticket**, otros miembros de Directiva bloqueados
 9. **Ticket se cierra** → Datos de jerarquía se limpian
 
-### Bloqueo Entre Mismo Nivel (NUEVO)
+### Bloqueo Entre Mismo Nivel y Colaboración (ACTUALIZADO 2025-11-08)
 - Si **Soporte A** escribe primero → **Soporte B, C, D...** solo pueden leer
 - Si **Soporte B** intenta escribir → Su mensaje se elimina + recibe DM con aviso
-- Para ayudar, **Soporte B** debe mencionar al nivel superior (@Moderador)
-- El mismo comportamiento aplica a **todos los niveles** (Moderador, Admin, Directiva)
+
+**Para colaborar entre compañeros del mismo nivel:**
+- **Soporte A** menciona a **@SoporteB** (usuario específico) → Solo Soporte B se desbloquea
+- **Soporte C, D...** siguen bloqueados
+- **Moderador, Admin, Directiva** siguen bloqueados (no se escala)
+- Mensaje de confirmación: "🤝 **Colaboración activada**: @SoporteB ahora puede escribir en este ticket."
+
+**Para escalar al nivel superior:**
+- **Soporte A** menciona **@Moderador** (rol completo) → Todo el rol Moderador se desbloquea
+- Esto ES escalación → Los niveles superiores ganan acceso
+
+**El mismo comportamiento aplica a TODOS los niveles** (Moderador, Admin, Directiva)
 
 ### Fallback Jerárquico
 - Si categoría tiene Soporte → Solo Soporte escribe inicialmente
