@@ -654,6 +654,7 @@ Sistema completo de mensajes de bienvenida totalmente personalizables para nuevo
 1. **`/bienvenida-setup`** - Configuración inicial del sistema
    - **canal** (opcional): Canal donde se enviarán las bienvenidas
    - **mensaje** (opcional): Texto personalizado con variables dinámicas
+   - **imagen** (opcional): URL de imagen de fondo para la bienvenida
    - **color** (opcional): Color hexadecimal del embed (ej: #5865F2)
    - **Requiere al menos un parámetro**
    - Respuesta efímera solo para el ejecutor
@@ -661,6 +662,7 @@ Sistema completo de mensajes de bienvenida totalmente personalizables para nuevo
 2. **`/bienvenida-editar`** - Editar configuración existente
    - **canal** (opcional): Cambiar canal de bienvenidas
    - **mensaje** (opcional): Cambiar mensaje personalizado
+   - **imagen** (opcional): Cambiar imagen de fondo
    - **color** (opcional): Cambiar color del embed
    - **Requiere al menos un parámetro**
    - Respuesta efímera solo para el ejecutor
@@ -686,17 +688,18 @@ Sistema completo de mensajes de bienvenida totalmente personalizables para nuevo
 1. Configurar el canal y mensaje inicial:
    /bienvenida-setup canal: #bienvenidas mensaje: ¡Bienvenido {usuario} a **{servidor}**! 🎉
    
-2. Configurar el color del embed:
-   /bienvenida-setup color: #5865F2
+2. Configurar imagen de fondo y color:
+   /bienvenida-setup imagen: https://i.imgur.com/ejemplo.png color: #5865F2
 
 3. Probar el mensaje:
    /bienvenida-test
 
 4. Si necesitas editar algo:
    /bienvenida-editar mensaje: ¡Hola {usuario}! Bienvenido a {servidor}. Somos {miembros} miembros.
+   /bienvenida-editar imagen: https://i.imgur.com/otra-imagen.png
 
 5. ¡Listo! El sistema funciona automáticamente cuando alguien se une.
-   El avatar del usuario se mostrará automáticamente en la bienvenida.
+   El avatar del usuario se mostrará sobre la imagen de fondo.
 ```
 
 ### Funcionamiento Automático
@@ -711,10 +714,11 @@ Tabla: `welcome_config`
 - **guild_id**: ID del servidor (clave primaria)
 - **channel_id**: ID del canal de bienvenidas
 - **message**: Texto personalizado con variables
+- **image_url**: URL de imagen de fondo (opcional)
 - **embed_color**: Color hexadecimal del embed
 - **updated_at**: Última actualización de configuración
 
-**Nota**: El avatar del usuario se obtiene dinámicamente, no se almacena en la base de datos
+**Nota**: El avatar del usuario se obtiene dinámicamente y se muestra sobre la imagen de fondo
 
 ### Archivos Clave
 - `src/systems/welcome/welcome-system.js`: Sistema principal con PostgreSQL y obtención de avatar
@@ -725,12 +729,14 @@ Tabla: `welcome_config`
 - `config.json`: directivaRoleId configurado (1435808275739181110)
 
 ## Cambios Recientes
-- 2025-11-08: **👋 SISTEMA DE BIENVENIDAS OPTIMIZADO** - Sistema simplificado con avatar automático del usuario
+- 2025-11-08: **🖼️ IMAGEN DE FONDO PERSONALIZABLE** - Configura imagen de fondo + avatar del usuario encima
+- 2025-11-08: Comandos actualizados con campo `imagen` para configurar fondo de bienvenidas
+- 2025-11-08: Avatar del usuario se muestra automáticamente sobre la imagen de fondo
+- 2025-11-08: **👋 SISTEMA DE BIENVENIDAS COMPLETO** - Sistema con avatar automático del usuario
 - 2025-11-08: 3 comandos de bienvenidas (setup, editar, test) solo para Directiva
-- 2025-11-08: Avatar automático: El icono del usuario se muestra automáticamente en la bienvenida
 - 2025-11-08: Sistema siempre activo: No necesita activación/desactivación manual
 - 2025-11-08: Variables dinámicas: {usuario}, {nombre}, {tag}, {servidor}, {miembros}, {id}
-- 2025-11-08: Base de datos PostgreSQL con tabla welcome_config (sin campos enabled/image_url)
+- 2025-11-08: Base de datos PostgreSQL con tabla welcome_config
 - 2025-11-08: Total de 39 comandos (36 base + 3 bienvenidas optimizadas)
 - 2025-11-07: **📊 SISTEMA DE ESTADÍSTICAS DE SERVIDOR** - Contadores automáticos de miembros en canales de voz (similar a ServerStats Bot)
 - 2025-11-07: 3 canales de voz configurados: Whitelisted, No Whitelisted, Ciudadanos
