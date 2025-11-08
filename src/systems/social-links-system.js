@@ -49,10 +49,12 @@ class SocialLinksSystem {
             return { success: false, error: "Plataforma no soportada" };
         }
 
-        const linkId = `${userId}_${platform}_${Date.now()}`;
+        const linkId = userId && userId !== 'no_user' 
+            ? `${userId}_${platform}_${Date.now()}`
+            : `${platform}_${Date.now()}`;
         
         this.links.set(linkId, {
-            userId,
+            userId: userId || 'no_user',
             platform: platform.toLowerCase(),
             username,
             notificationChannelId: notificationChannel,

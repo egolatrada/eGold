@@ -228,7 +228,14 @@ class StreamMonitorSystem {
 
     async checkKick(username) {
         try {
-            const response = await fetch(`https://kick.com/api/v2/channels/${username}`);
+            const cleanUsername = username.replace('https://kick.com/', '').replace(/\/$/, '');
+            
+            const response = await fetch(`https://kick.com/api/v2/channels/${cleanUsername}/livestream`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                }
+            });
             
             if (!response.ok) {
                 return { isLive: false, data: null };
@@ -236,21 +243,21 @@ class StreamMonitorSystem {
             
             const data = await response.json();
             
-            if (data.livestream && data.livestream.is_live) {
+            if (data && data.is_live) {
                 return {
                     isLive: true,
                     data: {
-                        title: data.livestream.session_title,
-                        thumbnail: data.livestream.thumbnail?.url,
-                        viewers: data.livestream.viewer_count,
-                        url: `https://kick.com/${username}`
+                        title: data.session_title,
+                        thumbnail: data.thumbnail?.url,
+                        viewers: data.viewer_count,
+                        url: `https://kick.com/${cleanUsername}`
                     }
                 };
             }
             
             return { isLive: false, data: null };
         } catch (error) {
-            console.error(`Error en checkKick para ${username}:`, error);
+            console.error(`Error en checkKick para ${username}:`, error.message);
             return { isLive: false, data: null };
         }
     }
