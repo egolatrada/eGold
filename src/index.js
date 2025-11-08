@@ -27,9 +27,9 @@ const CustomCommandsSystem = require('./systems/custom-commands-system');
 const SuggestionsSystem = require('./systems/suggestions-system');
 const ChangelogSystem = require('./systems/changelog-system');
 const ServerStatsSystem = require('./systems/server-stats');
-const TasksSystem = require('./systems/tasks/simple-tasks-system');
-const WarnsSystem = require('./systems/warns/warns-system');
-const WelcomeSystem = require('./systems/welcome/welcome-system');
+const TasksSystem = require('./systems/simple-tasks-system');
+const WarnsSystem = require('./systems/warns-system');
+const WelcomeSystem = require('./systems/welcome-system');
 
 // Handlers de eventos
 const { setupEventHandlers } = require('./handlers/events');
