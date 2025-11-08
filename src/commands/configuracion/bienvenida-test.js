@@ -50,13 +50,13 @@ module.exports = {
             const embed = new EmbedBuilder()
                 .setColor(currentConfig.embed_color || '#5865F2')
                 .setDescription(message)
-                .setThumbnail(interaction.user.displayAvatarURL({ size: 256 }))
+                .setAuthor({
+                    name: interaction.user.username,
+                    iconURL: interaction.user.displayAvatarURL({ dynamic: true, size: 256 })
+                })
+                .setThumbnail(interaction.user.displayAvatarURL({ dynamic: true, size: 512 }))
                 .setFooter({ text: `Miembro #${interaction.guild.memberCount} | 🧪 PRUEBA` })
                 .setTimestamp();
-
-            if (currentConfig.image_url) {
-                embed.setImage(currentConfig.image_url);
-            }
 
             await channel.send({ 
                 content: `${interaction.member} **[PRUEBA]**`,
@@ -69,7 +69,7 @@ module.exports = {
                 .setDescription(`El mensaje de bienvenida de prueba ha sido enviado a ${channel}.`)
                 .addFields(
                     { name: '📢 Canal', value: `${channel}`, inline: true },
-                    { name: '⚙️ Estado', value: currentConfig.enabled ? '🟢 Activo' : '🔴 Inactivo', inline: true }
+                    { name: '👤 Avatar', value: 'Se muestra el icono del usuario automáticamente', inline: true }
                 )
                 .setTimestamp();
 

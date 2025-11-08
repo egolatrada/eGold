@@ -18,10 +18,8 @@ class WelcomeSystem {
             await this.pool.query(`
                 CREATE TABLE IF NOT EXISTS welcome_config (
                     guild_id VARCHAR(32) PRIMARY KEY,
-                    enabled BOOLEAN DEFAULT false,
                     channel_id VARCHAR(32),
                     message TEXT DEFAULT 'Bienvenido {usuario} a **{servidor}**! 🎉',
-                    image_url TEXT,
                     embed_color VARCHAR(7) DEFAULT '#5865F2',
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
@@ -91,36 +89,11 @@ class WelcomeSystem {
         }
     }
 
-    async setEnabled(guildId, enabled) {
-        try {
-            const result = await this.pool.query(
-                `INSERT INTO welcome_config (guild_id, enabled)
-                 VALUES ($1, $2)
-                 ON CONFLICT (guild_id)
-                 DO UPDATE SET enabled = $2, updated_at = CURRENT_TIMESTAMP
-                 RETURNING *`,
-                [guildId, enabled]
-            );
-            
-            this.config = result.rows[0];
-            logger.info(`✅ Sistema de bienvenidas ${enabled ? 'activado' : 'desactivado'} para guild ${guildId}`);
-            return this.config;
-        } catch (error) {
-            logger.error('Error al cambiar estado de bienvenidas', error);
-            throw error;
-        }
-    }
-
     async sendWelcome(member) {
         try {
             const config = await this.getConfig(member.guild.id);
 
-            if (!config || !config.enabled) {
-                return;
-            }
-
-            if (!config.channel_id) {
-                logger.warn('⚠️ Sistema de bienvenidas activado pero sin canal configurado');
+            if (!config || !config.channel_id) {
                 return;
             }
 
@@ -136,13 +109,13 @@ class WelcomeSystem {
             const embed = new EmbedBuilder()
                 .setColor(config.embed_color || '#5865F2')
                 .setDescription(message)
-                .setThumbnail(member.user.displayAvatarURL({ size: 256 }))
+                .setAuthor({
+                    name: member.user.username,
+                    iconURL: member.user.displayAvatarURL({ dynamic: true, size: 256 })
+                })
+                .setThumbnail(member.user.displayAvatarURL({ dynamic: true, size: 512 }))
                 .setFooter({ text: `Miembro #${member.guild.memberCount}` })
                 .setTimestamp();
-
-            if (config.image_url) {
-                embed.setImage(config.image_url);
-            }
 
             await channel.send({ 
                 content: `${member}`,
