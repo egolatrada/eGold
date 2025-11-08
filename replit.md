@@ -435,6 +435,47 @@ Sistema automático de registro de cambios que publica actualizaciones en tiempo
 - `src/systems/changelog-system.js`: Sistema de publicación
 - Canal de changelog: 1435847630176653312 (🦋・servidor)
 
+## 🔄 ACTUALIZACIÓN COMANDOS (2025-11-08)
+
+**UNIFICACIÓN Y RENOMBRADO DE COMANDOS - TOTAL: 34 COMANDOS**
+
+### ✨ Comandos Unificados (Nuevos)
+- `/ticket-añadir` - Unifica ticket-añadir-usuario + ticket-añadir-rol
+  - Selección obligatoria: Usuario o Rol
+  - Autocompletado inteligente
+- `/ticket-eliminar` - Unifica ticket-eliminar-usuario + ticket-eliminar-rol
+  - Selección obligatoria: Usuario o Rol
+  - Protección al creador del ticket
+
+### 🔄 Comandos Renombrados (Sin Prefijo "ticket-")
+- `ticket-renombrar` → `/renombrar`
+- `ticket-transcript` → `/transcript`
+- `ticket-mantener-activo` → `/mantener-activo`
+- `ticket-embed` → `/embed`
+
+**Razón:** Comandos utilitarios no requieren prefijo. Comandos de creación/modificación mantienen "ticket-" para claridad.
+
+### 📊 Lista Final de Comandos de Tickets (8 comandos)
+1. `/ticket-crear` - Crea ticket en nombre de usuario
+2. `/ticket-añadir` - Añade usuario o rol ✨ NUEVO
+3. `/ticket-eliminar` - Elimina usuario o rol ✨ NUEVO
+4. `/renombrar` - Renombra ticket según prioridad
+5. `/transcript` - Genera transcripción del ticket
+6. `/mantener-activo` - Marca ticket como permanente
+7. `/embed` - Crea embed personalizado
+8. `/panel-tickets` - Crea/actualiza panel de tickets
+
+### 📈 Distribución por Categoría
+- **🎫 [TICKETS]:** 8 comandos
+- **🔧 [ADMIN]:** 5 comandos
+- **📝 [COMANDOS]:** 5 comandos
+- **ℹ️ [INFO]:** 6 comandos
+- **🛡️ [MODERACIÓN]:** 4 comandos
+- **📱 [SOCIAL]:** 3 comandos
+- **✅ [TAREAS]:** 3 comandos
+
+**TOTAL: 34 comandos** (reducido de 36)
+
 ## 💡 Sistema de Sugerencias (NUEVO)
 
 Sistema completo de gestión de sugerencias con votaciones interactivas y aprobación administrativa.
