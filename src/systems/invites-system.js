@@ -10,7 +10,7 @@ class InvitesSystem {
         this.messages = messages.logs.invites;
         this.inviteCache = new Map();
         this.inviteMessages = new Map();
-        this.cacheFilePath = path.join(__dirname, "invite-cache.json");
+        this.cacheFilePath = path.join(__dirname, "../data/invite-cache.json");
         this.loadCacheFromFile();
         this.setupEventListeners();
     }
