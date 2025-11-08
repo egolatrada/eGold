@@ -106,18 +106,25 @@ class TicketHierarchy {
             }
             // BLOQUEO ENTRE MISMO NIVEL: Si otro usuario del mismo nivel intenta escribir
             else if (writerRole === currentHandlingRole && ticketData.handledBy !== member.id) {
-                // Bloquear a este usuario específico del mismo nivel
-                await channel.permissionOverwrites.edit(member.id, {
-                    ViewChannel: true,
-                    SendMessages: false,
-                    ReadMessageHistory: true,
-                });
+                // Verificar si este usuario fue desbloqueado específicamente
+                const isUnlocked = ticketData.unlockedSameLevelUsers && ticketData.unlockedSameLevelUsers.includes(member.id);
                 
-                await message.delete().catch(() => {});
-                await member.send(`⛔ **Ticket bloqueado**: El ticket \`${channel.name}\` ya está siendo manejado por otro ${currentHandlingRole}. Si necesitas ayuda, menciona al rango superior.`).catch(() => {});
-                
-                logger.info(`🚫 ${member.user.tag} (${writerRole}) bloqueado - ticket ya manejado por ${ticketData.handledBy}`);
-                return;
+                if (!isUnlocked) {
+                    // Bloquear a este usuario específico del mismo nivel
+                    await channel.permissionOverwrites.edit(member.id, {
+                        ViewChannel: true,
+                        SendMessages: false,
+                        ReadMessageHistory: true,
+                    });
+                    
+                    await message.delete().catch(() => {});
+                    await member.send(`⛔ **Ticket bloqueado**: El ticket \`${channel.name}\` ya está siendo manejado por otro ${currentHandlingRole}. Si necesitas ayuda, menciona a un compañero específico o al rango superior.`).catch(() => {});
+                    
+                    logger.info(`🚫 ${member.user.tag} (${writerRole}) bloqueado - ticket ya manejado por ${ticketData.handledBy}`);
+                    return;
+                }
+                // Si está desbloqueado, puede escribir libremente
+                logger.info(`✅ ${member.user.tag} (${writerRole}) puede escribir - fue desbloqueado específicamente`);
             }
 
             await this.handleRoleMentions(message, channel, ticketData);
@@ -188,6 +195,7 @@ class TicketHierarchy {
                 handledBy: userId,
                 role: role,
                 escalatedTo: [],
+                unlockedSameLevelUsers: [],
                 timestamp: Date.now(),
             });
             
@@ -218,6 +226,14 @@ class TicketHierarchy {
 
         // Lógica de escalación según el rol que maneja el ticket
         const handlingRole = ticketData.role;
+
+        // NUEVO: Detectar menciones de usuarios específicos del mismo nivel para colaboración
+        await this.handleSameLevelUnlock(message, channel, ticketData, {
+            soporteRoleId,
+            moderadorRoleId,
+            administradorRoleId,
+            directivaRoleId
+        });
 
         // Soporte puede escalar a Moderador
         if (mentionedModeradorRole && hasSoporteRole && handlingRole === 'soporte') {
@@ -265,6 +281,71 @@ class TicketHierarchy {
                 
                 logger.info(`📈 Ticket ${channel.name} escalado a Directiva por ${member.user.tag}`);
             }
+        }
+    }
+
+    async handleSameLevelUnlock(message, channel, ticketData, roleIds) {
+        const { soporteRoleId, moderadorRoleId, administradorRoleId, directivaRoleId } = roleIds;
+        const member = message.member;
+        const handlingRole = ticketData.role;
+        
+        // Obtener el rol que maneja el ticket actualmente
+        let currentRoleId = null;
+        if (handlingRole === 'soporte') currentRoleId = soporteRoleId;
+        else if (handlingRole === 'moderador') currentRoleId = moderadorRoleId;
+        else if (handlingRole === 'administrador') currentRoleId = administradorRoleId;
+        else if (handlingRole === 'directiva') currentRoleId = directivaRoleId;
+
+        if (!currentRoleId) return;
+
+        // Verificar si el que escribe tiene el rol que maneja el ticket
+        const writerHasHandlingRole = member.roles.cache.has(currentRoleId);
+        if (!writerHasHandlingRole) return;
+
+        // Detectar menciones de usuarios específicos
+        const mentionedUsers = message.mentions.members;
+        if (!mentionedUsers || mentionedUsers.size === 0) return;
+
+        // Inicializar array si no existe
+        if (!ticketData.unlockedSameLevelUsers) {
+            ticketData.unlockedSameLevelUsers = [];
+        }
+
+        let unlockedCount = 0;
+        for (const [userId, mentionedMember] of mentionedUsers) {
+            // Verificar si el usuario mencionado tiene el MISMO rol que maneja el ticket
+            const hasSameRole = mentionedMember.roles.cache.has(currentRoleId);
+            
+            if (hasSameRole && userId !== ticketData.handledBy) {
+                // Verificar si ya está desbloqueado
+                if (!ticketData.unlockedSameLevelUsers.includes(userId)) {
+                    // Desbloquear a este usuario específico
+                    await channel.permissionOverwrites.edit(userId, {
+                        ViewChannel: true,
+                        SendMessages: true,
+                        ReadMessageHistory: true,
+                    });
+                    
+                    ticketData.unlockedSameLevelUsers.push(userId);
+                    unlockedCount++;
+                    
+                    logger.info(`🔓 ${mentionedMember.user.tag} desbloqueado por ${member.user.tag} (mismo nivel: ${handlingRole})`);
+                }
+            }
+        }
+
+        if (unlockedCount > 0) {
+            this.saveHierarchyData();
+            
+            const unlockedNames = Array.from(mentionedUsers.values())
+                .filter(m => ticketData.unlockedSameLevelUsers.includes(m.id))
+                .map(m => m.user.tag)
+                .join(', ');
+
+            await message.reply({
+                content: `🤝 **Colaboración activada**: ${unlockedNames} ahora puede${unlockedCount > 1 ? 'n' : ''} escribir en este ticket.`,
+                allowedMentions: { parse: [] }
+            });
         }
     }
 
