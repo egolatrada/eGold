@@ -3,7 +3,7 @@ const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('tareas')
-        .setDescription('Crea una lista de tareas enumeradas que se organizan automáticamente por categorías')
+        .setDescription('Crea una lista de tareas organizadas por categoría')
         .addStringOption(option =>
             option.setName('lista')
                 .setDescription('Lista de tareas (usa 1., 2., - o • al inicio de cada tarea)')
@@ -58,19 +58,20 @@ module.exports = {
             // PASO 1: Eliminar embeds antiguos si existen
             await tasksSystem.deleteOldTaskEmbeds(interaction.guild.id, interaction.channel);
 
-            // PASO 2: Generar embeds actualizados
+            // PASO 2: Generar embeds actualizados de TODAS las categorías
             const allTasks = await tasksSystem.getTasksByCategory(interaction.guild.id);
             const embeds = tasksSystem.generateTaskEmbeds(allTasks);
 
-            // PASO 3: Enviar nuevos embeds (sin mensajes de confirmación)
+            // PASO 3: Enviar nuevos embeds separados por categoría
             const reply = await interaction.editReply({
+                content: `✅ **${result.totalTasks} tareas añadidas a la categoría "${result.category}"**`,
                 embeds: embeds.slice(0, 10) // Máximo 10 embeds por mensaje
             });
 
             // Guardar IDs de mensajes para actualizar después
             const messageIds = [reply.id];
 
-            // Si hay más de 10 categorías, enviar el resto
+            // Si hay más de 10 categorías, enviar el resto en mensajes separados
             if (embeds.length > 10) {
                 for (let i = 10; i < embeds.length; i += 10) {
                     const followUp = await interaction.followUp({

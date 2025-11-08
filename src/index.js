@@ -161,8 +161,9 @@ client.once('ready', async () => {
 
 // Changelog de la versión actual - Actualizar aquí cuando hagas cambios
 const RECENT_CHANGES = [
-    'Sistema de tareas reactivado: `/tareas`, `/ver-tareas` y `/limpiar-tareas`',
-    'Comando `/limpiar-tareas` ahora elimina también los embeds anteriores automáticamente'
+    'Comando `/tareas` renovado: categoría obligatoria, sin IA, búsqueda de similitudes',
+    'Sistema anti-duplicados: "Desarrollo", "desarrollo", "DESARROLLO" se unifican automáticamente',
+    'Embeds separados por categoría con colores distintivos y actualización automática'
 ];
 
 // Sistema de changelog incremental
