@@ -34,45 +34,67 @@ async function handleAutocomplete(interaction, context) {
         }
         // Autocomplete para eliminar-streamer
         else if (commandName === 'eliminar-streamer') {
-            const focusedValue = interaction.options.getFocused().toLowerCase();
-            const userId = interaction.options.getUser('discord')?.id;
-            
-            if (!userId || !context.socialLinksSystem) {
+            if (!context.socialLinksSystem) {
                 await interaction.respond([]);
                 return;
             }
-            
-            const userLinks = context.socialLinksSystem.getUserLinks(userId);
-            
-            if (userLinks.length === 0) {
-                await interaction.respond([{
-                    name: 'No hay streamers configurados para este usuario',
-                    value: 'none'
-                }]);
-                return;
-            }
-            
-            const platformEmojis = {
-                twitch: '🎮',
-                kick: '⚡',
-                youtube: '📺'
-            };
-            
-            const filtered = userLinks
-                .filter(link => 
-                    link.username.toLowerCase().includes(focusedValue) ||
-                    link.platform.toLowerCase().includes(focusedValue)
-                )
-                .slice(0, 25)
-                .map(link => ({
+
+            try {
+                const focusedValue = interaction.options.getFocused().toLowerCase();
+                let userId;
+                
+                try {
+                    userId = interaction.options.get('discord')?.value;
+                } catch (e) {
+                    userId = null;
+                }
+                
+                if (!userId) {
+                    await interaction.respond([{
+                        name: 'Por favor, selecciona primero el usuario de Discord',
+                        value: 'select_user_first'
+                    }]);
+                    return;
+                }
+                
+                const userLinks = context.socialLinksSystem.getUserLinks(userId);
+                
+                if (userLinks.length === 0) {
+                    await interaction.respond([{
+                        name: 'Este usuario no tiene streamers configurados',
+                        value: 'no_streamers'
+                    }]);
+                    return;
+                }
+                
+                const platformEmojis = {
+                    twitch: '🎮',
+                    kick: '⚡',
+                    youtube: '📺'
+                };
+                
+                const filtered = userLinks
+                    .filter(link => 
+                        link.username.toLowerCase().includes(focusedValue) ||
+                        link.platform.toLowerCase().includes(focusedValue)
+                    )
+                    .slice(0, 25)
+                    .map(link => ({
+                        name: `${platformEmojis[link.platform]} ${link.platform.toUpperCase()} - ${link.username}`,
+                        value: link.linkId
+                    }));
+                
+                await interaction.respond(filtered.length > 0 ? filtered : userLinks.slice(0, 25).map(link => ({
                     name: `${platformEmojis[link.platform]} ${link.platform.toUpperCase()} - ${link.username}`,
                     value: link.linkId
-                }));
-            
-            await interaction.respond(filtered.length > 0 ? filtered : [{
-                name: 'No se encontraron resultados',
-                value: 'none'
-            }]);
+                })));
+            } catch (autocompleteError) {
+                logger.error('Error en autocomplete de eliminar-streamer:', autocompleteError);
+                await interaction.respond([{
+                    name: 'Error al cargar streamers',
+                    value: 'error'
+                }]);
+            }
         }
         else {
             logger.warn(`Autocomplete no manejado para comando: ${commandName}`);
