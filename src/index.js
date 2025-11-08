@@ -149,11 +149,85 @@ client.once('ready', async () => {
         // Iniciar verificación de inactividad de tickets
         ticketInactivity.startInactivityCheck();
         
+        // Enviar mensaje de estado del bot después de inicialización exitosa
+        await sendBotStatusMessage(client, 'success', null, commands, ticketsSystem);
+        
     } catch (error) {
         logger.error('Error durante la inicialización', error);
+        await sendBotStatusMessage(client, 'error', error, null, null).catch(() => {});
         process.exit(1);
     }
 });
+
+// Función para enviar mensaje de estado del bot
+async function sendBotStatusMessage(client, status, error = null, commandsMap = null, ticketsSys = null) {
+    try {
+        const botLogsChannelId = config.logs?.channels?.bots;
+        if (!botLogsChannelId) return;
+
+        const channel = await client.channels.fetch(botLogsChannelId);
+        if (!channel || !channel.isTextBased()) return;
+
+        const { EmbedBuilder, Colors } = require('discord.js');
+        
+        const statusConfig = {
+            success: {
+                color: Colors.Green,
+                emoji: '✅',
+                title: 'Bot Activo',
+                description: 'El bot se ha iniciado correctamente y está funcionando sin problemas.'
+            },
+            error: {
+                color: Colors.Red,
+                emoji: '❌',
+                title: 'Bot Detenido por Errores',
+                description: 'El bot encontró errores críticos durante la inicialización y se detuvo.'
+            },
+            stopped: {
+                color: Colors.Orange,
+                emoji: '⏸️',
+                title: 'Bot Detenido',
+                description: 'El bot se detuvo de manera controlada.'
+            }
+        };
+
+        const config_status = statusConfig[status] || statusConfig.stopped;
+
+        const embed = new EmbedBuilder()
+            .setColor(config_status.color)
+            .setTitle(`${config_status.emoji} ${config_status.title}`)
+            .setDescription(config_status.description)
+            .addFields(
+                { name: '🕐 Hora', value: `<t:${Math.floor(Date.now() / 1000)}:F>`, inline: true },
+                { name: '📊 Estado', value: status === 'success' ? 'Operacional' : status === 'error' ? 'Con Errores' : 'Detenido', inline: true },
+                { name: '💻 Proceso', value: `PID: ${process.pid}`, inline: true }
+            )
+            .setTimestamp();
+
+        if (status === 'success') {
+            const commandCount = commandsMap ? commandsMap.size : 0;
+            const ticketCount = (ticketsSys && ticketsSys.activeTickets) ? ticketsSys.activeTickets.size : 0;
+            
+            embed.addFields(
+                { name: '📝 Comandos', value: `${commandCount} comandos cargados`, inline: true },
+                { name: '🎫 Tickets', value: `${ticketCount} tickets activos`, inline: true },
+                { name: '🔄 Uptime', value: '<t:' + Math.floor(Date.now() / 1000) + ':R>', inline: true }
+            );
+        }
+
+        if (error) {
+            embed.addFields({
+                name: '⚠️ Error',
+                value: `\`\`\`${error.message.substring(0, 1000)}\`\`\``,
+                inline: false
+            });
+        }
+
+        await channel.send({ embeds: [embed] });
+    } catch (err) {
+        logger.error('Error al enviar mensaje de estado del bot', err);
+    }
+}
 
 // Login
 client.login(process.env.DISCORD_DEV_BOT_TOKEN).catch(error => {

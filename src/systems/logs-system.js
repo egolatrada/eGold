@@ -110,39 +110,99 @@ class LogsSystem {
         await this.sendLog(this.config.logs.channels.messages, embed);
     }
 
+    /**
+     * Función auxiliar para resaltar diferencias en negrita
+     */
+    highlightDifferences(oldText, newText) {
+        if (!oldText || !newText) return { oldHighlighted: oldText || '', newHighlighted: newText || '' };
+        
+        // Dividir en palabras
+        const oldWords = oldText.split(/(\s+)/);
+        const newWords = newText.split(/(\s+)/);
+        
+        let oldHighlighted = '';
+        let newHighlighted = '';
+        
+        // Comparar palabra por palabra
+        const maxLength = Math.max(oldWords.length, newWords.length);
+        
+        for (let i = 0; i < maxLength; i++) {
+            const oldWord = oldWords[i] || '';
+            const newWord = newWords[i] || '';
+            
+            if (oldWord !== newWord) {
+                // Resaltar diferencias en negrita
+                if (oldWord) oldHighlighted += `**${oldWord}**`;
+                if (newWord) newHighlighted += `**${newWord}**`;
+            } else {
+                oldHighlighted += oldWord;
+                newHighlighted += newWord;
+            }
+        }
+        
+        return { oldHighlighted, newHighlighted };
+    }
+
     async handleMessageUpdate(oldMessage, newMessage) {
         if (!newMessage.guild || newMessage.author?.bot) return;
         if (!this.config.logs.channels.messages) return;
         if (!this.isAllowedGuild(newMessage.guild.id)) return;
         if (oldMessage.content === newMessage.content) return;
 
+        // Resaltar diferencias
+        const { oldHighlighted, newHighlighted } = this.highlightDifferences(
+            oldMessage.content,
+            newMessage.content
+        );
+
+        // Descripción: "Mensaje editado por (usuario) en el canal (canal)"
+        const description = `Mensaje editado por ${newMessage.author} en el canal ${newMessage.channel}`;
+
         const embed = new EmbedBuilder()
             .setColor(Colors.Orange)
-            .setTitle(this.messages.messages.edited)
-            .setDescription(`**Mensaje editado en** ${newMessage.channel}`)
+            .setTitle("✏️ Mensaje editado")
+            .setDescription(description)
             .addFields(
-                { name: "Autor", value: `${newMessage.author}`, inline: true },
-                { name: "Canal", value: `${newMessage.channel}`, inline: true },
                 {
-                    name: "Mensaje",
-                    value: `[Ir al mensaje](${newMessage.url})`,
+                    name: "📍 Canal",
+                    value: `${newMessage.channel}`,
                     inline: true,
                 },
+                {
+                    name: "👤 Autor",
+                    value: `${newMessage.author}`,
+                    inline: true,
+                },
+                {
+                    name: "🔗 Mensaje",
+                    value: `[Ir al mensaje](${newMessage.url})`,
+                    inline: true,
+                }
             )
             .setTimestamp();
 
-        if (oldMessage.content) {
+        // Mostrar mensaje original y modificado con diferencias resaltadas
+        if (oldHighlighted && newHighlighted) {
+            const comparison = `**Mensaje original:**\n${oldHighlighted.substring(0, 900)}\n\n**Modificado a:**\n${newHighlighted.substring(0, 900)}`;
             embed.addFields({
-                name: "Antes",
-                value: oldMessage.content.substring(0, 1024),
+                name: "💬 Cambios",
+                value: comparison.substring(0, 1024),
             });
-        }
+        } else {
+            // Fallback si no se pueden resaltar las diferencias
+            if (oldMessage.content) {
+                embed.addFields({
+                    name: "Antes",
+                    value: oldMessage.content.substring(0, 1024),
+                });
+            }
 
-        if (newMessage.content) {
-            embed.addFields({
-                name: "Después",
-                value: newMessage.content.substring(0, 1024),
-            });
+            if (newMessage.content) {
+                embed.addFields({
+                    name: "Después",
+                    value: newMessage.content.substring(0, 1024),
+                });
+            }
         }
 
         await this.sendLog(this.config.logs.channels.messages, embed);
