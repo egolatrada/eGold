@@ -39,6 +39,8 @@ Bot de Discord todo-en-uno con gestión de tickets, verificación automática, m
     - ✅ **Menciones correctas**: Usa formato `<@userid>` para usuarios y `<@&roleid>` para roles en todas las notificaciones
     - ✅ **Jerarquía de roles respetada**: Al detectar qué staff está respondiendo, prioriza el rol más alto (Directiva → Administrador → Moderador → Soporte)
 
+11. **`/mensaje-boton` mejorado**: La opción de canal ahora usa **dropdown** en lugar de ingresar ID manualmente, mejorando la experiencia de usuario
+
 ---
 
 ## 🚀 DEPLOYMENT 24/7 GRATIS
