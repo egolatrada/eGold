@@ -1,8 +1,8 @@
 {
-  "lastBeat": 1762572909622,
+  "lastBeat": 1762572999624,
   "status": "healthy",
-  "ping": -1,
+  "ping": 27,
   "memory": 17,
-  "errors": 0,
-  "uptime": 298
+  "errors": 2,
+  "uptime": 90300
 }
