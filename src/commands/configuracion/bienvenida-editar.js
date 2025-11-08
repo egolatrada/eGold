@@ -4,8 +4,8 @@ const logger = require('../../utils/logger');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('bienvenida-setup')
-        .setDescription('⚙️ [DIRECTIVA] Configurar sistema de bienvenidas')
+        .setName('bienvenida-editar')
+        .setDescription('✏️ [DIRECTIVA] Editar configuración de bienvenidas')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .addChannelOption(option =>
             option.setName('canal')
@@ -25,7 +25,7 @@ module.exports = {
 
         if (directivaRoleId && !interaction.member.roles.cache.has(directivaRoleId)) {
             return await interaction.reply({
-                content: '❌ Solo el rol de **Directiva** puede configurar el sistema de bienvenidas.',
+                content: '❌ Solo el rol de **Directiva** puede editar el sistema de bienvenidas.',
                 ephemeral: true
             });
         }
@@ -44,7 +44,7 @@ module.exports = {
 
         if (!canal && !mensaje && !color) {
             return await interaction.reply({
-                content: '❌ Debes especificar al menos un parámetro para configurar.',
+                content: '❌ Debes especificar al menos un parámetro para editar.',
                 ephemeral: true
             });
         }
@@ -117,10 +117,10 @@ module.exports = {
 
             await interaction.editReply({ embeds: [embed] });
 
-            logger.info(`⚙️ ${interaction.user.tag} actualizó la configuración de bienvenidas`);
+            logger.info(`✏️ ${interaction.user.tag} editó la configuración de bienvenidas`);
 
         } catch (error) {
-            logger.error('Error al configurar sistema de bienvenidas', error);
+            logger.error('Error al editar configuración de bienvenidas', error);
             await interaction.editReply({
                 content: '❌ Ocurrió un error al actualizar la configuración. Por favor, inténtalo de nuevo.'
             });
