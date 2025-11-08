@@ -161,8 +161,9 @@ client.once('ready', async () => {
 
 // Changelog de la versión actual - Actualizar aquí cuando hagas cambios
 const RECENT_CHANGES = [
+    'Comandos personalizados corregidos y reorganizados: `/crear-comando`, `/editar-comando`, `/eliminar-comando`',
     'Comando `/staff-status` renovado: entrada manual de tiempo (unidad + cantidad)',
-    'Mensaje de estado del bot simplificado: eliminada información técnica innecesaria',
+    'Mensaje de estado del bot con changelog automático de cambios recientes',
     'Sistema de monitoreo de redes sociales desactivado (enviaba notificaciones cada 2 min)'
 ];
 

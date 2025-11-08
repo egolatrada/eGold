@@ -12,6 +12,22 @@ module.exports = {
                 .setAutocomplete(true)),
     
     async execute(interaction, context) {
+        if (!context.customCommandsSystem.isAllowedGuild(interaction.guild.id)) {
+            await interaction.reply({
+                content: '❌ Este comando no está disponible en este servidor.',
+                ephemeral: true
+            });
+            return;
+        }
+
+        if (!context.customCommandsSystem.hasStaffPermission(interaction.member)) {
+            await interaction.reply({
+                content: '❌ No tienes permisos para editar comandos personalizados.',
+                ephemeral: true
+            });
+            return;
+        }
+
         const commandName = interaction.options.getString('comando');
         await context.customCommandsSystem.showEditPanel(interaction, commandName);
     }
