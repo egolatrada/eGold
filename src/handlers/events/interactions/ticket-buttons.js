@@ -1,6 +1,9 @@
-const { PermissionFlagsBits, ChannelType, EmbedBuilder } = require('discord.js');
+const { PermissionFlagsBits, ChannelType, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { config, messages } = require('../../../config');
 const logger = require('../../../utils/logger');
+
+// Map para almacenar procesos de cierre pendientes
+const pendingCloseProcesses = new Map();
 
 async function handleCloseTicketButton(interaction, context) {
     const channel = interaction.channel;
@@ -12,8 +15,24 @@ async function handleCloseTicketButton(interaction, context) {
         });
     }
 
+    // Crear botón para cancelar cierre
+    const cancelButton = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId(`cancel_close_${channel.id}`)
+            .setLabel('❌ Cancelar Cierre')
+            .setStyle(ButtonStyle.Danger)
+    );
+
+    // Guardar el proceso de cierre como pendiente
+    pendingCloseProcesses.set(channel.id, {
+        interactionId: interaction.id,
+        timestamp: Date.now()
+    });
+
     await interaction.reply({
         content: messages.ticketClose.processingMessage,
+        components: [cancelButton],
+        ephemeral: true
     });
 
     try {
@@ -216,15 +235,30 @@ async function handleCloseTicketButton(interaction, context) {
 
         logger.success(`Ticket #${ticketData.ticketNumber} cerrado con ${sortedMessages.length} mensajes guardados`);
 
-        setTimeout(async () => {
+        const timeoutId = setTimeout(async () => {
             try {
+                // Verificar si el proceso sigue pendiente (no fue cancelado)
+                if (!pendingCloseProcesses.has(channel.id)) {
+                    logger.info(`Cierre del ticket ${channel.name} fue cancelado, no se eliminará el canal`);
+                    return;
+                }
+                
                 // Eliminar metadata del ticket antes de eliminar el canal
                 ticketsSystem.deleteTicketMetadata(channel.id);
+                // Limpiar proceso pendiente de cierre
+                pendingCloseProcesses.delete(channel.id);
                 await channel.delete();
             } catch (error) {
                 logger.error('Error al eliminar canal', error);
             }
         }, 5000);
+
+        // Actualizar el proceso pendiente con el timeoutId
+        if (pendingCloseProcesses.has(channel.id)) {
+            const processData = pendingCloseProcesses.get(channel.id);
+            processData.timeoutId = timeoutId;
+            pendingCloseProcesses.set(channel.id, processData);
+        }
     } catch (error) {
         logger.error('Error al cerrar ticket', error);
         await channel.send(messages.errors.transcriptError);
@@ -373,9 +407,37 @@ async function handleVoiceSupportButton(interaction, context) {
     }
 }
 
+async function handleCancelCloseButton(interaction, context) {
+    const channelId = interaction.customId.split('_')[2];
+
+    if (!pendingCloseProcesses.has(channelId)) {
+        return await interaction.update({
+            content: '❌ Este proceso de cierre ya finalizó o fue cancelado.',
+            components: []
+        });
+    }
+
+    // Obtener el proceso y cancelar el timeout
+    const processData = pendingCloseProcesses.get(channelId);
+    if (processData.timeoutId) {
+        clearTimeout(processData.timeoutId);
+    }
+
+    // Eliminar el proceso pendiente
+    pendingCloseProcesses.delete(channelId);
+
+    await interaction.update({
+        content: '✅ Cierre de ticket cancelado exitosamente. El ticket permanece abierto.',
+        components: []
+    });
+
+    logger.info(`🔄 Cierre de ticket cancelado por ${interaction.user.tag} en ${interaction.channel.name}`);
+}
+
 module.exports = {
     handleCloseTicketButton,
     handleReopenTicketButton,
     handleTranscriptButton,
-    handleVoiceSupportButton
+    handleVoiceSupportButton,
+    handleCancelCloseButton
 };

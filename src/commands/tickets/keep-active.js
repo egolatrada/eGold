@@ -31,8 +31,8 @@ module.exports = {
 
         if (success) {
             await interaction.reply({
-                content: `✅ Este ticket se mantendrá activo **permanentemente**.\n\n🔒 Solo se puede cerrar manualmente con el botón de "Cerrar Ticket".`,
-                ephemeral: false
+                content: `✅ Este ticket ya no se cerrará automáticamente y únicamente podrá ser cerrado mediante el botón "Cerrar Ticket".`,
+                ephemeral: true
             });
             logger.info(`🔒 Ticket ${channel.name} marcado como activo PERMANENTEMENTE por ${interaction.user.tag}`);
         } else {

@@ -44,6 +44,19 @@ async function handleButtonInteraction(interaction, context) {
             const { handleSuggestionButtons } = require('./suggestion-buttons');
             await handleSuggestionButtons(interaction, context);
         }
+        // Botón de cancelar cierre de ticket
+        else if (customId.startsWith('cancel_close_')) {
+            const { handleCancelCloseButton } = require('./ticket-buttons');
+            await handleCancelCloseButton(interaction, context);
+        }
+        // Botón de copiar ID de rol
+        else if (customId.startsWith('copy_role_id_')) {
+            const roleId = customId.split('_')[3];
+            await interaction.reply({
+                content: `✅ ID copiado: \`${roleId}\`\nPuedes pegarlo donde necesites.`,
+                ephemeral: true
+            });
+        }
         else {
             logger.warn(`Botón no manejado: ${customId}`);
         }

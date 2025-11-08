@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const logger = require('../../utils/logger');
 
 module.exports = {
@@ -19,19 +19,24 @@ module.exports = {
             const embed = new EmbedBuilder()
                 .setColor(targetRole.color || '#5865F2')
                 .setTitle('🔍 ID de Rol')
-                .setDescription(`Información del rol ${targetRole}`)
                 .addFields(
-                    { name: '🏷️ Nombre', value: targetRole.name, inline: true },
-                    { name: '🆔 ID', value: `\`${targetRole.id}\``, inline: true },
+                    { name: '🏷️ Nombre', value: targetRole.name, inline: false },
+                    { name: '🆔 ID', value: `\`${targetRole.id}\``, inline: false },
                     { name: '🎨 Color', value: targetRole.hexColor, inline: true },
-                    { name: '👥 Miembros', value: `${targetRole.members.size}`, inline: true },
-                    { name: '📍 Posición', value: `${targetRole.position}`, inline: true },
-                    { name: '📌 Mencionable', value: targetRole.mentionable ? '✅ Sí' : '❌ No', inline: true }
+                    { name: '👥 Miembros', value: `${targetRole.members.size}`, inline: true }
                 )
                 .setTimestamp();
 
+            const copyButton = new ActionRowBuilder().addComponents(
+                new ButtonBuilder()
+                    .setCustomId(`copy_role_id_${targetRole.id}`)
+                    .setLabel('📋 Copiar ID')
+                    .setStyle(ButtonStyle.Primary)
+            );
+
             await interaction.reply({
                 embeds: [embed],
+                components: [copyButton],
                 ephemeral: true
             });
 

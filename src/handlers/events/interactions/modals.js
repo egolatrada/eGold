@@ -5,10 +5,10 @@ async function handleModalInteraction(interaction, context) {
     const customId = interaction.customId;
     
     try {
-        // Modal de panel embed
-        if (customId === 'embed_modal') {
-            const { handleEmbedModal } = require('./embed-modals');
-            await handleEmbedModal(interaction, context);
+        // Modal de embed
+        if (customId.startsWith('embed_modal_')) {
+            const embedCommand = require('../../../commands/tickets/embed');
+            await embedCommand.handleEmbedModal(interaction);
         }
         // Modal de comandos personalizados (nuevo, editar)
         else if (customId.startsWith('custom_command_modal_')) {

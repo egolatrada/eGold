@@ -20,13 +20,13 @@ module.exports = {
                             { name: 'Instagram', value: 'instagram' },
                             { name: 'Twitter/X', value: 'twitter' }
                         ))
-                .addUserOption(option =>
-                    option.setName('usuario')
-                        .setDescription('Usuario de Discord')
-                        .setRequired(true))
                 .addStringOption(option =>
-                    option.setName('username')
-                        .setDescription('Nombre de usuario en la plataforma')
+                    option.setName('link')
+                        .setDescription('URL del perfil o canal')
+                        .setRequired(true))
+                .addUserOption(option =>
+                    option.setName('discord')
+                        .setDescription('Usuario de Discord')
                         .setRequired(true))
                 .addChannelOption(option =>
                     option.setName('canal')
@@ -47,15 +47,7 @@ module.exports = {
                 .addUserOption(option =>
                     option.setName('usuario')
                         .setDescription('Filtrar por usuario')
-                        .setRequired(false)))
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName('toggle')
-                .setDescription('Activa/desactiva una vinculación')
-                .addStringOption(option =>
-                    option.setName('id')
-                        .setDescription('ID de la vinculación')
-                        .setRequired(true))),
+                        .setRequired(false))),
     
     async execute(interaction, context) {
         // Delegar al sistema de social links

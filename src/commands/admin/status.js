@@ -14,6 +14,12 @@ function createStatusEmbed(healthSystem) {
 
     const uptimeString = `${days}d ${hours}h ${minutes}m ${seconds}s`;
 
+    const healthStatus = {
+        healthy: 'Saludable',
+        degraded: 'Degradado',
+        critical: 'Crítico'
+    }[stats.health] || 'Desconocido';
+
     const healthColor = {
         healthy: '#00FF00',
         degraded: '#FFA500',
@@ -30,10 +36,10 @@ function createStatusEmbed(healthSystem) {
         .setColor(healthColor)
         .setTitle(`${healthEmoji} Estado del Bot`)
         .addFields(
-            { name: '🟢 Estado', value: stats.health.toUpperCase(), inline: true },
+            { name: '🟢 Estado', value: healthStatus, inline: true },
             { name: '📡 Ping', value: `${stats.ping}ms`, inline: true },
             { name: '💾 Memoria', value: `${stats.memory}MB`, inline: true },
-            { name: '⏱️ Uptime', value: uptimeString, inline: true },
+            { name: '⏱️ Activo', value: uptimeString, inline: true },
             { name: '📝 Comandos', value: stats.commandsExecuted.toString(), inline: true },
             { name: '❌ Errores', value: stats.errorCount.toString(), inline: true }
         )
@@ -59,20 +65,15 @@ module.exports = {
                 .setStyle(ButtonStyle.Primary)
         );
 
-        // Responder efímeramente al usuario
+        // Responder efímeramente con el estado del bot
         await interaction.reply({
-            content: '✅ Estado del bot publicado',
+            embeds: [createStatusEmbed(healthSystem)],
+            components: [updateButton],
             flags: MessageFlags.Ephemeral
         });
 
-        // Enviar el embed público al canal
-        const statusMessage = await interaction.channel.send({ 
-            embeds: [createStatusEmbed(healthSystem)],
-            components: [updateButton]
-        });
-
         // Guardar el contexto para poder actualizar después
-        statusMessageContexts.set(statusMessage.id, {
+        statusMessageContexts.set(interaction.id, {
             healthSystem: healthSystem,
             channelId: interaction.channelId
         });

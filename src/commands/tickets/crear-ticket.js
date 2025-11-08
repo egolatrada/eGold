@@ -52,7 +52,7 @@ module.exports = {
                 });
             }
 
-            const categoryConfig = config.tickets?.categories?.find(cat => cat.value === selectedCategory);
+            const categoryConfig = config.tickets?.categories?.[selectedCategory];
             if (!categoryConfig) {
                 return await interaction.editReply({
                     content: '❌ Categoría no encontrada.'
@@ -65,7 +65,7 @@ module.exports = {
             const category = await guild.channels.fetch(categoryConfig.categoryId).catch(() => null);
             if (!category || category.type !== ChannelType.GuildCategory) {
                 return await interaction.editReply({
-                    content: `❌ No se pudo encontrar la categoría para **${categoryConfig.label}**.`
+                    content: `❌ No se pudo encontrar la categoría para **${categoryConfig.name}**.`
                 });
             }
 
@@ -121,9 +121,9 @@ module.exports = {
             });
 
             const welcomeEmbed = new EmbedBuilder()
-                .setColor(categoryConfig.color || '#5865F2')
-                .setTitle(`${categoryConfig.emoji || '🎫'} ${categoryConfig.label}`)
-                .setDescription(categoryConfig.description || `Gracias por abrir un ticket. El staff te atenderá pronto.`)
+                .setColor('#5865F2')
+                .setTitle(`${categoryConfig.emoji || '🎫'} ${categoryConfig.name}`)
+                .setDescription(categoryConfig.channelDescription || `Gracias por abrir un ticket. El staff te atenderá pronto.`)
                 .addFields({ name: '👤 Creado para', value: `${targetUser}`, inline: true })
                 .setFooter({ text: `Ticket #${ticketNumber.toString().padStart(4, '0')}` })
                 .setTimestamp();
