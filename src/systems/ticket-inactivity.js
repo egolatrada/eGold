@@ -45,14 +45,16 @@ class TicketInactivity {
     /**
      * Registra un nuevo ticket
      */
-    trackTicket(channelId, creatorId, category) {
+    trackTicket(channelId, creatorId, category, creatorType = 'usuario') {
         const now = Date.now();
         this.ticketActivity.set(channelId, {
             channelId,
             creatorId,
+            creatorType,
             category,
             createdAt: now,
             lastStaffResponse: null,
+            lastStaffRoleId: null,
             lastUserResponse: now,
             userWarned: false,
             supportNotified: false,
@@ -66,11 +68,12 @@ class TicketInactivity {
     /**
      * Actualiza actividad cuando el staff responde
      */
-    updateStaffActivity(channelId, userId) {
+    updateStaffActivity(channelId, userId, staffRoleId = null) {
         const activity = this.ticketActivity.get(channelId);
         if (!activity) return;
 
         activity.lastStaffResponse = Date.now();
+        activity.lastStaffRoleId = staffRoleId;
         activity.supportNotified = false; // Reset notificación
         this.saveActivityData();
     }
@@ -261,25 +264,31 @@ class TicketInactivity {
     }
 
     /**
-     * Verifica inactividad del usuario
+     * Verifica inactividad del usuario y del staff
      */
     async checkUserInactivity(channel, activity, now) {
-        // CRÍTICO: Solo verificar inactividad del usuario si el soporte YA respondió
-        // No cerrar tickets donde el usuario está esperando la primera respuesta del soporte
+        // CRÍTICO: Solo verificar inactividad si el soporte YA respondió al menos una vez
         if (!activity.lastStaffResponse) {
-            return; // Soporte nunca respondió, no penalizar al usuario
+            return; // Soporte nunca respondió, solo notificar en checkSupportInactivity
         }
 
-        // CORRECCIÓN: Solo verificar inactividad del usuario si el STAFF escribió último
-        // Si el usuario escribió último, es turno del staff de responder
+        // Caso 1: Usuario escribió último → Es turno del staff de responder
         if (activity.lastUserResponse && activity.lastUserResponse > activity.lastStaffResponse) {
-            return; // Usuario ya respondió, es turno del staff
+            const timeSinceUserResponse = now - activity.lastUserResponse;
+            
+            // 6 horas sin respuesta del staff → Notificar al rol específico
+            if (timeSinceUserResponse >= this.SUPPORT_INACTIVITY_TIME && !activity.supportNotified) {
+                await this.warnUser(channel, activity); // Esta función ahora maneja ambos casos
+                activity.supportNotified = true;
+                this.saveActivityData();
+            }
+            return;
         }
 
-        // El staff escribió último → Contar desde que el staff escribió
+        // Caso 2: Staff escribió último → Es turno del usuario de responder
         const timeSinceStaffResponse = now - activity.lastStaffResponse;
 
-        // 6 horas → Advertencia
+        // 6 horas → Advertencia al usuario
         if (timeSinceStaffResponse >= this.USER_WARNING_TIME && !activity.userWarned) {
             await this.warnUser(channel, activity);
             activity.userWarned = true;
@@ -294,24 +303,57 @@ class TicketInactivity {
 
     /**
      * Advierte al usuario sobre la inactividad
+     * Si el último mensaje fue del usuario, menciona al rol del staff que estaba respondiendo
+     * Si el último mensaje fue del staff, menciona al usuario creador del ticket
      */
     async warnUser(channel, activity) {
         try {
-            const user = await this.client.users.fetch(activity.creatorId).catch(() => null);
-            if (!user) return;
+            // Si el último mensaje fue del staff, advertir al usuario
+            if (activity.lastUserResponse && activity.lastUserResponse > activity.lastStaffResponse) {
+                // Usuario escribió último → Mencionar al rol específico del staff
+                let roleMention = '';
+                if (activity.lastStaffRoleId) {
+                    roleMention = `<@&${activity.lastStaffRoleId}>`;
+                } else {
+                    // Fallback: usar todos los roles permitidos
+                    const category = config.tickets.categories[activity.category];
+                    const allowedRoles = category?.allowedRoles || [];
+                    roleMention = allowedRoles.length > 0 
+                        ? allowedRoles.map(roleId => `<@&${roleId}>`).join(' ')
+                        : `<@&${config.tickets.staffRoleId}>`;
+                }
 
-            const embed = new EmbedBuilder()
-                .setColor('#FF0000')
-                .setTitle('⚠️ Advertencia de inactividad')
-                .setDescription(`Hola <@${activity.creatorId}>,\n\nHan pasado **6 horas** sin respuesta de tu parte en este ticket.\n\n⏱️ Si no respondes en **1 hora más**, el ticket será cerrado automáticamente por inactividad.`)
-                .setTimestamp();
+                const embed = new EmbedBuilder()
+                    .setColor('#FFA500')
+                    .setTitle('⏰ Usuario esperando respuesta')
+                    .setDescription(`${roleMention}\n\nEl usuario lleva **6 horas** esperando respuesta en este ticket.\n\n⏱️ Por favor, responde lo antes posible.`)
+                    .setTimestamp();
 
-            await channel.send({
-                content: `<@${activity.creatorId}>`,
-                embeds: [embed]
-            });
+                await channel.send({
+                    content: roleMention,
+                    embeds: [embed]
+                });
 
-            logger.info(`⚠️ Usuario advertido por inactividad en ticket ${channel.name}`);
+                logger.info(`⏰ Rol de staff notificado por inactividad en ticket ${channel.name}`);
+            } else {
+                // Staff escribió último → Advertir al usuario
+                const userMention = activity.creatorType === 'usuario' 
+                    ? `<@${activity.creatorId}>`
+                    : `<@&${activity.creatorId}>`;
+
+                const embed = new EmbedBuilder()
+                    .setColor('#FF0000')
+                    .setTitle('⚠️ Advertencia de inactividad')
+                    .setDescription(`Hola ${userMention},\n\nHan pasado **6 horas** sin respuesta de tu parte en este ticket.\n\n⏱️ Si no respondes en **1 hora más**, el ticket será cerrado automáticamente por inactividad.`)
+                    .setTimestamp();
+
+                await channel.send({
+                    content: userMention,
+                    embeds: [embed]
+                });
+
+                logger.info(`⚠️ Usuario advertido por inactividad en ticket ${channel.name}`);
+            }
         } catch (error) {
             logger.error('Error al advertir usuario', error);
         }

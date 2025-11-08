@@ -200,8 +200,9 @@ module.exports = {
                 components: [row]
             });
 
-            if (ticketInactivity && tipo === 'usuario') {
-                ticketInactivity.trackTicket(ticketChannel.id, targetUser.id, selectedCategory);
+            if (ticketInactivity) {
+                const creatorId = tipo === 'usuario' ? targetUser.id : targetRole.id;
+                ticketInactivity.trackTicket(ticketChannel.id, creatorId, selectedCategory, tipo);
             }
 
             if (hierarchyPerms && ticketHierarchy && tipo === 'usuario') {

@@ -38,13 +38,25 @@ async function handleMessageCreate(message, context) {
                 const administradorRoleId = hierarchyRoles.administrador?.roleId;
                 const directivaRoleId = hierarchyRoles.directiva?.roleId;
                 
-                const isStaff = (soporteRoleId && member.roles.cache.has(soporteRoleId)) || 
-                               (moderadorRoleId && member.roles.cache.has(moderadorRoleId)) || 
-                               (administradorRoleId && member.roles.cache.has(administradorRoleId)) ||
-                               (directivaRoleId && member.roles.cache.has(directivaRoleId));
+                let staffRoleId = null;
+                let isStaff = false;
+                
+                if (directivaRoleId && member.roles.cache.has(directivaRoleId)) {
+                    isStaff = true;
+                    staffRoleId = directivaRoleId;
+                } else if (administradorRoleId && member.roles.cache.has(administradorRoleId)) {
+                    isStaff = true;
+                    staffRoleId = administradorRoleId;
+                } else if (moderadorRoleId && member.roles.cache.has(moderadorRoleId)) {
+                    isStaff = true;
+                    staffRoleId = moderadorRoleId;
+                } else if (soporteRoleId && member.roles.cache.has(soporteRoleId)) {
+                    isStaff = true;
+                    staffRoleId = soporteRoleId;
+                }
                 
                 if (isStaff) {
-                    ticketInactivity.updateStaffActivity(message.channel.id, message.author.id);
+                    ticketInactivity.updateStaffActivity(message.channel.id, message.author.id, staffRoleId);
                 } else {
                     ticketInactivity.updateUserActivity(message.channel.id, message.author.id);
                 }
