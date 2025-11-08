@@ -1,12 +1,50 @@
 const { EmbedBuilder } = require('discord.js');
 const logger = require('../utils/logger');
+const fs = require('fs');
+const path = require('path');
 
 const CHANGELOG_CHANNEL_ID = '1435847630176653312';
+const PENDING_CHANGELOGS_FILE = path.join(__dirname, '../data/pending-changelogs.json');
 
 class ChangelogSystem {
     constructor(client) {
         this.client = client;
         this.changelogChannel = null;
+        this.pendingChangelogs = [];
+    }
+
+    loadPendingChangelogs() {
+        try {
+            if (fs.existsSync(PENDING_CHANGELOGS_FILE)) {
+                const data = fs.readFileSync(PENDING_CHANGELOGS_FILE, 'utf8');
+                this.pendingChangelogs = JSON.parse(data);
+                logger.info(`📝 ${this.pendingChangelogs.length} changelogs pendientes cargados`);
+            }
+        } catch (error) {
+            logger.error('Error al cargar changelogs pendientes', error);
+            this.pendingChangelogs = [];
+        }
+    }
+
+    savePendingChangelogs() {
+        try {
+            const dir = path.dirname(PENDING_CHANGELOGS_FILE);
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
+            }
+            fs.writeFileSync(PENDING_CHANGELOGS_FILE, JSON.stringify(this.pendingChangelogs, null, 2));
+        } catch (error) {
+            logger.error('Error al guardar changelogs pendientes', error);
+        }
+    }
+
+    addPendingChangelog(changes) {
+        this.pendingChangelogs.push({
+            timestamp: Date.now(),
+            changes
+        });
+        this.savePendingChangelogs();
+        logger.info(`✅ Changelog guardado para envío automático en próximo reinicio`);
     }
 
     async initialize() {
@@ -18,6 +56,24 @@ class ChangelogSystem {
                     logger.success(`📝 Sistema de changelog conectado al canal ${channel.name}`);
                     break;
                 }
+            }
+
+            // Cargar y enviar changelogs pendientes
+            this.loadPendingChangelogs();
+            
+            if (this.pendingChangelogs.length > 0 && this.changelogChannel) {
+                logger.info(`📤 Enviando ${this.pendingChangelogs.length} changelog(s) pendiente(s)...`);
+                
+                for (const changelog of this.pendingChangelogs) {
+                    await this.logBulkChanges(changelog.changes);
+                    // Pequeño delay entre changelogs para evitar rate limits
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+
+                // Limpiar changelogs pendientes después de enviar
+                this.pendingChangelogs = [];
+                this.savePendingChangelogs();
+                logger.success(`✅ Todos los changelogs pendientes han sido enviados`);
             }
         } catch (error) {
             logger.error('Error al inicializar sistema de changelog', error);

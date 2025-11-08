@@ -413,27 +413,43 @@ Sistema automático de gestión de inactividad con timers separados para staff y
 - `/staff-status`: Estadísticas de actividad del staff (tickets creados, cerrados, comandos usados)
 - `/bot-info`: Documentación completa del bot con embeds informativos
 
-## 📝 Sistema de Changelog Automático (NUEVO)
+## 📝 Sistema de Changelog Automático (ACTUALIZADO 2025-11-08)
 
-Sistema automático de registro de cambios que publica actualizaciones en tiempo real a un canal específico de Discord.
+Sistema que **envía automáticamente** los changelogs al canal de Discord cada vez que el bot se reinicia.
 
 ### Características
-- ✅ **6 categorías de cambios**: Feature, Fix, Update, Security, Performance, Removal
-- ✅ **Publicación automática** en canal configurado (ID: 1435847630176653312)
-- ✅ **Embeds con emojis y colores** según categoría
-- ✅ **Integración transparente** con todos los sistemas del bot
+- ✅ **Envío automático al reiniciar**: Los changelogs se envían sin intervención manual
+- ✅ **Persistencia**: Se guardan en archivo JSON hasta que se envíen
+- ✅ **Múltiples changelogs**: Puedes agregar varios que se enviarán en el próximo reinicio
+- ✅ **Script helper**: `add-changelog.js` para agregar changelogs fácilmente
+- ✅ **6 categorías**: Feature, Fix, Update, Security, Performance, Removal
 
-### Categorías Disponibles
-- `feature` (✨ verde) - Nuevas funcionalidades
-- `fix` (🐛 naranja) - Corrección de errores
-- `update` (📝 azul) - Actualizaciones y mejoras
-- `security` (🔒 rojo) - Parches de seguridad
-- `performance` (⚡ amarillo) - Mejoras de rendimiento
-- `removal` (🗑️ gris) - Funciones eliminadas
+### Cómo Usar
+```bash
+# Agregar changelog pendiente (se enviará en el próximo reinicio)
+node add-changelog.js
+
+# El script te pedirá:
+# - Emoji del cambio (✨/🔧/🔄/🔒/⚡/🗑️)
+# - Título del cambio
+# - Descripción detallada
+```
+
+### Flujo de Trabajo
+1. Realizas cambios en el código
+2. Ejecutas `node add-changelog.js` y describes los cambios
+3. Reinicias el bot (automático o manual)
+4. **El bot envía automáticamente** los changelogs al Discord
+5. Los usuarios ven las actualizaciones en el canal 🦋・servidor
 
 ### Archivos Clave
-- `src/systems/changelog-system.js`: Sistema de publicación
-- Canal de changelog: 1435847630176653312 (🦋・servidor)
+- `src/systems/changelog-system.js`: Sistema principal con envío automático
+- `src/data/pending-changelogs.json`: Changelogs pendientes (se crea automáticamente)
+- `add-changelog.js`: Script helper para agregar changelogs
+- `CHANGELOG-SYSTEM-README.md`: Documentación completa del sistema
+- Canal de Discord: 1435847630176653312 (🦋・servidor)
+
+**📖 Ver [CHANGELOG-SYSTEM-README.md](CHANGELOG-SYSTEM-README.md) para documentación completa**
 
 ## 🔄 ACTUALIZACIÓN COMANDOS (2025-11-08)
 
