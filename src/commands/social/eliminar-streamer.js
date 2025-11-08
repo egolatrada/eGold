@@ -6,8 +6,17 @@ module.exports = {
         .setDescription('🗑️ Elimina un streamer de las notificaciones automáticas')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .addStringOption(option =>
-            option.setName('id')
-                .setDescription('ID del streamer (obtén la lista con /lista-streamer)')
+            option.setName('plataforma')
+                .setDescription('Plataforma del streamer')
+                .setRequired(true)
+                .addChoices(
+                    { name: '🎮 Twitch', value: 'twitch' },
+                    { name: '⚡ Kick', value: 'kick' },
+                    { name: '📺 YouTube', value: 'youtube' }
+                ))
+        .addStringOption(option =>
+            option.setName('link_o_usuario')
+                .setDescription('Link o nombre de usuario del streamer')
                 .setRequired(true)),
     
     async execute(interaction, context) {
@@ -21,18 +30,31 @@ module.exports = {
         }
         
         try {
-            const linkId = interaction.options.getString('id');
+            const platform = interaction.options.getString('plataforma');
+            const username = interaction.options.getString('link_o_usuario');
             
-            const result = socialLinksSystem.removeLink(linkId);
+            const allLinks = socialLinksSystem.getAllLinks();
+            const matchingLink = allLinks.find(link => 
+                link.platform === platform && link.username === username
+            );
+            
+            if (!matchingLink) {
+                return await interaction.reply({
+                    content: `❌ **No se encontró el streamer**\n\n**Plataforma:** ${platform}\n**Usuario:** ${username}\n\n*Verifica que el nombre sea exactamente igual al que usaste al añadirlo. Usa /lista-streamer para ver todos los streamers configurados.*`,
+                    ephemeral: true
+                });
+            }
+            
+            const result = socialLinksSystem.removeLink(matchingLink.linkId);
             
             if (result.success) {
                 await interaction.reply({
-                    content: `✅ **Streamer eliminado correctamente**\n\nYa no se enviarán notificaciones para este streamer.`,
+                    content: `✅ **Streamer eliminado correctamente**\n\n**Plataforma:** ${platform}\n**Usuario:** ${username}\n\nYa no se enviarán notificaciones para este streamer.`,
                     ephemeral: true
                 });
             } else {
                 await interaction.reply({
-                    content: `❌ Error: ${result.error}\n\n*Usa /lista-streamer para ver los IDs disponibles.*`,
+                    content: `❌ Error: ${result.error}`,
                     ephemeral: true
                 });
             }
