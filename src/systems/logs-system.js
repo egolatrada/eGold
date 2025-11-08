@@ -503,29 +503,33 @@ class LogsSystem {
                     value: newRolesList.substring(0, 1024),
                 });
 
+                let executor = "No disponible";
                 try {
                     const auditLogs = await newMember.guild.fetchAuditLogs({
                         type: AuditLogEvent.MemberRoleUpdate,
-                        limit: 1,
+                        limit: 5,
                     });
 
-                    const roleLog = auditLogs.entries.first();
-                    if (
-                        roleLog &&
-                        roleLog.target.id === newMember.id &&
-                        Date.now() - roleLog.createdTimestamp < 3000
-                    ) {
-                        embed.addFields({
-                            name: "Modificado por",
-                            value: `${roleLog.executor}`,
-                            inline: true,
-                        });
+                    const roleLog = auditLogs.entries.find(
+                        entry => entry.target.id === newMember.id && 
+                        Date.now() - entry.createdTimestamp < 5000
+                    );
+                    
+                    if (roleLog) {
+                        executor = `${roleLog.executor}`;
                     }
                 } catch (error) {
-                    console.log(
-                        "No se pudo obtener información del cambio de roles",
+                    console.error(
+                        "No se pudo obtener información del cambio de roles:",
+                        error.message
                     );
                 }
+
+                embed.addFields({
+                    name: "👤 Modificado por",
+                    value: executor,
+                    inline: true,
+                });
 
                 await this.sendLog(this.config.logs.channels.roles, embed);
             }
