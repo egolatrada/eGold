@@ -1,347 +1,234 @@
 # 🏆 eGold Bot - Discord Bot para Strangers RP
 
-Bot de Discord profesional con sistema de tickets, moderación, verificación y gestión completa para servidores de roleplay.
+Bot de Discord profesional con sistema de tickets, moderación, verificación, sistema de advertencias, bienvenidas personalizadas y gestión completa para servidores de roleplay.
 
-## ✨ Características
+**Total de comandos: 39 comandos**  
+**Última actualización: 2025-11-08**
 
-- 🎯 Panel de tickets interactivo con menú desplegable integrado
-- 📋 Selección directa de tipo de ticket sin mensajes adicionales
-- 📁 Organización automática en categorías específicas
-- 🔒 Sistema de permisos (solo creador + staff)
-- 💾 Guardado automático de transcripciones en canales de Discord
-- 📝 Todos los mensajes son personalizables desde `messages.json`
-- 🎨 Embeds elegantes con timestamps de Discord
-- 🎉 Mensaje de bienvenida automático al añadir el bot a un servidor
-- 📩 DM al administrador con instrucciones de configuración
-- 🔐 Información sobre privacidad y confidencialidad del bot
-- 🔒 Comando `/panel-embed` para crear embeds **100% anónimos** sin dejar rastro
-- ✨ Sistema de embeds con panel privado reutilizable
-- 🖌️ Editor interactivo de embeds con todos los campos editables
-- 👥 Control de permisos por roles para funciones de staff
-- 🤖 Sistema de Q&A automático con IA (responde preguntas basándose en un canal de información)
-- 🧵 Respuestas en hilos para mantener conversaciones organizadas
-- 💡 Usa IA para generar respuestas precisas basadas en tu contenido
-- 📋 **Sistema completo de logs** - Registra toda la actividad del servidor
-- 🗑️ Logs de mensajes (eliminados, editados)
-- 👥 Logs de miembros (entradas, salidas, kicks, bans, cambios de nickname)
-- 🎭 Logs de roles (creados, eliminados, actualizados)
-- 🔊 Logs de voz (entradas, salidas, movimientos entre canales, mutes, ensordecimientos)
-- ⚡ Logs de comandos (separando admin y roles específicos)
-- 🤖 Logs de actividad de bots
-- 🔗 Logs de invitaciones (creación + hilos automáticos con usos)
+---
+
+## ✨ Características Principales
+
+### 🎫 Sistema de Tickets Avanzado
+- Panel interactivo con menú desplegable integrado
+- Creación de tickets para usuarios individuales o roles completos
+- Organización automática en categorías específicas
+- Sistema de permisos (solo creador + staff)
+- **Sistema de jerarquía de tickets** con roles de soporte escalonados
+- **Sistema de inactividad inteligente** con notificaciones bidireccionales
+- **Canales de voz temporales** con botón "Subir a soporte"
+- Guardado automático de transcripciones elegantes en Discord
+- Numeración persistente de tickets
+
+### 👋 Sistema de Bienvenidas
+- **Canal predefinido**: `1425955729541697688` (configurable)
+- Mensajes personalizables con variables dinámicas
+- Avatar del usuario mostrado automáticamente
+- Color de embed personalizable
+- Imagen de fondo opcional
+- Base de datos PostgreSQL para persistencia
+- 3 comandos: `/bienvenida-setup`, `/bienvenida-editar`, `/bienvenida-test`
+
+### ⚠️ Sistema de Advertencias (Warns)
+- Sistema completo de gestión de advertencias
+- 3 categorías: Leve, Moderada, Grave
+- Auto-revocación automática por tiempo configurado
+- Revocación manual con razón
+- Historial completo de advertencias por usuario
+- Comandos: `/warn`, `/unwarn`, `/warns`, `/warn-historial`
+
+### 📋 Sistema de Tareas
+- Gestión de tareas organizadas por categorías
+- Creación, visualización y eliminación de tareas
+- Persistencia en base de datos PostgreSQL
+- Comandos: `/tarea-crear`, `/tarea-ver`, `/tarea-borrar`
+
+### 🔐 Sistema de Verificación
+- Verificación automática con botón
+- Asignación automática de roles al verificarse
+- Panel de verificación personalizable
+
+### 🎨 Panel de Embeds Anónimos
+- Comando `/panel-embed` para crear embeds 100% anónimos
+- Editor interactivo con todos los campos editables
+- Panel privado reutilizable
+- Sin rastros de quién creó el embed
+- Control de permisos por roles
+
+### 📊 Sistema de Logs Completo
+- **Mensajes**: Eliminados, editados (con contenido original)
+- **Canales**: Creados, eliminados, threads
+- **Miembros**: Entradas, salidas, kicks, bans, cambios de nickname y roles
+- **Roles**: Creados, eliminados, actualizados
+- **Voz**: Entradas, salidas, movimientos
+- **Comandos**: Tracking de comandos (admin y roles específicos)
+- **Bots**: Actividad de bots
+- **Invitaciones**: Creación + hilos con tracking de usos
+
+### 🎥 Monitoreo de Streamers
+- Notificaciones automáticas cuando streamers van en vivo
+- Soporte para Twitch y YouTube
+- Configuración de canales de notificación
+- Comandos: `/streamer-añadir`, `/streamer-eliminar`, `/streamer-lista`
+
+### 🛡️ Sistema de Moderación
+- Detección automática de contenido NSFW/gore con IA (Gemini)
+- Verificación de seguridad de enlaces (phishing, malware)
+- Auto-moderación configurable
+
+### 💬 Sistema de Comandos Personalizados
+- Crear comandos personalizados sin programar
+- Gestión completa de comandos
+- Comandos: `/cmd-crear`, `/cmd-eliminar`, `/cmd-lista`, `/cmd-editar`
+
+### 💡 Sistema de Sugerencias
+- Canal dedicado para sugerencias
+- Sistema de respuesta con estado (Aprobada/Rechazada)
+- Comandos: `/sug-responder`
+
+### 📝 Sistema de Changelog
+- Registro de cambios del servidor
+- Envío directo a canal de Discord
+
+### 🔗 Integración de Redes Sociales
+- Enlaces a redes sociales del servidor
+- Comandos para gestionar links sociales
+
+### 💓 Sistema de Monitoreo y Salud
+- Health checks automáticos cada 5 minutos
+- Auto-restart en caso de errores críticos
+- Watchdog externo opcional para máxima disponibilidad
+- Comandos: `/status`, `/restart` (solo admins)
+
+---
+
+## 📋 Lista Completa de Comandos (39 Total)
+
+### 🎫 Tickets (7 comandos)
+1. `/setup-panel` - Crear panel de tickets
+2. `/ticket-crear` - Crear ticket para usuario o rol
+3. `/ticket-añadir` - Añadir usuario a ticket
+4. `/ticket-eliminar` - Eliminar usuario de ticket
+5. `/ticket-cerrar` - Cerrar ticket actual
+6. `/ticket-renombrar` - Renombrar ticket
+7. `/ticket-transcripción` - Obtener transcripción manual
+
+### 👋 Bienvenidas (3 comandos)
+8. `/bienvenida-setup` - Configurar sistema de bienvenidas
+9. `/bienvenida-editar` - Editar configuración existente
+10. `/bienvenida-test` - Probar mensaje de bienvenida
+
+### ⚠️ Advertencias (4 comandos)
+11. `/warn` - Advertir a un usuario
+12. `/unwarn` - Revocar advertencia
+13. `/warns` - Ver advertencias activas de un usuario
+14. `/warn-historial` - Ver historial completo de advertencias
+
+### 📋 Tareas (3 comandos)
+15. `/tarea-crear` - Crear nueva tarea
+16. `/tarea-ver` - Ver tareas pendientes
+17. `/tarea-borrar` - Borrar tarea completada
+
+### ⚙️ Configuración (5 comandos)
+18. `/panel-embed` - Crear embeds anónimos
+19. `/mensaje-boton` - Editar mensaje con botón
+20. `/clear` - Limpiar mensajes (1-100)
+21. `/config-tickets` - Ver configuración actual
+22. `/changelog` - Publicar cambios del servidor
+
+### 🎥 Streamers (3 comandos)
+23. `/streamer-añadir` - Añadir streamer a monitoreo
+24. `/streamer-eliminar` - Eliminar streamer
+25. `/streamer-lista` - Ver streamers monitoreados
+
+### 💬 Comandos Personalizados (4 comandos)
+26. `/cmd-crear` - Crear comando personalizado
+27. `/cmd-eliminar` - Eliminar comando personalizado
+28. `/cmd-lista` - Ver todos los comandos personalizados
+29. `/cmd-editar` - Editar comando existente
+
+### 💡 Sugerencias (1 comando)
+30. `/sug-responder` - Responder a sugerencia (Aprobada/Rechazada)
+
+### 🔗 Social (2 comandos)
+31. `/social-añadir` - Añadir enlace de red social
+32. `/social-eliminar` - Eliminar enlace de red social
+
+### ℹ️ Información (3 comandos)
+33. `/bot-info` - Información completa del bot
+34. `/comandos` - Lista todos los comandos organizados
+35. `/server-stats` - Estadísticas del servidor
+
+### 🛡️ Administración (4 comandos)
+36. `/status` - Estado de salud del bot
+37. `/restart` - Reiniciar el bot
+38. `/ban` - Banear usuario
+39. `/kick` - Expulsar usuario
+
+---
 
 ## 🚀 Configuración Inicial
 
-### 1. Añadir el Bot a tu Servidor
+### 1. Variables de Entorno (.env)
 
-Cuando añadas el bot a tu servidor de Discord:
+```env
+# Discord
+DISCORD_BOT_TOKEN=tu_token_aqui
+DISCORD_DEV_BOT_TOKEN=tu_dev_token_aqui (opcional)
 
-**📩 Recibirás un DM automático** con:
-- Mensaje de bienvenida personalizado
-- Instrucciones sobre configuración inicial
-- Información sobre la confidencialidad y privacidad del bot
-- Guía de primeros pasos
+# Base de Datos
+DATABASE_URL=postgresql://usuario:password@host:5432/database
 
-**📢 El bot enviará un mensaje al servidor** en:
-- Canal de sistema (si está configurado), o
-- Te dará opciones para elegir dónde recibir notificaciones
+# Seguridad
+SESSION_SECRET=un_secreto_aleatorio_fuerte
 
-### 2. Configurar el Bot en Discord
+# Opcional - Solo si usas IA
+OPENAI_API_KEY=tu_key_aqui
+GEMINI_API_KEY=tu_key_aqui
 
-El bot ya está conectado con tu token. Asegúrate de que tenga estos permisos en tu servidor:
-- ✅ Gestionar canales
-- ✅ Enviar mensajes
-- ✅ Gestionar mensajes
-- ✅ Insertar enlaces
-- ✅ Leer historial de mensajes
-- ✅ Usar comandos de aplicación
-- ✅ Adjuntar archivos
-- ✅ Ver registro de auditoría (para detectar quién añadió el bot)
-
-### 3. Crear Canales de Transcripciones
-
-Crea un canal (o varios) donde se guardarán las transcripciones de los tickets. Por ejemplo:
-- `#transcripts-soporte`
-- `#transcripts-reportes`
-- `#transcripts-general`
-
-Puedes usar un mismo canal para todas las categorías o canales separados.
-
-### 4. Obtener los IDs necesarios
-
-Para obtener IDs en Discord, primero activa el "Modo Desarrollador":
-- Configuración de Usuario → Avanzado → Modo de Desarrollador
-
-Luego haz clic derecho sobre:
-- **Categorías**: Clic derecho en la categoría → "Copiar ID de categoría"
-- **Roles**: Configuración del Servidor → Roles → Clic derecho en el rol → "Copiar ID del rol"
-- **Canales**: Clic derecho en el canal → "Copiar ID del canal"
-
-### 5. Editar config.json
-
-El `config.json` está **organizado en 3 secciones claramente separadas**:
-
-#### 🎫 Sección: TICKETS
-```json
-"tickets": {
-  "staffRoleId": "TU_ROL_STAFF_ID",
-  "ticketChannelId": "CANAL_PANEL_ID",
-  "categories": { ... }
-}
+# Opcional - Solo si usas monitoreo de streams
+TWITCH_CLIENT_ID=tu_client_id
+TWITCH_ACCESS_TOKEN=tu_token
+YOUTUBE_API_KEY=tu_key
 ```
 
-#### 🎨 Sección: EMBED
-```json
-"embed": {
-  "defaultColor": "0099ff",
-  "allowedRoles": [],
-  "maxTitleLength": 256,
-  "maxDescriptionLength": 4000
-}
-```
+### 2. Configurar config.json
 
-#### 🤖 Sección: Q&A CON IA
-```json
-"qaSystem": {
-  "enabled": false,
-  "infoChannelId": "CANAL_INFO_ID",
-  "questionsChannelId": "CANAL_PREGUNTAS_ID",
-  "responseModel": "gpt-4o-mini",
-  "maxKnowledgeMessages": 100,
-  "threadAutoArchiveDuration": 60
-}
-```
+El archivo `config.json` está organizado en secciones:
 
-📖 **[Ver guía completa de configuración en CONFIG_GUIDE.md](CONFIG_GUIDE.md)**
-
-**Ejemplo de configuración completa:**
-
+#### 🎫 Tickets
 ```json
 {
   "tickets": {
-    "staffRoleId": "TU_STAFF_ROLE_ID",
-    "ticketChannelId": "TU_TICKET_CHANNEL_ID",
+    "staffRoleId": "TU_ROL_STAFF_ID",
+    "ticketChannelId": "CANAL_PANEL_ID",
     "categories": {
       "general": {
         "name": "Soporte Técnico",
-        "categoryId": "TU_CATEGORY_ID",
-        "transcriptChannelId": "TU_CANAL_TRANSCRIPTS_ID",
+        "categoryId": "ID_CATEGORIA_DISCORD",
+        "transcriptChannelId": "ID_CANAL_TRANSCRIPTS",
         "emoji": "🔧",
         "channelDescription": "Canal de soporte técnico"
-      },
-      "Soporte": {
-        "name": "Soporte General",
-        "categoryId": "TU_CATEGORY_ID",
-        "transcriptChannelId": "TU_CANAL_TRANSCRIPTS_ID",
-        "emoji": "💬",
-        "channelDescription": "Canal de soporte general"
       }
     }
-  },
-  "embed": {
-    "defaultColor": "0099ff",
-    "allowedRoles": [],
-    "maxTitleLength": 256,
-    "maxDescriptionLength": 4000
-  },
-  "qaSystem": {
-    "enabled": false,
-    "infoChannelId": "CANAL_INFO_ID_AQUI",
-    "questionsChannelId": "CANAL_PREGUNTAS_ID_AQUI",
-    "responseModel": "gpt-4o-mini",
-    "maxKnowledgeMessages": 100,
-    "threadAutoArchiveDuration": 60
   }
 }
 ```
 
-**📌 Campos importantes:**
-- **tickets.staffRoleId**: Rol que puede ver todos los tickets (OBLIGATORIO)
-- **tickets.ticketChannelId**: Canal donde aparecerá el panel de tickets
-- **tickets.categories.*.categoryId**: Categoría donde se crearán los canales
-- **tickets.categories.*.transcriptChannelId**: Canal de transcripciones (OBLIGATORIO)
-- **qaSystem.enabled**: `true` para activar el sistema Q&A, `false` para desactivar
-
-## 📖 Uso
-
-### Crear el Panel de Tickets
-
-1. Ve al canal donde quieres el panel de tickets
-2. Usa el comando: `/setup-panel`
-3. El panel aparecerá con el menú desplegable integrado
-
-### Crear un Ticket
-
-1. Selecciona el tipo de ticket del menú desplegable del panel
-2. Se creará automáticamente un canal privado
-3. Solo tú y el staff podrán ver el canal
-
-### Cerrar un Ticket
-
-1. Dentro del canal del ticket, haz clic en **"Cerrar Ticket"**
-2. La transcripción se enviará al canal de transcripciones configurado
-3. El canal se eliminará después de 5 segundos
-
-### Crear Embeds Personalizados (100% Anónimo)
-
-El bot incluye un sistema **completamente anónimo** para crear embeds sin dejar rastro:
-
-#### 🔒 **Método Recomendado: `/panel-embed` (Anónimo Total)**
-
-Este método es **100% invisible** - nadie sabrá quién creó el embed:
-
-1. Usa el comando: `/panel-embed` (opcionalmente selecciona un canal específico)
-2. Aparecerá un **panel privado que solo tú puedes ver**
-3. Haz clic en el botón **"✨ Crear Embed"**
-4. Se abrirá un formulario interactivo con los siguientes campos:
-   - **Título**: El título del embed
-   - **Descripción**: Contenido principal del embed
-   - **Color**: Color en formato hexadecimal (ej: 0099ff)
-   - **Footer**: Texto al pie del embed
-   - **Autor**: Nombre del autor
-5. Completa los campos que quieras (todos son opcionales)
-6. El embed se enviará al canal seleccionado **sin que nadie sepa quién lo creó**
-
-**✨ Ventajas de `/panel-embed`:**
-- ✅ **100% Anónimo** - Sin mensajes públicos de "ha utilizado /panel-embed"
-- ✅ **Reutilizable** - Puedes usar el mismo panel múltiples veces
-- ✅ **Privado** - Solo tú ves el panel de control
-- ✅ **Sin rastros** - El embed aparece como si lo hubiera enviado el bot
-- ✅ **Mensajes efímeros** - Todas las confirmaciones son privadas y solo las ves tú
-
-### Eliminar Mensajes con `/clear` 🗑️
-
-El bot incluye un comando para eliminar mensajes de manera eficiente con logs automáticos:
-
-**Uso del comando:**
-1. Usa el comando: `/clear cantidad:50` (puedes elegir de 1 a 100 mensajes)
-2. El bot eliminará la cantidad especificada de mensajes
-3. Recibirás una confirmación privada
-
-**Sistema de Logs Automáticos:**
-
-**Si eliminas más de 20 mensajes:**
-- 📄 Se crea una **transcripción completa** en archivo `.txt`
-- 🔴 Embed con color **rojo** indicando eliminación masiva
-- 📋 El archivo incluye: usuario, timestamp, contenido y archivos adjuntos de cada mensaje
-- 📨 Se envía al canal de logs de mensajes
-
-**Si eliminas 20 o menos mensajes:**
-- 📝 Embed con **lista de mensajes** eliminados
-- 🟠 Color **naranja** para eliminaciones normales
-- 👤 Muestra autor y contenido de cada mensaje (truncado a 100 caracteres)
-- 📨 Se envía al canal de logs de mensajes
-
-**Registro del comando:**
-- ⚡ Se registra el uso del comando en el **canal de logs de comandos**
-- 👤 Muestra quién ejecutó el comando
-- 📊 Cantidad de mensajes eliminados
-- 📍 Canal donde se eliminaron
-
-**Características:**
-- ✅ Límite de 1-100 mensajes por comando
-- ✅ Solo funciona con mensajes de menos de 14 días (limitación de Discord)
-- ✅ Requiere permiso de "Gestionar Mensajes"
-- ✅ Respuestas privadas (solo tú ves el resultado)
-- ✅ Logs automáticos en canales configurados
-
-**🔐 Restricciones de Seguridad (Configurables en config.json):**
-
-Puedes controlar **quién** y **dónde** se puede usar el comando:
-
-**`allowedRoleId`**: Restringe el comando a un rol específico
-```json
-"embed": {
-  "allowedRoleId": "1234567890123456"
-}
-```
-- **Vacío (`""`)**: Cualquier usuario con permiso "Gestionar Mensajes" puede usarlo
-- **Con ID de rol**: Solo usuarios con ese rol específico pueden usarlo
-
-**`allowedChannelId`**: Restringe el comando a un canal específico
-```json
-"embed": {
-  "allowedChannelId": "9876543210987654"
-}
-```
-- **Vacío (`""`)**: El comando funciona en cualquier canal
-- **Con ID de canal**: El comando **solo** funciona en ese canal
-
-**💡 Ejemplo completo de restricción:**
-```json
-"embed": {
-  "allowedRoleId": "1234567890123456",
-  "allowedChannelId": "9876543210987654"
-}
-```
-Con esta configuración, **solo** el rol `1234567890123456` podrá usar `/panel-embed` y **solo** en el canal `9876543210987654`.
-
-### Sistema de Q&A Automático con IA 🤖
-
-El bot incluye un sistema inteligente de preguntas y respuestas que usa IA para responder automáticamente basándose en la información de tu servidor.
-
-**Cómo funciona:**
-1. Tienes un **Canal de Información** donde pones todo el contenido informativo (reglas, guías, FAQs, etc.)
-2. Los usuarios hacen preguntas en el **Canal de Preguntas**
-3. El bot lee la información del canal de contenido
-4. Usa IA para generar una respuesta precisa basada en esa información
-5. Responde automáticamente en un hilo para mantener todo organizado
-
-**Configuración en config.json:**
-```json
-{
-  "qaSystem": {
-    "enabled": true,
-    "infoChannelId": "ID_DEL_CANAL_DE_INFORMACION",
-    "questionsChannelId": "ID_DEL_CANAL_DE_PREGUNTAS",
-    "responseModel": "gpt-4o-mini"
-  }
-}
-```
-
-**Parámetros:**
-- `enabled`: `true` para activar, `false` para desactivar
-- `infoChannelId`: ID del canal donde está toda la información
-- `questionsChannelId`: ID del canal donde los usuarios harán preguntas
-- `responseModel`: Modelo de IA a usar (opciones: `"gpt-4o-mini"`, `"gpt-4o"`, `"gpt-5-mini"`)
-
-**Características:**
-- ✅ Lee hasta 100 mensajes del canal de información
-- ✅ Responde solo basándose en la información disponible
-- ✅ Crea hilos automáticamente para cada pregunta
-- ✅ Respuestas en español
-- ✅ Indicador de "escribiendo..." mientras genera la respuesta
-
-**Nota importante:** Este sistema usa **Replit AI Integrations**, que proporciona acceso a OpenAI sin necesitar tu propia API key. Los costos se cargan a tus créditos de Replit.
-
-### Sistema de Logs Completo 📋
-
-El bot incluye un **sistema modular de logs** que registra toda la actividad del servidor. Puedes activar solo los tipos de logs que necesites.
-
-**Tipos de logs disponibles:**
-
-1. **🗑️ Mensajes** - Mensajes eliminados y editados (con contenido original)
-2. **🏗️ Canales** - Canales creados, eliminados y threads
-3. **👥 Miembros** - Entradas, salidas, kicks, bans, unbans, cambios de nickname, cambios de roles
-4. **🎭 Roles** - Roles creados, eliminados y actualizados (nombre, color, permisos)
-5. **🔊 Voz** - Entradas, salidas y movimientos entre canales de voz
-6. **⚡ Comandos** - Tracking de comandos usados (separando admins y roles específicos)
-7. **🤖 Bots** - Actividad de bots (mensajes automáticos, respuestas a comandos)
-
-**Configuración en config.json:**
+#### 📋 Logs
 ```json
 {
   "logs": {
     "enabled": true,
     "channels": {
-      "messages": "ID_CANAL_LOGS_MENSAJES",
-      "channels": "ID_CANAL_LOGS_CANALES",
-      "members": "ID_CANAL_LOGS_MIEMBROS",
-      "roles": "ID_CANAL_LOGS_ROLES",
-      "voice": "ID_CANAL_LOGS_VOZ",
-      "commands": "ID_CANAL_LOGS_COMANDOS",
-      "bots": "ID_CANAL_LOGS_BOTS",
-      "invites": "ID_CANAL_LOGS_INVITACIONES"
+      "messages": "ID_CANAL",
+      "channels": "ID_CANAL",
+      "members": "ID_CANAL",
+      "roles": "ID_CANAL",
+      "voice": "ID_CANAL",
+      "commands": "ID_CANAL",
+      "bots": "ID_CANAL",
+      "invites": "ID_CANAL"
     },
     "logAllCommands": false,
     "trackedRoles": ["ID_ROL_1", "ID_ROL_2"]
@@ -350,270 +237,422 @@ El bot incluye un **sistema modular de logs** que registra toda la actividad del
 ```
 
 **Opciones de configuración:**
-- **Un canal para todo**: Usa el mismo ID en todos los tipos de logs
-- **Canales separados**: Usa IDs diferentes para organizar los logs por categoría
-- **Solo algunos logs**: Deja vacío (`""`) los tipos que no quieras registrar
-- **`logAllCommands`**: `false` = solo admins y roles específicos, `true` = todos los comandos
-- **`trackedRoles`**: Array de IDs de roles cuyos comandos quieres registrar
+- Un canal para todo: usa el mismo ID en todos los tipos
+- Canales separados: usa IDs diferentes por categoría
+- Solo algunos logs: deja vacío (`""`) los que no quieras
 
-**Características:**
-- ✅ Embeds elegantes con colores por tipo de evento
-- ✅ Información completa (usuario, canal, razón, moderador, etc.)
-- ✅ Timestamps de Discord
-- ✅ Detección automática de moderadores usando Audit Logs
-- ✅ Completamente modular - activa solo lo que necesites
-
-#### 🔗 Logs de Invitaciones (invites)
-
-El sistema de logs incluye un **subsistema de tracking de invitaciones** que registra quién crea invitaciones y quién las usa.
-
-**Cómo funciona:**
-
-1. **Cuando se crea una invitación** → El bot registra un embed con:
-   - Quién la creó
-   - Código de la invitación
-   - Fecha y hora de creación
-   - Usos máximos (si tiene límite)
-   - Cuándo expira (si tiene expiración)
-   - Canal al que invita
-
-2. **Cuando alguien usa la invitación** → El bot crea un hilo automático en el embed original mostrando:
-   - Quién usó la invitación
-   - ID del usuario
-   - Cuándo se unió
-   - Foto de perfil
-   - Número de uso de esa invitación
-
-**Configuración:** Añade el ID del canal en `logs.channels.invites`:
+#### 🎨 Embeds
 ```json
 {
-  "logs": {
-    "enabled": true,
-    "channels": {
-      "invites": "ID_DEL_CANAL_DE_INVITACIONES"
-    }
+  "embed": {
+    "defaultColor": "0099ff",
+    "allowedRoleId": "",
+    "allowedChannelId": "",
+    "maxTitleLength": 256,
+    "maxDescriptionLength": 4000
   }
 }
 ```
 
+### 3. Permisos Necesarios del Bot
+
+El bot necesita estos permisos en Discord:
+- ✅ Gestionar canales
+- ✅ Gestionar roles
+- ✅ Enviar mensajes
+- ✅ Gestionar mensajes
+- ✅ Insertar enlaces
+- ✅ Leer historial de mensajes
+- ✅ Usar comandos de aplicación
+- ✅ Adjuntar archivos
+- ✅ Ver registro de auditoría
+- ✅ Administrador (recomendado)
+
+### 4. Obtener IDs en Discord
+
+1. Activa **Modo Desarrollador** en Discord:
+   - Configuración → Avanzado → Modo Desarrollador ✅
+
+2. Haz clic derecho sobre:
+   - **Canales**: Clic derecho → "Copiar ID del canal"
+   - **Roles**: Configuración del Servidor → Roles → Clic derecho → "Copiar ID del rol"
+   - **Categorías**: Clic derecho → "Copiar ID de categoría"
+   - **Usuarios**: Clic derecho → "Copiar ID del usuario"
+
+---
+
+## 📖 Uso de Características Principales
+
+### 🎫 Sistema de Tickets
+
+**Crear panel:**
+```
+/setup-panel
+```
+
+**Crear ticket para un usuario específico:**
+```
+/ticket-crear usuario:@usuario
+```
+
+**Crear ticket para un rol completo:**
+```
+/ticket-crear rol:@rol
+```
+
+**Dentro del ticket:**
+- Botón "Cerrar Ticket" → Cierra y guarda transcripción
+- Botón "Subir a soporte" → Crea canal de voz temporal
+
+### 👋 Sistema de Bienvenidas
+
+**Configuración rápida (usa canal predefinido):**
+```
+/bienvenida-setup mensaje:"Bienvenido {usuario} a {servidor}! 🎉"
+```
+
+**Configuración completa:**
+```
+/bienvenida-setup canal:#bienvenidas mensaje:"Tu mensaje" color:#5865F2 imagen:URL
+```
+
+**Variables disponibles:**
+- `{usuario}` - Mención del usuario
+- `{nombre}` - Nombre del usuario
+- `{tag}` - Tag completo (nombre#0000)
+- `{servidor}` - Nombre del servidor
+- `{miembros}` - Cantidad de miembros
+- `{id}` - ID del usuario
+
+**Probar antes de publicar:**
+```
+/bienvenida-test
+```
+
+### ⚠️ Sistema de Advertencias
+
+**Advertir usuario:**
+```
+/warn usuario:@usuario categoria:Leve razon:"Razón de la advertencia"
+```
+
+**Categorías disponibles:**
+- `Leve` - 7 días hasta auto-revocación
+- `Moderada` - 14 días hasta auto-revocación
+- `Grave` - 30 días hasta auto-revocación
+
+**Ver advertencias activas:**
+```
+/warns usuario:@usuario
+```
+
+**Revocar advertencia:**
+```
+/unwarn id:123 razon:"Razón de revocación"
+```
+
+### 📋 Sistema de Tareas
+
+**Crear tarea:**
+```
+/tarea-crear categoria:"Desarrollo" tarea:"Implementar nueva funcionalidad"
+```
+
+**Ver tareas:**
+```
+/tarea-ver categoria:"Desarrollo"
+```
+
+**Borrar tarea:**
+```
+/tarea-borrar id:123
+```
+
+### 🎨 Embeds Anónimos
+
+**Crear embed 100% anónimo:**
+```
+/panel-embed canal:#anuncios
+```
+
+Aparecerá un panel privado con botón "✨ Crear Embed". Al hacer clic:
+1. Se abre formulario interactivo
+2. Completas los campos (todos opcionales)
+3. El embed se envía sin que nadie sepa quién lo creó
+
 **Características:**
-- ✅ Registro automático de todas las invitaciones creadas
-- ✅ Hilos automáticos por cada invitación mostrando todos sus usos
-- ✅ Tracking completo de usos por invitación
-- ✅ Información completa del usuario que se unió (avatar, ID, fecha)
-- ✅ Integrado en el sistema de logs
-- ✅ Mensajes personalizables desde `messages.json` (sección `logs.invites`)
+- ✅ 100% Anónimo - sin rastros
+- ✅ Panel reutilizable
+- ✅ Todas las confirmaciones privadas
 
-**Ejemplo de uso:**
+### 📊 Logs de Invitaciones
 
-1. Un moderador crea una invitación → Aparece un embed en el canal de logs:
-   ```
-   🔗 Invitación Creada
-   
-   👤 Creado por: @Moderador
-   📅 Fecha: 5 nov 2025, 6:15 AM
-   🔗 Código: abc123
-   📊 Usos máximos: 10
-   📍 Canal: #general
-   ```
+El sistema registra automáticamente:
+1. Cuando se crea una invitación → Embed con detalles
+2. Cuando alguien la usa → Hilo en ese embed mostrando quién se unió
+3. Cada nuevo uso → Se añade al mismo hilo
 
-2. Alguien usa esa invitación → Se crea un hilo en ese embed:
-   ```
-   @NuevoUsuario usó la invitación abc123 (Uso #1)
-   
-   👤 Usuario: @NuevoUsuario
-   🆔 ID: 123456789
-   📅 Se unió: hace 2 segundos
-   ```
+**Perfecto para tracking de invitaciones** 📈
 
-3. Otro usuario usa la misma invitación → Se añade al mismo hilo:
-   ```
-   @OtroUsuario usó la invitación abc123 (Uso #2)
-   
-   👤 Usuario: @OtroUsuario
-   🆔 ID: 987654321
-   📅 Se unió: hace 5 minutos
-   ```
+### 🗑️ Limpiar Mensajes
 
-¡Perfecto para hacer tracking de qué invitación trae más gente a tu servidor! 📊
+```
+/clear cantidad:50
+```
 
-📖 **Ver [CONFIG_GUIDE.md](CONFIG_GUIDE.md) para más ejemplos de configuración de logs**
+**Sistema de logs automáticos:**
+- **> 20 mensajes**: Crea archivo .txt con transcripción completa
+- **≤ 20 mensajes**: Embed con lista de mensajes eliminados
 
-## 📋 Formato de Transcripciones
+### 🎥 Monitoreo de Streamers
 
-Las transcripciones se envían a Discord con:
-- **Embed informativo** con:
-  - Nombre del ticket
-  - Creador del ticket (con mención)
-  - Fechas de creación y cierre (formato Discord)
-  - Lista de participantes (menciones de todos los que escribieron)
-- **Archivo .txt expandible** con toda la conversación completa
-  - Se puede expandir directamente en Discord sin descargar
-  - Incluye timestamps, autores, y contenido de todos los mensajes
-  - Registra archivos adjuntos y embeds
+**Añadir streamer:**
+```
+/streamer-añadir plataforma:Twitch usuario:nombre_usuario canal:#notificaciones
+```
+
+**Ver lista:**
+```
+/streamer-lista
+```
+
+El bot verificará cada 2 minutos y enviará notificación cuando vayan en vivo.
+
+---
+
+## 🚀 Deployment en VPS (Producción)
+
+### Entornos Duales
+
+- **Desarrollo**: Replit (testing y desarrollo)
+- **Producción**: VPS Digital Ocean con PM2 (99.99% uptime)
+
+### Guía Completa
+
+Consulta **`DEPLOYMENT.md`** para instrucciones completas de deployment en VPS, que incluye:
+
+✅ Configuración de VPS Ubuntu 20.04+  
+✅ Instalación de Node.js 18+, PM2 y PostgreSQL  
+✅ Script automatizado de deployment (`deploy-vps.sh`)  
+✅ Configuración de variables de entorno  
+✅ Comandos PM2 para gestión del bot  
+✅ Seguridad, monitoreo y troubleshooting  
+
+### Deployment Rápido
+
+```bash
+# En el VPS, ejecuta:
+./deploy-vps.sh
+```
+
+Este script automáticamente:
+1. Detiene el proceso anterior
+2. Actualiza el código desde Git
+3. Instala dependencias
+4. Inicia con PM2 configurado
+
+---
 
 ## 🎨 Personalización
 
 ### Editar Mensajes del Bot
 
-**TODOS** los mensajes del bot se pueden personalizar en `messages.json`, incluyendo:
+**TODOS** los mensajes se personalizan en `messages.json`:
 
-#### 📝 Mensajes de Tickets
 ```json
 {
   "panel": {
     "title": "🎫 Sistema de Tickets",
-    "description": "Tu descripción personalizada",
-    "footer": "Tu footer personalizado"
+    "description": "Selecciona el tipo de ticket",
+    "footer": "El staff te atenderá pronto"
   },
   "ticketWelcome": {
     "title": "{emoji} Ticket de {categoryName}",
-    "description": "Tu mensaje de bienvenida"
-  }
-}
-```
-
-#### 📋 Mensajes de Logs (¡NUEVO!)
-Ahora puedes personalizar **todos los títulos de los logs**:
-
-```json
-{
+    "description": "Describe tu problema aquí"
+  },
   "logs": {
     "messages": {
       "deleted": "🗑️ Mensaje Eliminado",
       "edited": "✏️ Mensaje Editado"
-    },
-    "channels": {
-      "created": "➕ Canal Creado",
-      "deleted": "➖ Canal Eliminado",
-      "threadCreated": "🧵 Thread Creado",
-      "threadDeleted": "🧵 Thread Eliminado"
-    },
-    "members": {
-      "joined": "👋 Miembro Unido",
-      "left": "👋 Miembro Salió",
-      "kicked": "🦶 Miembro Expulsado (Kick)",
-      "nicknameChanged": "📝 Nickname Cambiado",
-      "banned": "🔨 Miembro Baneado",
-      "unbanned": "🔓 Miembro Desbaneado"
-    },
-    "roles": {
-      "created": "➕ Rol Creado",
-      "deleted": "➖ Rol Eliminado",
-      "updated": "🔄 Rol Actualizado",
-      "memberRolesUpdated": "🎭 Roles de Miembro Actualizados"
-    },
-    "voice": {
-      "joined": "🔊 Usuario Entró a Canal de Voz",
-      "left": "🔇 Usuario Salió de Canal de Voz",
-      "moved": "🔀 Usuario Movido entre Canales de Voz"
-    },
-    "commands": {
-      "admin": "⚡ Comando Usado (Admin)",
-      "regular": "💬 Comando Usado"
-    },
-    "bots": {
-      "activity": "🤖 Actividad de Bot"
     }
   }
 }
 ```
 
-💡 **Puedes cambiar cualquier emoji, texto o estilo** a tu gusto. Solo edita `messages.json` y reinicia el bot.
+### Variables Disponibles
 
-**Variables disponibles en mensajes de tickets:**
-- `{emoji}` - El emoji de la categoría
+En mensajes de tickets:
+- `{emoji}` - Emoji de la categoría
 - `{categoryName}` - Nombre de la categoría
 - `{user}` - Mención del usuario
 - `{channel}` - Mención del canal
-- `{serverName}` - Nombre del servidor (en mensajes de bienvenida)
+- `{serverName}` - Nombre del servidor
 
-### Personalizar Mensajes de Bienvenida
+---
 
-Cuando añades el bot a un nuevo servidor, se envían mensajes automáticos. Puedes personalizarlos en `messages.json`:
+## 📊 Estructura del Proyecto
 
-```json
-{
-  "welcome": {
-    "dmTitle": "🎉 ¡Gracias por añadir el Bot de Tickets!",
-    "dmDescription": "Tu mensaje personalizado aquí. Usa {serverName} para el nombre del servidor.",
-    "serverTitle": "🤖 Bot de Tickets Añadido",
-    "serverDescription": "Mensaje que aparece en el canal de sistema del servidor"
-  }
-}
+```
+egold-discord-bot/
+├── src/
+│   ├── commands/          # Comandos slash organizados por categoría
+│   │   ├── admin/
+│   │   ├── configuracion/
+│   │   ├── custom/
+│   │   ├── info/
+│   │   ├── moderation/
+│   │   ├── social/
+│   │   ├── tasks/
+│   │   └── tickets/
+│   ├── systems/           # Sistemas modulares
+│   │   ├── changelog-system.js
+│   │   ├── custom-commands-system.js
+│   │   ├── health.js
+│   │   ├── invites-system.js
+│   │   ├── logs-system.js
+│   │   ├── moderation-system.js
+│   │   ├── server-stats.js
+│   │   ├── simple-tasks-system.js
+│   │   ├── social-links-system.js
+│   │   ├── social-media-monitor-system.js
+│   │   ├── stream-monitor-system.js
+│   │   ├── suggestions-system.js
+│   │   ├── ticket-hierarchy.js
+│   │   ├── ticket-inactivity.js
+│   │   ├── tickets.js
+│   │   ├── verification-system.js
+│   │   ├── warns-system.js
+│   │   └── welcome-system.js
+│   ├── handlers/          # Manejadores de eventos y comandos
+│   ├── utils/             # Utilidades
+│   ├── data/              # Datos persistentes (JSON)
+│   ├── client.js          # Configuración del cliente Discord
+│   ├── config.js          # Carga de configuración
+│   └── index.js           # Punto de entrada principal
+├── config.json            # Configuración del servidor
+├── messages.json          # Mensajes personalizables
+├── watchdog.js            # Sistema de monitoreo y auto-restart
+├── deploy-vps.sh          # Script de deployment VPS
+├── package.json           # Dependencias del proyecto
+├── DEPLOYMENT.md          # Guía de deployment VPS
+└── README.md              # Este archivo
 ```
 
-Este mensaje incluye automáticamente:
-- 🔒 Información sobre confidencialidad y privacidad
-- 📝 Instrucciones de configuración inicial
-- 🛡️ Permisos necesarios
-
-### Agregar más tipos de tickets
-
-Edita `config.json` y agrega nuevas entradas en `tickets.categories`:
-
-```json
-{
-  "tickets": {
-    "staffRoleId": "TU_STAFF_ROLE_ID",
-    "ticketChannelId": "TU_TICKET_CHANNEL_ID",
-    "categories": {
-      "general": { ... },
-      "nuevo_tipo": {
-        "name": "Nombre Visible",
-        "categoryId": "ID_DE_LA_CATEGORIA",
-        "transcriptChannelId": "ID_CANAL_TRANSCRIPTS",
-        "emoji": "🎉",
-        "channelDescription": "Descripción del canal"
-      }
-    }
-  }
-}
-```
-
-**📖 Consulta [CONFIG_GUIDE.md](CONFIG_GUIDE.md) para más detalles**
-
-### Cambiar colores de los embeds
-
-En `index.js`, busca `.setColor()` y cambia el valor hexadecimal:
-- `#0099ff` - Azul (panel de tickets)
-- `#00ff00` - Verde (ticket creado)
-- `#3498db` - Azul claro (transcripción)
-- `#ff0000` - Rojo (ticket cerrado)
+---
 
 ## 🔧 Solución de Problemas
 
 ### El bot no responde
-- Verifica que el bot esté online en Discord
-- Revisa los logs del workflow en Replit
+1. Verifica que el bot esté online en Discord
+2. Revisa los logs del workflow/PM2
+3. Ejecuta `/status` para ver el estado
 
 ### No se crean los canales
-- Asegúrate de que los `categoryId` en `config.json` sean correctos
-- Verifica que el bot tenga permisos de administrador o "Gestionar Canales"
+1. Verifica que los `categoryId` sean correctos
+2. Asegúrate de que el bot tenga permisos de administrador
+3. Verifica que las categorías existan
 
 ### Error al guardar transcripciones
-- Verifica que los `transcriptChannelId` sean correctos
-- Asegúrate de que el bot tenga permisos para enviar mensajes y archivos en esos canales
+1. Verifica que los `transcriptChannelId` sean correctos
+2. Asegúrate de que el bot tenga permisos en esos canales
 
 ### Los comandos slash no aparecen
-- Espera unos minutos (pueden tardar en sincronizarse)
-- Echa al bot del servidor y vuelve a invitarlo
+1. Espera unos minutos (pueden tardar en sincronizarse)
+2. Echa al bot y vuelve a invitarlo
+3. Verifica que el bot tenga permiso "Usar comandos de aplicación"
 
-## 📝 Archivos de Configuración
+### Sistema de bienvenidas no funciona
+1. Verifica que el canal esté configurado con `/bienvenida-setup`
+2. Usa `/bienvenida-test` para probar
+3. Revisa los logs del bot
 
-### config.json
-Configuración de categorías, roles y canales de Discord.
+### Advertencias no se auto-revocan
+1. Verifica que el bot esté corriendo continuamente
+2. El sistema verifica cada 1 minuto
+3. Revisa los logs para errores de base de datos
 
-### messages.json
-Todos los mensajes que el bot envía. Personaliza aquí el texto.
+---
 
-### index.js
-Código principal del bot. Solo edita si necesitas cambios avanzados.
+## 📝 Dependencias
+
+```json
+{
+  "discord.js": "^14.14.1",
+  "dotenv": "^16.6.1",
+  "pg": "^8.16.3",
+  "rss-parser": "^3.13.0"
+}
+```
+
+**Requisitos:**
+- Node.js 18.0.0 o superior
+- PostgreSQL (para sistemas persistentes)
+- PM2 (para producción VPS)
+
+---
+
+## 🛡️ Seguridad y Privacidad
+
+- ✅ Tokens almacenados en variables de entorno
+- ✅ Transcripciones privadas solo para staff
+- ✅ Embeds anónimos sin rastros
+- ✅ Datos sensibles en base de datos segura
+- ✅ Permisos por roles configurables
+- ✅ Logs de auditoría completos
+
+---
+
+## 📈 Estado del Proyecto
+
+**Última actualización**: 2025-11-08  
+**Versión**: 2.0.0  
+**Estado**: ✅ Producción  
+**Tamaño**: 229MB (optimizado)  
+**Comandos**: 39 comandos activos  
+**Sistemas**: 18 sistemas modulares  
+
+### Recientes Mejoras (Nov 2025)
+
+✅ Sistema de bienvenidas con canal predefinido  
+✅ Sistema completo de advertencias con auto-revocación  
+✅ Sistema de tareas simplificado  
+✅ Limpieza masiva del proyecto (~50MB recuperados)  
+✅ Scripts de deployment automatizados para VPS  
+✅ Estructura optimizada y documentación consolidada  
+
+---
 
 ## 🆘 Soporte
 
-Si tienes problemas o preguntas, revisa:
-1. Los logs del workflow
-2. Los permisos del bot en Discord
-3. Que los IDs en config.json sean correctos
-4. Que los canales de transcripciones existan y sean accesibles
+**Monitoreo del Bot:**
+```
+/status
+```
+
+**Reiniciar el Bot:**
+```
+/restart
+```
+
+**Información del Bot:**
+```
+/bot-info
+```
+
+Si tienes problemas:
+1. Revisa los logs (Replit console o `pm2 logs`)
+2. Verifica permisos del bot en Discord
+3. Asegúrate de que los IDs en `config.json` sean correctos
+4. Consulta `DEPLOYMENT.md` para deployment VPS
+5. Usa `/status` para diagnóstico rápido
+
+---
+
+## 📜 Licencia
+
+ISC License
+
+---
+
+**Desarrollado para Strangers RP** 🎮  
+**Bot profesional con 99.99% uptime en VPS** 🚀
