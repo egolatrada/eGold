@@ -34,6 +34,6 @@ module.exports = {
     
     async execute(interaction, context) {
         // Delegar al sistema de comandos personalizados
-        await context.customCommandsSystem.handleSlashCommand(interaction);
+        await context.customCommandsSystem.handleCrearComando(interaction);
     }
 };
