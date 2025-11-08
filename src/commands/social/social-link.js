@@ -50,14 +50,94 @@ module.exports = {
                         .setRequired(false))),
     
     async execute(interaction, context) {
-        // Delegar al sistema de social links
         const subcommand = interaction.options.getSubcommand();
         const { socialLinksSystem } = context;
         
-        // TODO: Implementar handlers por subcommand
-        await interaction.reply({
-            content: '⚠️ Comando en proceso de migración. Usa el comando antiguo por ahora.',
-            ephemeral: true
-        });
+        if (!socialLinksSystem) {
+            return await interaction.reply({
+                content: '❌ El sistema de redes sociales no está disponible.',
+                ephemeral: true
+            });
+        }
+        
+        try {
+            if (subcommand === 'add') {
+                const platform = interaction.options.getString('plataforma');
+                const link = interaction.options.getString('link');
+                const user = interaction.options.getUser('discord');
+                const channel = interaction.options.getChannel('canal');
+                
+                const result = socialLinksSystem.addLink(
+                    user.id,
+                    platform,
+                    link,
+                    channel.id
+                );
+                
+                if (result.success) {
+                    await interaction.reply({
+                        content: `✅ Vinculación añadida correctamente.\n\n**Usuario:** ${user}\n**Plataforma:** ${platform}\n**Link:** ${link}\n**Canal de anuncios:** ${channel}\n**ID:** \`${result.linkId}\``,
+                        ephemeral: true
+                    });
+                } else {
+                    await interaction.reply({
+                        content: `❌ Error: ${result.error}`,
+                        ephemeral: true
+                    });
+                }
+            }
+            else if (subcommand === 'remove') {
+                const linkId = interaction.options.getString('id');
+                
+                const result = socialLinksSystem.removeLink(linkId);
+                
+                if (result.success) {
+                    await interaction.reply({
+                        content: `✅ Vinculación eliminada correctamente.`,
+                        ephemeral: true
+                    });
+                } else {
+                    await interaction.reply({
+                        content: `❌ Error: ${result.error}`,
+                        ephemeral: true
+                    });
+                }
+            }
+            else if (subcommand === 'list') {
+                const user = interaction.options.getUser('usuario');
+                
+                let links;
+                if (user) {
+                    links = socialLinksSystem.getUserLinks(user.id);
+                } else {
+                    links = socialLinksSystem.getAllLinks();
+                }
+                
+                if (links.length === 0) {
+                    return await interaction.reply({
+                        content: user 
+                            ? `ℹ️ ${user} no tiene vinculaciones registradas.`
+                            : 'ℹ️ No hay vinculaciones registradas.',
+                        ephemeral: true
+                    });
+                }
+                
+                const linksList = links.map(l => {
+                    const status = l.enabled ? '✅' : '❌';
+                    return `${status} **${l.platform}** - <@${l.userId}>\n└ Link: ${l.username}\n└ Canal: <#${l.notificationChannelId}>\n└ ID: \`${l.linkId}\``;
+                }).join('\n\n');
+                
+                await interaction.reply({
+                    content: `📱 **Vinculaciones de Redes Sociales**${user ? ` de ${user}` : ''}:\n\n${linksList}`,
+                    ephemeral: true
+                });
+            }
+        } catch (error) {
+            console.error('Error en /social-link:', error);
+            await interaction.reply({
+                content: '❌ Ocurrió un error al procesar el comando.',
+                ephemeral: true
+            }).catch(() => {});
+        }
     }
 };
