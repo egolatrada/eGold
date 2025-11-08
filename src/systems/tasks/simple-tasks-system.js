@@ -98,109 +98,66 @@ class SimpleTasksSystem {
     }
 
     /**
-     * Categoriza una tarea usando IA
+     * Normaliza un nombre de categoría para evitar duplicados
+     * Convierte a minúsculas, quita acentos, espacios extra, etc.
      */
-    async categorizeTask(taskText) {
-        if (!this.aiSystem) {
-            return 'General';
+    normalizeCategory(category) {
+        if (!category) return 'general';
+        
+        let normalized = category.toLowerCase().trim();
+        
+        // Quitar acentos
+        const accentsMap = {
+            'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u',
+            'à': 'a', 'è': 'e', 'ì': 'i', 'ò': 'o', 'ù': 'u',
+            'ä': 'a', 'ë': 'e', 'ï': 'i', 'ö': 'o', 'ü': 'u',
+            'â': 'a', 'ê': 'e', 'î': 'i', 'ô': 'o', 'û': 'u',
+            'ñ': 'n'
+        };
+        
+        for (const [accented, plain] of Object.entries(accentsMap)) {
+            normalized = normalized.replace(new RegExp(accented, 'g'), plain);
         }
-
-        try {
-            const prompt = `Clasifica la siguiente tarea en UNA de estas categorías EXACTAS (responde SOLO con el nombre de la categoría):
-
-Discord - Tareas relacionadas con Discord (bots, canales, roles, moderación de Discord)
-Scripts GTA - Scripts, recursos, configuración de FiveM/GTA roleplay (origen police, admin menu, etc)
-Desarrollo - Programación, código, features nuevas
-Configuración - Configuración de servidor, ajustes, setup
-Eventos - Organización de eventos, actividades
-Marketing - Promoción, redes sociales, publicidad
-Soporte - Ayuda a usuarios, tickets, atención
-Bugs - Corrección de errores, problemas técnicos
-Contenido - Creación de contenido, documentación
-Administración - Gestión general, tareas administrativas
-General - Otras tareas que no encajan en las categorías anteriores
-
-Tarea: "${taskText}"
-
-Ejemplos:
-- "Eliminar bots innecesarios" → Discord
-- "Configurar origen police" → Scripts GTA
-- "Configurar admin menu" → Scripts GTA
-- "Hacer de betatester" → Soporte
-- "Leer un libro" → General
-
-Categoría:`;
-
-            const response = await this.aiSystem.generateResponse(prompt, []);
-            const category = response.trim();
-            
-            const validCategories = [
-                'Discord', 'Scripts GTA', 'Desarrollo', 'Configuración', 'Eventos', 
-                'Marketing', 'Soporte', 'Bugs', 'Contenido', 
-                'Administración', 'General'
-            ];
-
-            return validCategories.includes(category) ? category : 'General';
-        } catch (error) {
-            logger.error('Error al categorizar con IA', error);
-            return 'General';
-        }
+        
+        // Quitar caracteres especiales excepto espacios
+        normalized = normalized.replace(/[^\w\s-]/g, '');
+        
+        // Normalizar espacios múltiples
+        normalized = normalized.replace(/\s+/g, ' ').trim();
+        
+        return normalized;
     }
 
     /**
-     * Categoriza múltiples tareas en lote usando IA
+     * Busca una categoría similar existente en la base de datos
+     * Retorna la categoría existente si encuentra una similar, o null si no existe
      */
-    async categorizeTasks(tasks) {
-        if (!this.aiSystem) {
-            return tasks.map(() => 'General');
-        }
-
+    async findSimilarCategory(guildId, categoryName) {
         try {
-            const tasksList = tasks.map((task, i) => `${i + 1}. ${task}`).join('\n');
+            // Obtener todas las categorías existentes del servidor
+            const result = await this.pool.query(
+                `SELECT DISTINCT category FROM simple_tasks WHERE guild_id = $1`,
+                [guildId]
+            );
             
-            const prompt = `Clasifica cada tarea en UNA de estas categorías:
-Discord, Scripts GTA, Desarrollo, Configuración, Eventos, Marketing, Soporte, Bugs, Contenido, Administración, General
-
-Guía de categorías:
-- Discord: Bots, canales, roles, moderación de Discord
-- Scripts GTA: Scripts FiveM/GTA (origen police, admin menu, recursos roleplay)
-- Configuración: Setup, configuración de servidor
-- Soporte: Ayuda, tickets, betatester
-- General: Tareas personales (leer, etc)
-
-Tareas:
-${tasksList}
-
-Responde en formato: número|categoría (ejemplo: "1|Discord")
-Una línea por tarea, en orden:`;
-
-            const response = await this.aiSystem.generateResponse(prompt, []);
-            const lines = response.trim().split('\n');
+            if (result.rows.length === 0) {
+                return null;
+            }
             
-            const categories = [];
-            for (let i = 0; i < tasks.length; i++) {
-                if (lines[i]) {
-                    const parts = lines[i].split('|');
-                    if (parts.length === 2) {
-                        const cat = parts[1].trim();
-                        const validCategories = [
-                            'Discord', 'Scripts GTA', 'Desarrollo', 'Configuración', 'Eventos', 
-                            'Marketing', 'Soporte', 'Bugs', 'Contenido', 
-                            'Administración', 'General'
-                        ];
-                        categories.push(validCategories.includes(cat) ? cat : 'General');
-                    } else {
-                        categories.push('General');
-                    }
-                } else {
-                    categories.push('General');
+            const normalizedInput = this.normalizeCategory(categoryName);
+            
+            // Buscar coincidencia exacta normalizada
+            for (const row of result.rows) {
+                const existingNormalized = this.normalizeCategory(row.category);
+                if (existingNormalized === normalizedInput) {
+                    return row.category; // Retornar la categoría original existente
                 }
             }
             
-            return categories;
+            return null; // No se encontró categoría similar
         } catch (error) {
-            logger.error('Error al categorizar tareas en lote', error);
-            return tasks.map(() => 'General');
+            logger.error('Error al buscar categoría similar', error);
+            return null;
         }
     }
 
@@ -214,44 +171,51 @@ Una línea por tarea, en orden:`;
             return { success: false, error: 'No se detectaron tareas en el texto proporcionado.' };
         }
 
-        let categories;
-        if (manualCategory) {
-            // Usar categoría manual para todas
-            categories = tasks.map(() => manualCategory);
-        } else {
-            // Usar IA para categorizar
-            categories = await this.categorizeTasks(tasks);
+        if (!manualCategory) {
+            return { success: false, error: 'Debes especificar una categoría para las tareas.' };
         }
 
-        // Guardar en base de datos
+        // Buscar si existe una categoría similar
+        const existingCategory = await this.findSimilarCategory(guildId, manualCategory);
+        
+        // Usar categoría existente si se encuentra, o crear nueva con capitalización
+        const finalCategory = existingCategory || this.capitalizeCategory(manualCategory);
+        
+        logger.info(`📂 Categoría seleccionada: "${finalCategory}" ${existingCategory ? '(existente)' : '(nueva)'}`);
+
+        // Guardar todas las tareas con la misma categoría
         const savedTasks = [];
         for (let i = 0; i < tasks.length; i++) {
             const result = await this.pool.query(
                 `INSERT INTO simple_tasks (guild_id, channel_id, task_text, category) 
                  VALUES ($1, $2, $3, $4) 
                  RETURNING *`,
-                [guildId, channelId, tasks[i], categories[i]]
+                [guildId, channelId, tasks[i], finalCategory]
             );
             savedTasks.push(result.rows[0]);
         }
 
-        // Agrupar por categoría
-        const tasksByCategory = {};
-        for (const task of savedTasks) {
-            if (!tasksByCategory[task.category]) {
-                tasksByCategory[task.category] = [];
-            }
-            tasksByCategory[task.category].push(task);
-        }
-
-        logger.info(`📝 ${tasks.length} tareas añadidas en ${Object.keys(tasksByCategory).length} categorías`);
+        logger.info(`📝 ${tasks.length} tareas añadidas a la categoría "${finalCategory}"`);
         
         return { 
             success: true, 
-            tasksByCategory,
-            totalTasks: tasks.length,
-            categories: Object.keys(tasksByCategory).length
+            category: finalCategory,
+            totalTasks: tasks.length
         };
+    }
+
+    /**
+     * Capitaliza correctamente un nombre de categoría
+     * Convierte la primera letra de cada palabra en mayúscula
+     */
+    capitalizeCategory(category) {
+        if (!category) return 'General';
+        
+        return category
+            .trim()
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join(' ');
     }
 
     /**

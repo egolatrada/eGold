@@ -11,20 +11,8 @@ module.exports = {
         )
         .addStringOption(option =>
             option.setName('categoria')
-                .setDescription('Categoría para TODAS las tareas (opcional, por defecto usa IA)')
-                .setRequired(false)
-                .addChoices(
-                    { name: '💻 Desarrollo', value: 'Desarrollo' },
-                    { name: '🛡️ Moderación', value: 'Moderación' },
-                    { name: '⚙️ Configuración', value: 'Configuración' },
-                    { name: '🎉 Eventos', value: 'Eventos' },
-                    { name: '📢 Marketing', value: 'Marketing' },
-                    { name: '🎫 Soporte', value: 'Soporte' },
-                    { name: '🐛 Bugs', value: 'Bugs' },
-                    { name: '📝 Contenido', value: 'Contenido' },
-                    { name: '👑 Administración', value: 'Administración' },
-                    { name: '📋 General', value: 'General' }
-                )
+                .setDescription('Categoría para TODAS las tareas (obligatorio)')
+                .setRequired(true)
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
