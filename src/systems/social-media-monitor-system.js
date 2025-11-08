@@ -270,7 +270,7 @@ class SocialMediaMonitorSystem {
                     titleEmoji: '🎬',
                     name: 'YOUTUBE',
                     color: 0xFF0000,
-                    subtitle: '**Strangers RP** tiene contenido fresco para la comunidad. 🔥',
+                    subtitle: '**Strangers RP** trae contenido fresco para la comunidad. 🔥',
                     videoEmoji: '🎥',
                     watchText: '📺 **Míralo aquí:**',
                     watchLabel: 'Ver video',
@@ -282,7 +282,7 @@ class SocialMediaMonitorSystem {
                     titleEmoji: '🎵',
                     name: 'TIKTOK',
                     color: 0x000000,
-                    subtitle: '**Strangers RP** tiene nuevo contenido en TikTok. 🔥',
+                    subtitle: '**Strangers RP** trae nuevo contenido en TikTok. 🔥',
                     videoEmoji: '📱',
                     watchText: '🔗 **Míralo aquí:**',
                     watchLabel: 'Ver video',
@@ -294,7 +294,7 @@ class SocialMediaMonitorSystem {
                     titleEmoji: '🐦',
                     name: 'TWITTER/X',
                     color: 0x1DA1F2,
-                    subtitle: '**Strangers RP** tiene novedades importantes. 🔥',
+                    subtitle: '**Strangers RP** trae novedades importantes. 🔥',
                     videoEmoji: '📢',
                     watchText: '🔗 **Lee el tweet:**',
                     watchLabel: 'Ver tweet',
@@ -329,12 +329,11 @@ class SocialMediaMonitorSystem {
 
             // Construir descripción del embed
             let description = `${platform.subtitle}\n\n`;
-            description += `${platform.videoEmoji} ${post.title}\n`;
+            description += `${platform.videoEmoji} **${post.title}**\n`;
             description += `${videoDescription}\n\n`;
             description += `> ${platform.watchText} [${platform.watchLabel}](${post.url})\n`;
             description += `> ${platform.cta}\n\n`;
-            description += `> 🕒 **Publicado el:** ${fecha}\n`;
-            description += `> 📱 **Canal oficial:** [@StrangersRP](${platform.accountUrl})`;
+            description += `📱 **Canal oficial:** [@StrangersRP](${platform.accountUrl})`;
 
             const embed = new EmbedBuilder()
                 .setColor(platform.color)
@@ -348,7 +347,7 @@ class SocialMediaMonitorSystem {
 
             // Enviar mensaje con título separado + embed
             await channel.send({
-                content: `${platform.titleEmoji} ¡NUEVA PUBLICACIÓN DE ${platform.name}!`,
+                content: `${platform.titleEmoji} **¡NUEVA PUBLICACIÓN DE ${platform.name}!**`,
                 embeds: [embed]
             });
             console.log(`📤 Notificación enviada: ${account.platform}/${account.username} - ${post.title}`);
