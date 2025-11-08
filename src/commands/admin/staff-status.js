@@ -8,18 +8,22 @@ module.exports = {
         .setDescription('📊 Muestra estadísticas de actividad del staff')
         .addStringOption(option =>
             option
-                .setName('periodo')
-                .setDescription('Período de tiempo a analizar')
+                .setName('unidad')
+                .setDescription('Unidad de tiempo')
                 .addChoices(
-                    { name: 'Última Hora', value: '1h' },
-                    { name: 'Últimas 6 Horas', value: '6h' },
-                    { name: 'Últimas 12 Horas', value: '12h' },
-                    { name: 'Últimas 24 Horas', value: '24h' },
-                    { name: 'Últimos 3 Días', value: '3d' },
-                    { name: 'Última Semana', value: '7d' },
-                    { name: 'Últimas 2 Semanas', value: '14d' },
-                    { name: 'Último Mes', value: '30d' }
+                    { name: 'Horas', value: 'horas' },
+                    { name: 'Días', value: 'días' },
+                    { name: 'Semanas', value: 'semanas' },
+                    { name: 'Meses', value: 'meses' }
                 )
+                .setRequired(false)
+        )
+        .addIntegerOption(option =>
+            option
+                .setName('cantidad')
+                .setDescription('Cantidad de tiempo (ejemplo: 24 horas, 7 días)')
+                .setMinValue(1)
+                .setMaxValue(90)
                 .setRequired(false)
         )
         .addStringOption(option =>
@@ -62,7 +66,17 @@ module.exports = {
     
     async execute(interaction, context) {
         try {
-            const period = interaction.options.getString('periodo') || '24h';
+            const unidad = interaction.options.getString('unidad') || 'horas';
+            
+            // Valores por defecto dinámicos según la unidad elegida
+            const defaultCantidad = {
+                'horas': 24,
+                'días': 7,
+                'semanas': 1,
+                'meses': 1
+            };
+            
+            const cantidad = interaction.options.getInteger('cantidad') || defaultCantidad[unidad] || 24;
             const roleFilter = interaction.options.getString('rol') || 'todos';
             const targetUser = interaction.options.getUser('usuario');
             const topLimit = interaction.options.getInteger('top') || 10;
@@ -71,18 +85,36 @@ module.exports = {
 
             await interaction.deferReply({ ephemeral: false });
 
-            const periodMs = {
-                '1h': 60 * 60 * 1000,
-                '6h': 6 * 60 * 60 * 1000,
-                '12h': 12 * 60 * 60 * 1000,
-                '24h': 24 * 60 * 60 * 1000,
-                '3d': 3 * 24 * 60 * 60 * 1000,
-                '7d': 7 * 24 * 60 * 60 * 1000,
-                '14d': 14 * 24 * 60 * 60 * 1000,
-                '30d': 30 * 24 * 60 * 60 * 1000
+            // Calcular período en milisegundos dinámicamente
+            const unidadMs = {
+                'horas': 60 * 60 * 1000,
+                'días': 24 * 60 * 60 * 1000,
+                'semanas': 7 * 24 * 60 * 60 * 1000,
+                'meses': 30 * 24 * 60 * 60 * 1000
             };
 
-            const timeLimit = Date.now() - periodMs[period];
+            // Validar que la unidad sea válida
+            if (!unidadMs[unidad]) {
+                return await interaction.editReply({
+                    content: '❌ Unidad de tiempo no válida. Usa: horas, días, semanas o meses.',
+                    ephemeral: true
+                });
+            }
+
+            const periodMs = unidadMs[unidad] * cantidad;
+            
+            // Validar rango mínimo (1 hora) y máximo (90 días)
+            const MIN_PERIOD = 60 * 60 * 1000; // 1 hora
+            const MAX_PERIOD = 90 * 24 * 60 * 60 * 1000; // 90 días
+            
+            if (periodMs < MIN_PERIOD || periodMs > MAX_PERIOD) {
+                return await interaction.editReply({
+                    content: '❌ El período debe estar entre 1 hora y 90 días.',
+                    ephemeral: true
+                });
+            }
+
+            const timeLimit = Date.now() - periodMs;
 
             const staffRoles = {
                 directiva: '1435808275739181110',
@@ -167,16 +199,22 @@ module.exports = {
                 sortedStaff.sort((a, b) => (b.messages + b.ticketsHelped * 5) - (a.messages + a.ticketsHelped * 5));
             }
 
-            const periodNames = {
-                '1h': 'Última Hora',
-                '6h': 'Últimas 6 Horas',
-                '12h': 'Últimas 12 Horas',
-                '24h': 'Últimas 24 Horas',
-                '3d': 'Últimos 3 Días',
-                '7d': 'Última Semana',
-                '14d': 'Últimas 2 Semanas',
-                '30d': 'Último Mes'
-            };
+            // Generar nombre del período dinámicamente con pluralización correcta
+            let periodName;
+            if (cantidad === 1) {
+                // Singular: "Última hora", "Último día", "Última semana", "Último mes"
+                const singularMap = {
+                    'horas': 'Última hora',
+                    'días': 'Último día',
+                    'semanas': 'Última semana',
+                    'meses': 'Último mes'
+                };
+                periodName = singularMap[unidad];
+            } else {
+                // Plural: "Últimas X horas", "Últimos X días", "Últimas X semanas", "Últimos X meses"
+                const genero = (unidad === 'horas' || unidad === 'semanas') ? 'Últimas' : 'Últimos';
+                periodName = `${genero} ${cantidad} ${unidad}`;
+            }
 
             const roleNames = {
                 directiva: 'Directiva',
@@ -193,14 +231,14 @@ module.exports = {
                 soporte: '💬'
             };
 
-            let title = `📊 Estadísticas de Staff - ${periodNames[period]}`;
+            let title = `📊 Estadísticas de Staff - ${periodName}`;
             let description = showInactive ? 
                 `Top ${topLimit} miembros del staff menos activos` : 
                 `Top ${topLimit} miembros del staff más activos`;
 
             if (targetUser) {
                 title = `📊 Estadísticas de ${targetUser.username}`;
-                description = `Período: ${periodNames[period]}`;
+                description = `Período: ${periodName}`;
             } else if (roleFilter !== 'todos') {
                 description += ` (${roleNames[roleFilter]})`;
             }
@@ -259,7 +297,7 @@ module.exports = {
 
             await interaction.editReply({ embeds: [embed] });
 
-            logger.info(`📊 ${interaction.user.tag} consultó estadísticas de staff (${period}, ${roleFilter}, top ${topLimit})`);
+            logger.info(`📊 ${interaction.user.tag} consultó estadísticas de staff (${periodName}, ${roleFilter}, top ${topLimit})`);
 
         } catch (error) {
             logger.error('Error al generar estadísticas de staff', error);
