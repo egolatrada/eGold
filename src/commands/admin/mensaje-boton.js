@@ -17,10 +17,10 @@ module.exports = {
                 .setDescription('Texto del botón')
                 .setRequired(true)
         )
-        .addStringOption(option =>
+        .addChannelOption(option =>
             option
                 .setName('canal_destino')
-                .setDescription('ID del canal al que dirigir')
+                .setDescription('Canal al que dirigirá el botón')
                 .setRequired(true)
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
@@ -29,13 +29,12 @@ module.exports = {
         try {
             const mensajeId = interaction.options.getString('mensaje_id');
             const textoBoton = interaction.options.getString('texto_boton');
-            const canalDestino = interaction.options.getString('canal_destino');
+            const canal = interaction.options.getChannel('canal_destino');
 
-            // Verificar que el canal existe
-            const canal = await interaction.guild.channels.fetch(canalDestino).catch(() => null);
+            // El canal ya viene validado por Discord
             if (!canal) {
                 return await interaction.reply({
-                    content: `❌ No se encontró el canal con ID: ${canalDestino}`,
+                    content: `❌ No se pudo obtener el canal seleccionado`,
                     ephemeral: true
                 });
             }
@@ -51,7 +50,7 @@ module.exports = {
 
             // Crear el botón con customId que incluye el canal destino
             const boton = new ButtonBuilder()
-                .setCustomId(`navegar_canal:${canalDestino}`)
+                .setCustomId(`navegar_canal:${canal.id}`)
                 .setLabel(textoBoton)
                 .setStyle(ButtonStyle.Primary);
 
@@ -76,7 +75,7 @@ module.exports = {
                 ephemeral: true
             });
 
-            logger.success(`${interaction.user.tag} añadió botón "${textoBoton}" al mensaje ${mensajeId} dirigiendo a canal ${canalDestino}`);
+            logger.success(`${interaction.user.tag} añadió botón "${textoBoton}" al mensaje ${mensajeId} dirigiendo a canal ${canal.id}`);
 
         } catch (error) {
             logger.error('Error al editar mensaje con botón', error);
