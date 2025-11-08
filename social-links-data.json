@@ -1,4 +1,13 @@
 {
-  "links": {},
-  "lastUpdate": 1762577488125
+  "links": {
+    "no_user_kick_1762577900298": {
+      "userId": "no_user",
+      "platform": "kick",
+      "username": "https://kick.com/desst3/",
+      "notificationChannelId": "1370611205038936166",
+      "createdAt": 1762577900298,
+      "enabled": true
+    }
+  },
+  "lastUpdate": 1762577900298
 }
