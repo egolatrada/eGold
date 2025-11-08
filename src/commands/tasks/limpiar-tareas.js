@@ -19,6 +19,10 @@ module.exports = {
         try {
             await interaction.deferReply({ ephemeral: true });
 
+            // PASO 1: Eliminar los embeds antiguos de tareas
+            await tasksSystem.deleteOldTaskEmbeds(interaction.guild.id, interaction.channel);
+
+            // PASO 2: Eliminar todas las tareas de la base de datos
             const deletedCount = await tasksSystem.clearAllTasks(interaction.guild.id);
 
             if (deletedCount === 0) {
@@ -28,7 +32,7 @@ module.exports = {
             } else {
                 await interaction.editReply({
                     content: `✅ **${deletedCount} tareas eliminadas correctamente**\n\n` +
-                            `El servidor ahora no tiene tareas registradas.`
+                            `Los embeds y las tareas del servidor han sido eliminados completamente.`
                 });
             }
 
