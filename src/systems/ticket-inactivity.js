@@ -303,7 +303,7 @@ class TicketInactivity {
             const embed = new EmbedBuilder()
                 .setColor('#FF0000')
                 .setTitle('⚠️ Advertencia de inactividad')
-                .setDescription(`Hola <@${activity.creatorId}>,\n\nHan pasado **6 horas** sin respuesta de tu parte en este ticket.\n\n⏱️ Si no respondes en **1 hora más**, el ticket será cerrado automáticamente por inactividad.\n\n💡 Si necesitas más tiempo, usa el comando \`/mantener-activo\` para evitar el cierre automático.`)
+                .setDescription(`Hola <@${activity.creatorId}>,\n\nHan pasado **6 horas** sin respuesta de tu parte en este ticket.\n\n⏱️ Si no respondes en **1 hora más**, el ticket será cerrado automáticamente por inactividad.`)
                 .setTimestamp();
 
             await channel.send({
