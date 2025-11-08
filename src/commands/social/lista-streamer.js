@@ -61,10 +61,13 @@ module.exports = {
                 const status = link.enabled ? '✅ Activo' : '❌ Inactivo';
                 const emoji = platformEmojis[link.platform] || '📱';
                 const platformName = link.platform.charAt(0).toUpperCase() + link.platform.slice(1);
+                const discordUser = (link.userId && link.userId !== 'no_user') 
+                    ? `<@${link.userId}>` 
+                    : '*Sin vincular*';
                 
                 embed.addFields({
                     name: `${emoji} ${platformName} - ${link.username}`,
-                    value: `${status}\n👤 Discord: <@${link.userId}>\n📢 Canal: <#${link.notificationChannelId}>\n🆔 ID: \`${link.linkId}\``,
+                    value: `${status}\n👤 Discord: ${discordUser}\n📢 Canal: <#${link.notificationChannelId}>\n🆔 ID: \`${link.linkId}\``,
                     inline: false
                 });
             });

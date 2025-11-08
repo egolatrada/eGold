@@ -260,28 +260,43 @@ class StreamMonitorSystem {
             const channel = await this.client.channels.fetch(link.notificationChannelId);
             if (!channel || !channel.isTextBased()) return;
 
-            const user = await this.client.users.fetch(link.userId);
-            
             const platforms = this.socialLinksSystem.getSupportedPlatforms();
             const platformInfo = platforms[link.platform];
             
             const embed = new EmbedBuilder()
                 .setColor(platformInfo.color)
-                .setAuthor({
-                    name: `${platformInfo.icon} ${platformInfo.name}`,
-                    iconURL: user.displayAvatarURL()
-                })
                 .setTitle(`🔴 ${link.username} está EN VIVO!`)
                 .setURL(streamData.url)
-                .addFields(
-                    { name: "👤 Streamer", value: `${user}`, inline: true },
-                    { name: "📺 Plataforma", value: platformInfo.name, inline: true }
-                )
                 .setTimestamp();
             
             if (streamData.title) {
                 embed.setDescription(`**${streamData.title}**`);
             }
+            
+            const fields = [
+                { name: "📺 Plataforma", value: platformInfo.name, inline: true }
+            ];
+            
+            if (link.userId && link.userId !== 'no_user') {
+                try {
+                    const user = await this.client.users.fetch(link.userId);
+                    embed.setAuthor({
+                        name: `${platformInfo.icon} ${platformInfo.name}`,
+                        iconURL: user.displayAvatarURL()
+                    });
+                    fields.unshift({ name: "👤 Usuario Discord", value: `${user}`, inline: true });
+                } catch (e) {
+                    embed.setAuthor({
+                        name: `${platformInfo.icon} ${platformInfo.name}`
+                    });
+                }
+            } else {
+                embed.setAuthor({
+                    name: `${platformInfo.icon} ${platformInfo.name}`
+                });
+            }
+            
+            embed.addFields(...fields);
             
             if (streamData.game) {
                 embed.addFields({ name: "🎮 Jugando", value: streamData.game, inline: true });

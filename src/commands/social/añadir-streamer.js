@@ -18,14 +18,14 @@ module.exports = {
             option.setName('link_o_usuario')
                 .setDescription('Link del canal o nombre de usuario (ej: twitch.tv/canal o canal)')
                 .setRequired(true))
-        .addUserOption(option =>
-            option.setName('discord')
-                .setDescription('Usuario de Discord vinculado')
-                .setRequired(true))
         .addChannelOption(option =>
             option.setName('canal')
                 .setDescription('Canal donde se enviarán las notificaciones')
-                .setRequired(true)),
+                .setRequired(true))
+        .addUserOption(option =>
+            option.setName('discord')
+                .setDescription('Usuario de Discord vinculado (opcional)')
+                .setRequired(false)),
     
     async execute(interaction, context) {
         const { socialLinksSystem } = context;
@@ -51,7 +51,7 @@ module.exports = {
             }
             
             const result = socialLinksSystem.addLink(
-                user.id,
+                user?.id || 'no_user',
                 platform,
                 username,
                 channel.id
@@ -64,8 +64,10 @@ module.exports = {
                     youtube: '📺'
                 };
                 
+                const discordInfo = user ? `\n💬 **Discord:** ${user}` : '';
+                
                 await interaction.reply({
-                    content: `✅ **Streamer añadido correctamente**\n\n${platformEmojis[platform]} **Plataforma:** ${platform.charAt(0).toUpperCase() + platform.slice(1)}\n👤 **Usuario:** ${username}\n💬 **Discord:** ${user}\n📢 **Canal de notificaciones:** ${channel}\n🆔 **ID:** \`${result.linkId}\`\n\n*Las notificaciones se enviarán automáticamente cuando ${username} esté en directo.*`,
+                    content: `✅ **Streamer añadido correctamente**\n\n${platformEmojis[platform]} **Plataforma:** ${platform.charAt(0).toUpperCase() + platform.slice(1)}\n👤 **Usuario:** ${username}${discordInfo}\n📢 **Canal de notificaciones:** ${channel}\n🆔 **ID:** \`${result.linkId}\`\n\n*Las notificaciones se enviarán automáticamente cuando ${username} esté en directo.*`,
                     ephemeral: true
                 });
             } else {
