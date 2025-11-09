@@ -122,7 +122,7 @@ module.exports = {
                 .setDescription(`Has sido advertido en **${interaction.guild.name}**`)
                 .addFields(
                     { name: '📋 Categoría', value: categoryName, inline: true },
-                    { name: '👤 Moderador', value: interaction.user.tag, inline: true },
+                    { name: '👮 Moderador responsable', value: `${interaction.user}`, inline: true },
                     { name: '📅 Fecha', value: `<t:${Math.floor(new Date(warning.created_at).getTime() / 1000)}:F>`, inline: false },
                     { name: '📝 Motivo', value: reason, inline: false }
                 )
@@ -154,7 +154,7 @@ module.exports = {
                 .addFields(
                     { name: '👤 Usuario advertido', value: `${targetUser} (${targetUser.tag})`, inline: false },
                     { name: '📋 Categoría', value: categoryName, inline: true },
-                    { name: '👮 Moderador', value: interaction.user.tag, inline: true },
+                    { name: '👮 Moderador responsable', value: `${interaction.user}`, inline: true },
                     { name: '📅 Fecha', value: `<t:${Math.floor(new Date(warning.created_at).getTime() / 1000)}:F>`, inline: false },
                     { name: '📝 Motivo', value: reason, inline: false }
                 )

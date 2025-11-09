@@ -29,67 +29,71 @@ module.exports = {
             const tipoPanel = interaction.options.getString('tipo');
             const mensajeId = interaction.options.getString('mensaje_id');
 
-            // Configuraciones de los paneles
-            const panelConfigs = {
+            // Definir qué categorías mostrar en cada tipo de panel
+            // Todas las demás categorías del config.json se incluyen automáticamente en "whitelist"
+            const panelCategoryFilters = {
                 whitelist: {
                     title: '🎫 Sistema de Tickets — Strangers RP',
                     description: 'Antes de abrir un ticket, asegúrate de seleccionar la categoría correcta, ya que nos ayudará a atenderte más rápido y mantener el orden dentro del servidor. 🎭',
                     footer: 'El staff revisará tu caso lo antes posible.',
-                    categories: [
-                        'soporte-dudas',
-                        'bugs-fallos',
-                        'donaciones',
-                        'playmakers',
-                        'ck',
-                        'reportes-publicos',
-                        'ticket-apelacion',
-                        'ticket-devoluciones',
-                        'creador-contenido',
-                        'peds',
-                        'ems',
-                        'lspd-sapd',
-                        'org-criminales',
-                        'comercios'
-                    ]
+                    excludeCategories: ['convalidar-whitelist', 'dudas-generales'] // Excluir categorías de no-whitelist
                 },
                 no_whitelist: {
                     title: '🎫 Sistema de Acceso — Strangers RP',
                     description: '¡Bienvenido a Strangers RP! Selecciona el tipo de ticket según tu situación:\n\n📋 **Convalidar Whitelist**: Si vienes de otro servidor autorizado\n❓ **Dudas**: Preguntas generales sobre el servidor',
                     footer: 'El staff te atenderá lo antes posible.',
-                    categories: [
-                        'convalidar-whitelist',
-                        'dudas-generales'
-                    ]
+                    includeCategories: ['convalidar-whitelist', 'dudas-generales'] // Solo estas categorías
                 }
             };
 
-            const panelConfig = panelConfigs[tipoPanel];
+            const panelConfig = panelCategoryFilters[tipoPanel];
             
-            if (!panelConfig) {
+            // Construir lista de categorías dinámicamente desde config.json
+            const allConfigCategories = Object.keys(config.tickets.categories || {});
+            let categoriesToShow = [];
+
+            if (panelConfig.includeCategories) {
+                // Modo whitelist: solo las categorías especificadas
+                categoriesToShow = panelConfig.includeCategories.filter(cat => 
+                    allConfigCategories.includes(cat)
+                );
+            } else if (panelConfig.excludeCategories) {
+                // Modo normal: todas excepto las excluidas
+                categoriesToShow = allConfigCategories.filter(cat => 
+                    !panelConfig.excludeCategories.includes(cat)
+                );
+            } else {
+                // Por defecto: todas las categorías
+                categoriesToShow = allConfigCategories;
+            }
+
+            if (categoriesToShow.length === 0) {
                 return await interaction.reply({
-                    content: '❌ Tipo de panel no válido.',
+                    content: '❌ No se encontraron categorías válidas para este panel. Verifica el config.json.',
                     ephemeral: true
                 });
             }
 
-            // Crear opciones del menú
+            // Crear opciones del menú dinámicamente
             const selectOptions = [];
-            for (const categoryKey of panelConfig.categories) {
+            for (const categoryKey of categoriesToShow) {
                 const category = config.tickets.categories[categoryKey];
-                if (category) {
+                if (category && category.name) {
                     selectOptions.push(
                         new StringSelectMenuOptionBuilder()
                             .setLabel(category.name)
-                            .setDescription(category.menuDescription || category.channelDescription)
+                            .setDescription((category.menuDescription || category.channelDescription || 'Sin descripción').substring(0, 100))
                             .setValue(categoryKey)
-                            .setEmoji(category.emoji)
+                            .setEmoji(category.emoji || '🎫')
                     );
+                } else {
+                    logger.warn(`Categoría ${categoryKey} no encontrada o incompleta en config.json`);
                 }
             }
 
             if (selectOptions.length === 0) {
                 return await interaction.reply({
-                    content: '❌ No se encontraron categorías válidas para este panel en config.json',
+                    content: '❌ No se pudieron generar opciones de tickets. Verifica que las categorías en config.json tengan campos válidos (name, emoji, menuDescription).',
                     ephemeral: true
                 });
             }

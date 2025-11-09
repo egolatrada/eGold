@@ -75,7 +75,7 @@ class InvitesSystem {
         if (this.client.isReady()) {
             this.cacheInvites();
         } else {
-            this.client.on("ready", () => this.cacheInvites());
+            this.client.on("clientReady", () => this.cacheInvites());
         }
         
         this.client.on("inviteCreate", (invite) => {

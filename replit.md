@@ -4,9 +4,56 @@ Bot de Discord todo-en-uno con gestión de tickets, verificación automática, m
 
 ## 📋 ÚLTIMA ACTUALIZACIÓN: 2025-11-09
 
-**Total de comandos: 36 comandos**
+**Total de comandos: 39 comandos (actualizado)**
 
 ### ✨ Cambios Implementados Hoy
+
+#### SESIÓN 6: Panel Dinámico y Sistema de Warns Mejorado (2025-11-09)
+1. **Panel de Tickets Dinámico**:
+   - `/panel-tickets` ahora lee **TODAS** las categorías del config.json automáticamente
+   - Panel `whitelist`: Muestra todas excepto "convalidar-whitelist" y "dudas-generales"
+   - Panel `no_whitelist`: Muestra solo "convalidar-whitelist" y "dudas-generales"
+   - ✅ **Ya no necesitas editar código** para agregar categorías, solo actualiza config.json
+
+2. **Comando `/comandos` Actualizado Completamente**:
+   - Ahora muestra **39 comandos** organizados en **7 categorías**:
+     - 🎫 TICKETS (8): `/panel-tickets`, `/crear-ticket`, `/ticket-añadir`, etc.
+     - 🔧 ADMIN (4): `/restart`, `/staff-status`, `/mensaje-boton`, `/sug-responder`
+     - 📝 COMANDOS PERSONALIZADOS (5): `/comando-crear`, `/comando-editar`, etc.
+     - ℹ️ INFO (6): `/bot-info`, `/rol-id`, `/solicitar-bot`, `/enviar-info`, `/donar`, `/sugerir`
+     - 🛡️ MODERACIÓN (7): `/kick`, `/ban`, `/unban`, `/clear`, `/warn`, `/warn-lista`, `/warn-eliminar`
+     - ✅ TAREAS (3): `/tarea-crear`, `/tarea-borrar`, `/tarea-ver`
+     - 🎨 BIENVENIDA (3): `/bienvenida-setup`, `/bienvenida-editar`, `/bienvenida-test`
+   - Incluye todos los comandos de warns y bienvenida
+   - Se eliminó referencia a `/setup-panel` (ahora es `/panel-tickets`)
+
+3. **Sistema de Warns COMPLETAMENTE MEJORADO**:
+   - **Moderador responsable**: Ahora es **mención directa** (`${interaction.user}`) en lugar de texto plano
+   - **Label actualizado**: "Moderador responsable" en ambos embeds (DM y público)
+   - **Embeds separados por advertencia**: Cada warn tiene su propio embed con colores por categoría
+   - **Auto-refresh**: Borra mensajes previos automáticamente al usar `/warn-lista` de nuevo
+   - **Paginación completa**: Muestra TODAS las advertencias (no trunca a 9)
+     - Primer mensaje: Resumen + 9 warns
+     - Mensajes siguientes: 9 warns cada uno
+     - Sin pérdida de información
+   - **Footer con progreso**: "Advertencia 1/15 • ID: xxx"
+   - **Colores dinámicos**: Verde (suave), Naranja (moderado), Rojo (grave), Gris (revocadas)
+
+4. **Documentación Completa para VPS**:
+   - Creado `INSTRUCCIONES_VPS.md` con guía paso a paso
+   - Incluye configuración de config.json para producción
+   - Instrucciones de sincronización con Git
+   - Comandos de PM2 para deployment
+   - Checklist de verificación post-actualización
+   - Documentación de problemas conocidos
+
+5. **Verificaciones Realizadas**:
+   - ✅ Event handler `messageUpdate` existe y funciona (logs-system.js)
+   - ✅ No hay comando `/setup-panel` duplicado (solo `/panel-tickets`)
+   - ✅ Botón de cerrar ticket: código correcto, problema puede ser de permisos en VPS
+   - ✅ `/ticket-añadir`: código correcto, problema puede ser de jerarquía de roles
+   - ✅ Bot reinicia correctamente sin errores
+   - ✅ Todos los sistemas iniciados correctamente
 
 #### SESIÓN 5: Corrección de Errores y Mejora de UX (2025-11-09)
 1. **Bug Fix - Comandos de Bienvenida y Warns**:

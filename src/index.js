@@ -96,7 +96,7 @@ let commands;
 const embedRoleSelections = new Map();
 
 // Evento Ready
-client.once('ready', async () => {
+client.once('clientReady', async () => {
     logger.success(`Bot iniciado como ${client.user.tag}`);
     
     // Verificar si hay un reinicio pendiente de confirmación

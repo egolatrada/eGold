@@ -6,9 +6,9 @@ const http = require("http");
 class ModerationSystem {
     constructor(client, config, messages) {
         this.client = client;
-        this.config = config.autoModeration;
-        this.logsConfig = config.logs;
-        this.messages = messages.moderation;
+        this.config = config.autoModeration || { enabled: false };
+        this.logsConfig = config.logs || {};
+        this.messages = messages.moderation || {};
 
         // IA DESHABILITADA - Sistema de moderación funciona sin IA
         this.ai = null;
@@ -20,7 +20,7 @@ class ModerationSystem {
     }
 
     async init() {
-        if (!this.config.enabled) return;
+        if (!this.config || !this.config.enabled) return;
 
         this.client.on("messageCreate", (message) =>
             this.handleMessage(message),
@@ -30,7 +30,7 @@ class ModerationSystem {
     }
 
     async sendStaffLog(embed) {
-        const channelId = this.logsConfig.channels.staff;
+        const channelId = this.logsConfig?.channels?.staff;
         if (
             !channelId ||
             channelId.includes("1435563400439660615") ||
@@ -50,7 +50,7 @@ class ModerationSystem {
 
     async handleMessage(message) {
         if (!message.guild || message.author.bot) return;
-        if (!this.config.enabled) return;
+        if (!this.config || !this.config.enabled) return;
 
         const member = message.member;
         if (!member) return;
