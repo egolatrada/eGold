@@ -23,8 +23,12 @@ module.exports = {
             const channel = interaction.channel;
             const cantidad = interaction.options.getInteger('cantidad') || 50;
 
-            const isTicketChannel = channel.name.includes('ticket-');
-            if (!isTicketChannel) {
+            // Verificar que estamos en un canal de ticket
+            const isCommandTicket = channel.name.startsWith('ticket-');
+            const ticketCategories = Object.values(config.tickets?.categories || {});
+            const isPanelTicket = ticketCategories.some(cat => cat.categoryId === channel.parentId);
+            
+            if (!isCommandTicket && !isPanelTicket) {
                 return await interaction.editReply({
                     content: '❌ Este comando solo funciona en canales de tickets.'
                 });
