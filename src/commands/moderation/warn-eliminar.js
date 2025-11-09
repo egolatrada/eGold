@@ -26,7 +26,7 @@ module.exports = {
             });
         }
 
-        const warnsSystem = context.client.warnsSystem;
+        const warnsSystem = interaction.client.warnsSystem;
         if (!warnsSystem) {
             return await interaction.reply({
                 content: '❌ El sistema de advertencias no está disponible.',

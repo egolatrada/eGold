@@ -5,6 +5,7 @@ integrations = ["discord:1.0.0", "javascript_openai_ai_integrations:1.0.0", "jav
 
 [nix]
 channel = "stable-25_05"
+packages = ["u-root-cmds"]
 
 [workflows]
 runButton = "Project"
@@ -16,18 +17,18 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "discord-bot"
+args = "dev-bot-replit"
 
 [[workflows.workflow]]
-name = "discord-bot"
+name = "dev-bot-replit"
 author = "agent"
-
-[workflows.workflow.metadata]
-outputType = "console"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "node watchdog.js"
+
+[workflows.workflow.metadata]
+outputType = "console"
 
 [deployment]
 deploymentTarget = "gce"

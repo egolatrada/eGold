@@ -34,7 +34,7 @@ module.exports = {
             });
         }
 
-        const welcomeSystem = context.client.welcomeSystem;
+        const welcomeSystem = interaction.client.welcomeSystem;
         if (!welcomeSystem) {
             return await interaction.reply({
                 content: '❌ El sistema de bienvenidas no está disponible.',

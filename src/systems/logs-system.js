@@ -111,32 +111,98 @@ class LogsSystem {
     }
 
     /**
+     * LCS sobre palabras (sin espacios) usando programación dinámica
+     */
+    lcsWords(arr1, arr2) {
+        const m = arr1.length;
+        const n = arr2.length;
+        const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
+        
+        for (let i = 1; i <= m; i++) {
+            for (let j = 1; j <= n; j++) {
+                if (arr1[i - 1] === arr2[j - 1]) {
+                    dp[i][j] = dp[i - 1][j - 1] + 1;
+                } else {
+                    dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+                }
+            }
+        }
+        
+        // Reconstruir índices de la subsecuencia común
+        const commonIndices = [];
+        let i = m, j = n;
+        while (i > 0 && j > 0) {
+            if (arr1[i - 1] === arr2[j - 1]) {
+                commonIndices.unshift(j - 1); // Índice en arr2 (mensaje nuevo)
+                i--;
+                j--;
+            } else if (dp[i - 1][j] > dp[i][j - 1]) {
+                i--;
+            } else {
+                j--;
+            }
+        }
+        
+        return new Set(commonIndices);
+    }
+
+    /**
      * Función auxiliar para resaltar diferencias en negrita
+     * En el mensaje ORIGINAL: todo sin negrita
+     * En el mensaje MODIFICADO: SOLO las palabras nuevas/editadas en negrita
      */
     highlightDifferences(oldText, newText) {
         if (!oldText || !newText) return { oldHighlighted: oldText || '', newHighlighted: newText || '' };
         
-        // Dividir en palabras
-        const oldWords = oldText.split(/(\s+)/);
-        const newWords = newText.split(/(\s+)/);
+        // Mensaje original: siempre sin negrita
+        const oldHighlighted = oldText;
         
-        let oldHighlighted = '';
+        // Extraer solo palabras (sin espacios)
+        const oldWords = oldText.split(/\s+/).filter(w => w.length > 0);
+        const newWords = newText.split(/\s+/).filter(w => w.length > 0);
+        
+        // Encontrar subsecuencia común usando LCS
+        const commonIndices = this.lcsWords(oldWords, newWords);
+        
+        // Reconstruir mensaje nuevo con negrita en palabras que NO están en LCS
         let newHighlighted = '';
+        let wordIndex = 0;
+        let inWord = false;
+        let currentWord = '';
         
-        // Comparar palabra por palabra
-        const maxLength = Math.max(oldWords.length, newWords.length);
-        
-        for (let i = 0; i < maxLength; i++) {
-            const oldWord = oldWords[i] || '';
-            const newWord = newWords[i] || '';
+        for (let i = 0; i < newText.length; i++) {
+            const char = newText[i];
             
-            if (oldWord !== newWord) {
-                // Resaltar diferencias en negrita
-                if (oldWord) oldHighlighted += `**${oldWord}**`;
-                if (newWord) newHighlighted += `**${newWord}**`;
+            if (/\s/.test(char)) {
+                // Es un espacio
+                if (inWord) {
+                    // Finalizar palabra actual
+                    if (commonIndices.has(wordIndex)) {
+                        // Palabra está en subsecuencia común → sin negrita
+                        newHighlighted += currentWord;
+                    } else {
+                        // Palabra nueva o modificada → negrita
+                        newHighlighted += `**${currentWord}**`;
+                    }
+                    wordIndex++;
+                    currentWord = '';
+                    inWord = false;
+                }
+                // Añadir el espacio sin negrita
+                newHighlighted += char;
             } else {
-                oldHighlighted += oldWord;
-                newHighlighted += newWord;
+                // Es parte de una palabra
+                inWord = true;
+                currentWord += char;
+            }
+        }
+        
+        // Procesar última palabra si existe
+        if (currentWord.length > 0) {
+            if (commonIndices.has(wordIndex)) {
+                newHighlighted += currentWord;
+            } else {
+                newHighlighted += `**${currentWord}**`;
             }
         }
         

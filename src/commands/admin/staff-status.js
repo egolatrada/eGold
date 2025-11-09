@@ -158,15 +158,41 @@ module.exports = {
                        ch.name.includes('┃');
             });
 
+            // Contar actividad en canales de tickets con paginación
             for (const channel of ticketChannels.values()) {
                 try {
                     // Solo procesar canales de texto (ignorar categorías y canales de voz)
                     if (!channel.isTextBased()) continue;
                     
-                    const messages = await channel.messages.fetch({ limit: 100 });
-                    const recentMessages = messages.filter(m => m.createdTimestamp > timeLimit);
+                    let allMessages = [];
+                    let lastMessageId = null;
+                    let fetchedCount = 0;
+                    const maxMessages = 500; // Máximo de mensajes a procesar por canal
+                    
+                    // Fetch con paginación para obtener más mensajes
+                    while (fetchedCount < maxMessages) {
+                        const options = { limit: 100 };
+                        if (lastMessageId) {
+                            options.before = lastMessageId;
+                        }
+                        
+                        const messages = await channel.messages.fetch(options);
+                        if (messages.size === 0) break;
+                        
+                        // Filtrar mensajes recientes
+                        const recentMessages = messages.filter(m => m.createdTimestamp > timeLimit);
+                        if (recentMessages.size === 0) break; // Ya no hay mensajes recientes
+                        
+                        allMessages.push(...recentMessages.values());
+                        fetchedCount += messages.size;
+                        lastMessageId = messages.last().id;
+                        
+                        // Si no trajimos todos los mensajes solicitados, ya terminamos
+                        if (messages.size < 100) break;
+                    }
 
-                    for (const msg of recentMessages.values()) {
+                    // Contar mensajes por usuario
+                    for (const msg of allMessages) {
                         if (staffActivity.has(msg.author.id)) {
                             const activity = staffActivity.get(msg.author.id);
                             activity.messages++;
@@ -178,6 +204,7 @@ module.exports = {
                     }
                 } catch (err) {
                     // Canal inaccesible, continuar
+                    logger.error(`Error al procesar canal ${channel.name}:`, err.message);
                 }
             }
 

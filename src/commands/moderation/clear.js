@@ -5,17 +5,17 @@ const logger = require('../../utils/logger');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('clear')
-        .setDescription('🛡️ [MODERACIÓN] Elimina mensajes del canal')
+        .setDescription('🛡️ [MODERACIÓN] Elimina mensajes del canal (por defecto 100)')
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
         .addIntegerOption(option =>
             option.setName('cantidad')
-                .setDescription('Cantidad de mensajes a eliminar (1-100)')
-                .setRequired(true)
+                .setDescription('Cantidad de mensajes a eliminar (1-100, por defecto: 100)')
+                .setRequired(false)
                 .setMinValue(1)
                 .setMaxValue(100)),
     
     async execute(interaction, context) {
-        const amount = interaction.options.getInteger('cantidad');
+        const amount = interaction.options.getInteger('cantidad') || 100;
 
         try {
             // Primero, obtener los mensajes que se van a eliminar
@@ -142,10 +142,12 @@ module.exports = {
                 flags: MessageFlags.Ephemeral
             });
 
-            // Enviar transcript al canal de logs de comandos
-            if (config.logs && config.logs.enabled && config.logs.channels && config.logs.channels.commands) {
+            // Enviar transcript al canal de logs de moderación o comandos
+            const logChannelId = config.logs?.channels?.moderation || config.logs?.channels?.commands;
+            
+            if (config.logs?.enabled && logChannelId) {
                 try {
-                    const logChannel = await interaction.guild.channels.fetch(config.logs.channels.commands);
+                    const logChannel = await interaction.guild.channels.fetch(logChannelId);
                     
                     if (logChannel) {
                         const embed = new EmbedBuilder()

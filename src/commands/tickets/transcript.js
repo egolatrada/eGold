@@ -223,13 +223,26 @@ module.exports = {
                 .setFooter({ text: `Ticket: ${channel.name}` })
                 .setTimestamp();
 
-            await transcriptChannel.send({
-                embeds: [transcriptEmbed],
-                files: [attachment]
-            });
+            // Detectar si estamos en Replit (desarrollo) - REPL_ID solo existe en Replit
+            // En VPS (producción) no existe REPL_ID, así que isDevBot será false
+            const isDevBot = !!process.env.REPL_ID;
+            
+            // Solo enviar log al canal si es el bot de producción
+            if (!isDevBot) {
+                await transcriptChannel.send({
+                    embeds: [transcriptEmbed],
+                    files: [attachment]
+                });
+                
+                logger.success(`📋 [PROD] Transcripción enviada a ${transcriptChannel.name}`);
+            } else {
+                logger.info(`📋 [DEV] Transcripción generada pero NO enviada al canal (modo desarrollo)`);
+            }
 
             await interaction.editReply({
-                content: `✅ Transcripción generada con éxito\n\n📋 **Mensajes incluidos:** ${sortedMessages.length}\n📁 **Enviado a:** ${transcriptChannel}\n🎫 **Ticket:** ${channel.name}`
+                content: isDevBot 
+                    ? `✅ Transcripción generada (modo desarrollo)\n\n📋 **Mensajes incluidos:** ${sortedMessages.length}\n⚠️ **Nota:** En desarrollo NO se envía al canal de transcripciones\n🎫 **Ticket:** ${channel.name}`
+                    : `✅ Transcripción generada con éxito\n\n📋 **Mensajes incluidos:** ${sortedMessages.length}\n📁 **Enviado a:** ${transcriptChannel}\n🎫 **Ticket:** ${channel.name}`
             });
 
             logger.success(`📋 Transcripción generada: ${channel.name} - ${sortedMessages.length} mensajes → ${transcriptChannel.name}`);

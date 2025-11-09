@@ -11,6 +11,15 @@ class InvitesSystem {
         this.inviteCache = new Map();
         this.inviteMessages = new Map();
         this.cacheFilePath = path.join(__dirname, "../data/invite-cache.json");
+        
+        // Detectar si estamos en Replit (desarrollo) - REPL_ID solo existe en Replit
+        // En VPS (producción) no existe REPL_ID, así que isDevBot será false
+        this.isDevBot = !!process.env.REPL_ID;
+        
+        if (this.isDevBot) {
+            console.log('📨 Sistema de invitaciones en modo DESARROLLO (no enviará logs al canal)');
+        }
+        
         this.loadCacheFromFile();
         this.setupEventListeners();
     }
@@ -103,6 +112,19 @@ class InvitesSystem {
         if (!this.isAllowedGuild(invite.guild.id)) return;
         if (!this.config.logs.channels.invites) return;
 
+        // Cachear la invitación localmente
+        if (!this.inviteCache.has(invite.guild.id)) {
+            this.inviteCache.set(invite.guild.id, new Map());
+        }
+        this.inviteCache.get(invite.guild.id).set(invite.code, 0);
+        this.saveCacheToFile();
+
+        // Si es el bot de desarrollo, NO enviar logs (solo cachear)
+        if (this.isDevBot) {
+            console.log(`📨 [DEV] Invitación ${invite.code} cacheada (sin log al canal)`);
+            return;
+        }
+
         const embed = new EmbedBuilder()
             .setColor(Colors.Green)
             .setTitle(this.messages.created)
@@ -130,11 +152,6 @@ class InvitesSystem {
             const message = await channel.send({ embeds: [embed] });
             
             this.inviteMessages.set(invite.code, message.id);
-            
-            if (!this.inviteCache.has(invite.guild.id)) {
-                this.inviteCache.set(invite.guild.id, new Map());
-            }
-            this.inviteCache.get(invite.guild.id).set(invite.code, 0);
             this.saveCacheToFile();
         } catch (error) {
             console.log("Error al enviar log de invitación:", error);
@@ -165,6 +182,14 @@ class InvitesSystem {
 
             if (usedInvite) {
                 oldInvites.set(usedInvite.code, usedInvite.uses);
+                this.inviteCache.set(member.guild.id, new Map(newInvites.map(inv => [inv.code, inv.uses])));
+                this.saveCacheToFile();
+
+                // Si es el bot de desarrollo, NO enviar logs (solo cachear)
+                if (this.isDevBot) {
+                    console.log(`📨 [DEV] Invitación ${usedInvite.code} usada por ${member.user.tag} (sin log al canal)`);
+                    return;
+                }
 
                 try {
                     const channel = await this.client.channels.fetch(this.config.logs.channels.invites);
@@ -214,10 +239,10 @@ class InvitesSystem {
                 } catch (error) {
                     console.log("❌ Error al enviar log de uso de invitación:", error.message);
                 }
+            } else {
+                this.inviteCache.set(member.guild.id, new Map(newInvites.map(inv => [inv.code, inv.uses])));
+                this.saveCacheToFile();
             }
-
-            this.inviteCache.set(member.guild.id, new Map(newInvites.map(inv => [inv.code, inv.uses])));
-            this.saveCacheToFile();
         } catch (error) {
             console.log("Error al detectar invitación usada:", error);
         }

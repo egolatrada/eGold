@@ -25,10 +25,6 @@ function setupEventHandlers(client, context) {
             const { handleMessageCreate } = require('./message-create');
             await handleMessageCreate(message, context);
             
-            // Q&A System (si el mensaje menciona al bot en canal específico)
-            // Custom Commands
-            await context.customCommandsSystem.handleMessage(message);
-            
             // Moderación
             await context.moderationSystem.handleMessage(message);
         } catch (error) {

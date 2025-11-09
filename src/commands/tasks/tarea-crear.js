@@ -62,9 +62,8 @@ module.exports = {
             const allTasks = await tasksSystem.getTasksByCategory(interaction.guild.id);
             const embeds = tasksSystem.generateTaskEmbeds(allTasks);
 
-            // PASO 3: Enviar nuevos embeds separados por categoría
+            // PASO 3: Enviar nuevos embeds separados por categoría (sin mensaje de confirmación)
             const reply = await interaction.editReply({
-                content: `✅ **${result.totalTasks} tareas añadidas a la categoría "${result.category}"**`,
                 embeds: embeds.slice(0, 10) // Máximo 10 embeds por mensaje
             });
 

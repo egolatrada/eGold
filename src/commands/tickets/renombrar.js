@@ -5,23 +5,28 @@ const logger = require('../../utils/logger');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('renombrar')
-        .setDescription('✏️ [TICKETS] Renombra el ticket (mantiene el emoji original)')
+        .setDescription('✏️ [TICKETS] Renombra el ticket con cualquier frase (mantiene el emoji original)')
         .addStringOption(option =>
             option
                 .setName('nombre')
-                .setDescription('Nuevo nombre para el ticket (sin emoji ni separador)')
+                .setDescription('Nueva descripción del ticket (puede ser una frase completa)')
                 .setRequired(true)
+                .setMaxLength(80)
         ),
     
     async execute(interaction, context) {
         try {
             const channel = interaction.channel;
             const newName = interaction.options.getString('nombre');
-            const staffRoleId = config.tickets?.staffRoleId;
 
-            if (!staffRoleId || !interaction.member.roles.cache.has(staffRoleId)) {
+            // Verificar permisos: Gestionar Mensajes o rol de staff configurado
+            const hasManageMessages = interaction.member.permissions.has(PermissionFlagsBits.ManageMessages);
+            const staffRoleId = config.tickets?.staffRoleId;
+            const hasStaffRole = staffRoleId && interaction.member.roles.cache.has(staffRoleId);
+
+            if (!hasManageMessages && !hasStaffRole) {
                 return await interaction.reply({
-                    content: '❌ Solo el staff puede renombrar tickets.',
+                    content: '❌ Necesitas permisos de **Gestionar Mensajes** o ser miembro del staff para renombrar tickets.',
                     ephemeral: true
                 });
             }
@@ -63,14 +68,18 @@ module.exports = {
                 });
             }
 
-            // Función de sanitización para nombres de canales
+            // Función de sanitización para nombres de canales (Discord no permite espacios)
+            // Convierte espacios en guiones para mantener frases legibles
             const sanitizeName = (name) => {
                 return name
                     .toLowerCase()
                     .normalize('NFD')
                     .replace(/[\u0300-\u036f]/g, '') // Remover acentos
-                    .replace(/[^a-z0-9]+/g, '-') // Reemplazar espacios y caracteres especiales con guiones
-                    .replace(/^-+|-+$/g, ''); // Remover guiones al inicio y final
+                    .replace(/\s+/g, '-') // Convertir espacios en guiones
+                    .replace(/[^a-z0-9-]+/g, '-') // Reemplazar caracteres especiales con guiones
+                    .replace(/-+/g, '-') // Evitar guiones múltiples consecutivos
+                    .replace(/^-+|-+$/g, '') // Remover guiones al inicio y final
+                    .substring(0, 80); // Limitar longitud (Discord tiene límite de 100 chars total)
             };
             
             const sanitizedNewName = sanitizeName(newName);

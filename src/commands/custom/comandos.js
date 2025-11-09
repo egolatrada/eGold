@@ -58,13 +58,6 @@ module.exports = {
                     inline: false
                 },
                 {
-                    name: '📱 SOCIAL (3 comandos)',
-                    value: '• `/streamer-añadir` - Añade streamer\n' +
-                           '• `/streamer-eliminar` - Elimina streamer\n' +
-                           '• `/streamer-lista` - Lista streamers',
-                    inline: false
-                },
-                {
                     name: '✅ TAREAS (3 comandos)',
                     value: '• `/tarea-crear` - Crear lista de tareas\n' +
                            '• `/tarea-borrar` - Eliminar todas las tareas\n' +
@@ -78,12 +71,12 @@ module.exports = {
                     inline: false
                 }
             )
-            .setFooter({ text: 'Total: 33 comandos | Bot desarrollado por @egolatrada' })
+            .setFooter({ text: 'Total: 36 comandos | Bot desarrollado por @egolatrada' })
             .setTimestamp();
 
         await interaction.reply({
             embeds: [embed],
-            ephemeral: true
+            ephemeral: false
         });
     }
 };

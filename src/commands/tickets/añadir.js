@@ -5,25 +5,59 @@ const logger = require('../../utils/logger');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('ticket-añadir')
-        .setDescription('👥 [TICKETS] Añade usuarios y/o roles al ticket actual (sin límite)')
-        .addStringOption(option =>
+        .setDescription('👥 [TICKETS] Añade usuarios y/o roles al ticket actual')
+        .addUserOption(option =>
             option
-                .setName('usuarios')
-                .setDescription('Menciona usuarios separados por espacios (ej: @user1 @user2 @user3)')
+                .setName('usuario1')
+                .setDescription('Usuario a añadir al ticket')
                 .setRequired(false)
         )
-        .addStringOption(option =>
+        .addUserOption(option =>
             option
-                .setName('roles')
-                .setDescription('Menciona roles separados por espacios (ej: @rol1 @rol2 @rol3)')
+                .setName('usuario2')
+                .setDescription('Usuario adicional a añadir')
+                .setRequired(false)
+        )
+        .addUserOption(option =>
+            option
+                .setName('usuario3')
+                .setDescription('Usuario adicional a añadir')
+                .setRequired(false)
+        )
+        .addUserOption(option =>
+            option
+                .setName('usuario4')
+                .setDescription('Usuario adicional a añadir')
+                .setRequired(false)
+        )
+        .addUserOption(option =>
+            option
+                .setName('usuario5')
+                .setDescription('Usuario adicional a añadir')
+                .setRequired(false)
+        )
+        .addRoleOption(option =>
+            option
+                .setName('rol1')
+                .setDescription('Rol a añadir al ticket')
+                .setRequired(false)
+        )
+        .addRoleOption(option =>
+            option
+                .setName('rol2')
+                .setDescription('Rol adicional a añadir')
+                .setRequired(false)
+        )
+        .addRoleOption(option =>
+            option
+                .setName('rol3')
+                .setDescription('Rol adicional a añadir')
                 .setRequired(false)
         ),
     
     async execute(interaction, context) {
         try {
             const channel = interaction.channel;
-            const usuariosInput = interaction.options.getString('usuarios');
-            const rolesInput = interaction.options.getString('roles');
             const staffRoleId = config.tickets?.staffRoleId;
 
             if (!staffRoleId || !interaction.member.roles.cache.has(staffRoleId)) {
@@ -41,9 +75,23 @@ module.exports = {
                 });
             }
 
-            if (!usuariosInput && !rolesInput) {
+            // Recolectar todos los usuarios y roles de las opciones
+            const users = [];
+            const roles = [];
+            
+            for (let i = 1; i <= 5; i++) {
+                const user = interaction.options.getUser(`usuario${i}`);
+                if (user) users.push(user);
+            }
+            
+            for (let i = 1; i <= 3; i++) {
+                const role = interaction.options.getRole(`rol${i}`);
+                if (role) roles.push(role);
+            }
+
+            if (users.length === 0 && roles.length === 0) {
                 return await interaction.reply({
-                    content: '❌ Debes mencionar al menos 1 usuario o 1 rol para añadir al ticket.',
+                    content: '❌ Debes seleccionar al menos 1 usuario o 1 rol para añadir al ticket.',
                     ephemeral: true
                 });
             }
@@ -57,80 +105,57 @@ module.exports = {
             const errors = [];
 
             // Procesar usuarios
-            if (usuariosInput) {
-                const userIds = usuariosInput.match(/<@!?(\d+)>/g);
-                
-                if (userIds && userIds.length > 0) {
-                    for (const mention of userIds) {
-                        const userId = mention.replace(/<@!?(\d+)>/, '$1');
-                        
-                        try {
-                            const user = await interaction.guild.members.fetch(userId).catch(() => null);
-                            
-                            if (!user) {
-                                errors.push(`Usuario con ID ${userId} no encontrado`);
-                                continue;
-                            }
-
-                            const currentPermissions = channel.permissionOverwrites.cache.get(userId);
-                            if (currentPermissions?.allow.has(PermissionFlagsBits.ViewChannel)) {
-                                skippedUsers.push(user.user.tag);
-                                continue;
-                            }
-
-                            await channel.permissionOverwrites.create(userId, {
-                                ViewChannel: true,
-                                SendMessages: true,
-                                ReadMessageHistory: true,
-                                AttachFiles: true,
-                                EmbedLinks: true,
-                            });
-
-                            addedUsers.push(user);
-                        } catch (error) {
-                            errors.push(`Error al añadir usuario ${userId}: ${error.message}`);
-                            logger.error(`Error al añadir usuario ${userId}`, error);
-                        }
+            for (const user of users) {
+                try {
+                    const member = await interaction.guild.members.fetch(user.id).catch(() => null);
+                    
+                    if (!member) {
+                        errors.push(`Usuario ${user.tag} no encontrado en el servidor`);
+                        continue;
                     }
+
+                    const currentPermissions = channel.permissionOverwrites.cache.get(user.id);
+                    if (currentPermissions?.allow.has(PermissionFlagsBits.ViewChannel)) {
+                        skippedUsers.push(user.tag);
+                        continue;
+                    }
+
+                    await channel.permissionOverwrites.create(user.id, {
+                        ViewChannel: true,
+                        SendMessages: true,
+                        ReadMessageHistory: true,
+                        AttachFiles: true,
+                        EmbedLinks: true,
+                    });
+
+                    addedUsers.push(member);
+                } catch (error) {
+                    errors.push(`Error al añadir usuario ${user.tag}: ${error.message}`);
+                    logger.error(`Error al añadir usuario ${user.id}`, error);
                 }
             }
 
             // Procesar roles
-            if (rolesInput) {
-                const roleIds = rolesInput.match(/<@&(\d+)>/g);
-                
-                if (roleIds && roleIds.length > 0) {
-                    for (const mention of roleIds) {
-                        const roleId = mention.replace(/<@&(\d+)>/, '$1');
-                        
-                        try {
-                            const role = await interaction.guild.roles.fetch(roleId).catch(() => null);
-                            
-                            if (!role) {
-                                errors.push(`Rol con ID ${roleId} no encontrado`);
-                                continue;
-                            }
-
-                            const currentPermissions = channel.permissionOverwrites.cache.get(roleId);
-                            if (currentPermissions?.allow.has(PermissionFlagsBits.ViewChannel)) {
-                                skippedRoles.push(role.name);
-                                continue;
-                            }
-
-                            await channel.permissionOverwrites.create(roleId, {
-                                ViewChannel: true,
-                                SendMessages: true,
-                                ReadMessageHistory: true,
-                                AttachFiles: true,
-                                EmbedLinks: true,
-                            });
-
-                            addedRoles.push(role);
-                        } catch (error) {
-                            errors.push(`Error al añadir rol ${roleId}: ${error.message}`);
-                            logger.error(`Error al añadir rol ${roleId}`, error);
-                        }
+            for (const role of roles) {
+                try {
+                    const currentPermissions = channel.permissionOverwrites.cache.get(role.id);
+                    if (currentPermissions?.allow.has(PermissionFlagsBits.ViewChannel)) {
+                        skippedRoles.push(role.name);
+                        continue;
                     }
+
+                    await channel.permissionOverwrites.create(role.id, {
+                        ViewChannel: true,
+                        SendMessages: true,
+                        ReadMessageHistory: true,
+                        AttachFiles: true,
+                        EmbedLinks: true,
+                    });
+
+                    addedRoles.push(role);
+                } catch (error) {
+                    errors.push(`Error al añadir rol ${role.name}: ${error.message}`);
+                    logger.error(`Error al añadir rol ${role.id}`, error);
                 }
             }
 

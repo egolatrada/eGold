@@ -2,11 +2,39 @@
 
 Bot de Discord todo-en-uno con gestión de tickets, verificación automática, moderación con IA, logs completos y Q&A inteligente.
 
-## 📋 ÚLTIMA ACTUALIZACIÓN: 2025-11-08
+## 📋 ÚLTIMA ACTUALIZACIÓN: 2025-11-09
 
-**Total de comandos: 39 comandos** (36 base + 3 sistema de bienvenidas optimizado)
+**Total de comandos: 36 comandos**
 
 ### ✨ Cambios Implementados Hoy
+
+#### SESIÓN 5: Corrección de Errores y Mejora de UX (2025-11-09)
+1. **Bug Fix - Comandos de Bienvenida y Warns**:
+   - Corregido error en 6 comandos que intentaban acceder a `context.client` en lugar de `interaction.client`
+   - Archivos corregidos: `bienvenida-setup.js`, `bienvenida-test.js`, `bienvenida-editar.js`, `warn.js`, `warn-lista.js`, `warn-eliminar.js`
+   - ✅ Todos los comandos ahora funcionan correctamente
+
+2. **Mejora UX - Comando `/comandos`**:
+   - Cambiado de mensaje ephemeral (privado) a mensaje público
+   - Ahora todo el staff puede ver la lista de comandos cuando alguien la ejecuta
+   - ✅ Mejor visibilidad para colaboración del equipo
+
+3. **Simplificación - Sistema de Tareas**:
+   - Eliminado mensaje de confirmación al añadir tareas con `/tarea-crear`
+   - Ahora solo muestra el embed con las tareas, sin texto adicional
+   - ✅ Interfaz más limpia y visual
+
+4. **Rediseño COMPLETO - Comando `/warn`**:
+   - **Antes**: Confuso sistema con "Temporal" + cantidad + unidad separadas
+   - **Ahora**: Sistema intuitivo y directo
+   - Nueva estructura de opciones:
+     - `duracion`: 🔒 Permanente / ⏰ Horas / 📅 Días / 📆 Semanas
+     - `cantidad`: Número (solo si NO es permanente)
+   - Flujo simplificado:
+     - Permanente → No pide nada más
+     - Horas/Días/Semanas → Pide cantidad directamente
+   - ✅ Mucho más fácil e intuitivo de usar
+   - Eliminadas opciones de "Minutos" y "Meses" por simplicidad
 
 #### SESIÓN 4: Limpieza Masiva y Preparación para VPS (2025-11-08)
 1. **Limpieza Completa de Archivos Temporales**:

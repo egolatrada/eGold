@@ -18,13 +18,13 @@ module.exports = {
             const mainEmbed = new EmbedBuilder()
                 .setColor('#5865F2')
                 .setTitle('🤖 eGold - Bot Todo-en-Uno')
-                .setDescription('Bot completo de gestión para servidores de roleplay con 33 comandos y múltiples sistemas automatizados')
+                .setDescription('Bot completo de gestión para servidores de roleplay con 36 comandos y múltiples sistemas automatizados')
                 .addFields(
                     { name: '📊 Versión', value: `\`${version}\``, inline: true },
                     { name: '⏰ Uptime', value: `${days}d ${hours}h ${minutes}m`, inline: true },
                     { name: '📡 Ping', value: `${client.ws.ping}ms`, inline: true },
                     { name: '👥 Servidores', value: `${client.guilds.cache.size}`, inline: true },
-                    { name: '💬 Comandos', value: `33 comandos`, inline: true },
+                    { name: '💬 Comandos', value: `36 comandos`, inline: true },
                     { name: '🔧 Node.js', value: process.version, inline: true }
                 )
                 .setThumbnail(client.user.displayAvatarURL())
@@ -129,27 +129,13 @@ module.exports = {
                     }
                 );
 
-            const socialTasksEmbed = new EmbedBuilder()
+            const tasksEmbed = new EmbedBuilder()
                 .setColor('#FEE75C')
-                .setTitle('📱 Social y Tareas (7 comandos)')
-                .setDescription('Gestión de redes sociales, streamers y tareas del servidor')
+                .setTitle('✅ Sistema de Tareas (3 comandos)')
+                .setDescription('Gestión de tareas del servidor')
                 .addFields(
                     {
-                        name: '📺 Monitoreo de Streamers',
-                        value: '`/streamer-añadir` - Añadir streamer (Twitch/Kick/YouTube)\n' +
-                            '`/streamer-eliminar` - Eliminar streamer\n' +
-                            '`/streamer-lista` - Ver todos los streamers\n' +
-                            '**Funciones**: Notificaciones automáticas cuando van en vivo',
-                        inline: false
-                    },
-                    {
-                        name: '🔗 Redes Sociales',
-                        value: '`/social-link` - Gestionar vinculaciones\n' +
-                            '**Plataformas**: Twitch, Kick, YouTube, Instagram, Twitter/X, Threads, TikTok, Facebook',
-                        inline: false
-                    },
-                    {
-                        name: '✅ Sistema de Tareas',
+                        name: '✅ Comandos de Tareas',
                         value: '`/tarea-crear` - Crear lista de tareas por categoría\n' +
                             '`/tarea-ver` - Ver todas las tareas organizadas\n' +
                             '`/tarea-borrar` - Eliminar todas las tareas\n' +
@@ -251,15 +237,15 @@ module.exports = {
                         value: '• Sistema de tareas por categorías\n' +
                             '• Tracking de invitaciones\n' +
                             '• Estadísticas de staff\n' +
-                            '• Monitoreo de streamers del servidor',
+                            '• Sistema de advertencias y warnings',
                         inline: false
                     },
                     {
                         name: '👥 Gestión de Comunidad',
                         value: '• Verificación automática de nuevos miembros\n' +
-                            '• Vinculación de redes sociales\n' +
-                            '• Notificaciones de streams\n' +
-                            '• Sistema de roles y permisos avanzado',
+                            '• Sistema de bienvenida personalizado\n' +
+                            '• Sistema de roles y permisos avanzado\n' +
+                            '• Comandos personalizados con prefijo !',
                         inline: false
                     }
                 );
@@ -272,7 +258,7 @@ module.exports = {
             );
 
             await interaction.reply({
-                embeds: [mainEmbed, ticketsEmbed, moderationEmbed, systemsEmbed, socialTasksEmbed, commandsEmbed, infoEmbed, usosEmbed],
+                embeds: [mainEmbed, ticketsEmbed, moderationEmbed, systemsEmbed, tasksEmbed, commandsEmbed, infoEmbed, usosEmbed],
                 components: [row],
                 ephemeral: false
             });

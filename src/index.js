@@ -9,6 +9,45 @@ const { createClient } = require('./client');
 const { config, messages, validateConfig } = require('./config');
 const { registerCommands } = require('./handlers/command-loader');
 const logger = require('./utils/logger');
+const fs = require('fs');
+const path = require('path');
+
+// Función para verificar y enviar confirmación de reinicio
+async function checkRestartConfirmation(client) {
+    const RESTART_DATA_PATH = path.join(__dirname, 'data/restart-pending.json');
+    
+    try {
+        if (fs.existsSync(RESTART_DATA_PATH)) {
+            const restartData = JSON.parse(fs.readFileSync(RESTART_DATA_PATH, 'utf-8'));
+            const { channelId, userId, username, timestamp } = restartData;
+            
+            // Calcular tiempo de reinicio
+            const restartTime = Math.floor((Date.now() - timestamp) / 1000);
+            
+            // Enviar mensaje de confirmación al canal
+            const channel = await client.channels.fetch(channelId).catch(() => null);
+            if (channel && channel.isTextBased()) {
+                await channel.send({
+                    content: `✅ **Bot reiniciado correctamente**\n\n👤 Solicitado por: <@${userId}>\n⏱️ Tiempo de reinicio: **${restartTime}s**\n🟢 Estado: **Activo y operativo**`
+                });
+                logger.success(`✅ Confirmación de reinicio enviada a ${username} (${restartTime}s)`);
+            }
+            
+            // Eliminar archivo de reinicio pendiente
+            fs.unlinkSync(RESTART_DATA_PATH);
+        }
+    } catch (error) {
+        logger.error('Error al procesar confirmación de reinicio:', error);
+        // Eliminar archivo si hay error para evitar bucles
+        try {
+            if (fs.existsSync(RESTART_DATA_PATH)) {
+                fs.unlinkSync(RESTART_DATA_PATH);
+            }
+        } catch (e) {
+            // Ignorar error de eliminación
+        }
+    }
+}
 
 // Sistemas
 const TicketsSystem = require('./systems/tickets');
@@ -20,9 +59,6 @@ const LogsSystem = require('./systems/logs-system');
 const InvitesSystem = require('./systems/invites-system');
 const ModerationSystem = require('./systems/moderation-system');
 const VerificationSystem = require('./systems/verification-system');
-const SocialLinksSystem = require('./systems/social-links-system');
-const StreamMonitorSystem = require('./systems/stream-monitor-system');
-const SocialMediaMonitorSystem = require('./systems/social-media-monitor-system');
 const CustomCommandsSystem = require('./systems/custom-commands-system');
 const SuggestionsSystem = require('./systems/suggestions-system');
 const ChangelogSystem = require('./systems/changelog-system');
@@ -47,9 +83,6 @@ let logsSystem;
 let invitesSystem;
 let moderationSystem;
 let verificationSystem;
-let socialLinksSystem;
-let streamMonitorSystem;
-let socialMediaMonitorSystem;
 let customCommandsSystem;
 let suggestionsSystem;
 let changelogSystem;
@@ -66,6 +99,9 @@ const embedRoleSelections = new Map();
 client.once('ready', async () => {
     logger.success(`Bot iniciado como ${client.user.tag}`);
     
+    // Verificar si hay un reinicio pendiente de confirmación
+    await checkRestartConfirmation(client);
+    
     try {
         // Inicializar sistemas
         ticketsSystem = new TicketsSystem(client, config, messages);
@@ -76,9 +112,6 @@ client.once('ready', async () => {
         invitesSystem = new InvitesSystem(client, config);
         moderationSystem = new ModerationSystem(client, config, messages);
         verificationSystem = new VerificationSystem(client, config);
-        socialLinksSystem = new SocialLinksSystem(client, config);
-        streamMonitorSystem = new StreamMonitorSystem(client, config, socialLinksSystem);
-        socialMediaMonitorSystem = new SocialMediaMonitorSystem(client);
         customCommandsSystem = new CustomCommandsSystem(client, config);
         suggestionsSystem = new SuggestionsSystem();
         changelogSystem = new ChangelogSystem(client);
@@ -125,15 +158,6 @@ client.once('ready', async () => {
         customCommandsSystem.loadCommands();
         logger.success('Sistema de comandos personalizados iniciado correctamente');
         
-        // Social links system se carga automáticamente en constructor
-        logger.info('Sistema de redes sociales iniciado correctamente');
-        
-        // Iniciar sistema de monitoreo de streams
-        streamMonitorSystem.start();
-        
-        // Iniciar sistema de monitoreo de redes sociales
-        // await socialMediaMonitorSystem.init(); // DESACTIVADO - Enviaba notificaciones cada 2 min
-        
         // Setup event handlers
         setupEventHandlers(client, {
             ticketsSystem,
@@ -145,9 +169,6 @@ client.once('ready', async () => {
             invitesSystem,
             moderationSystem,
             verificationSystem,
-            socialLinksSystem,
-            streamMonitorSystem,
-            socialMediaMonitorSystem,
             customCommandsSystem,
             suggestionsSystem,
             changelogSystem,

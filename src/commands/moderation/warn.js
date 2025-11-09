@@ -5,11 +5,9 @@ const logger = require('../../utils/logger');
 const WARN_CHANNELS = ['1436824228279357580', '1370611084574326784'];
 
 const TIME_UNITS = {
-    'minutos': 60000,
     'horas': 3600000,
     'días': 86400000,
-    'semanas': 604800000,
-    'meses': 2592000000
+    'semanas': 604800000
 };
 
 module.exports = {
@@ -36,28 +34,20 @@ module.exports = {
                 .setRequired(true))
         .addStringOption(option =>
             option.setName('duracion')
-                .setDescription('Duración de la advertencia')
+                .setDescription('¿Cuánto durará la advertencia?')
                 .setRequired(true)
                 .addChoices(
                     { name: '🔒 Permanente', value: 'permanente' },
-                    { name: '⏰ Temporal', value: 'temporal' }
+                    { name: '⏰ Horas', value: 'horas' },
+                    { name: '📅 Días', value: 'días' },
+                    { name: '📆 Semanas', value: 'semanas' }
                 ))
         .addIntegerOption(option =>
-            option.setName('auto_revocar_cantidad')
-                .setDescription('Cantidad de tiempo para auto-revocar (solo si es temporal)')
+            option.setName('cantidad')
+                .setDescription('Número de horas/días/semanas (solo si NO es permanente)')
                 .setRequired(false)
-                .setMinValue(1))
-        .addStringOption(option =>
-            option.setName('auto_revocar_unidad')
-                .setDescription('Unidad de tiempo para auto-revocar (solo si es temporal)')
-                .setRequired(false)
-                .addChoices(
-                    { name: 'Minutos', value: 'minutos' },
-                    { name: 'Horas', value: 'horas' },
-                    { name: 'Días', value: 'días' },
-                    { name: 'Semanas', value: 'semanas' },
-                    { name: 'Meses', value: 'meses' }
-                )),
+                .setMinValue(1)
+                .setMaxValue(365)),
     
     async execute(interaction, context) {
         if (!WARN_CHANNELS.includes(interaction.channelId)) {
@@ -67,7 +57,7 @@ module.exports = {
             });
         }
 
-        const warnsSystem = context.client.warnsSystem;
+        const warnsSystem = interaction.client.warnsSystem;
         if (!warnsSystem) {
             return await interaction.reply({
                 content: '❌ El sistema de advertencias no está disponible.',
@@ -79,8 +69,7 @@ module.exports = {
         const category = interaction.options.getString('categoria');
         const reason = interaction.options.getString('motivo');
         const duracion = interaction.options.getString('duracion');
-        const autoRevokeAmount = interaction.options.getInteger('auto_revocar_cantidad');
-        const autoRevokeUnit = interaction.options.getString('auto_revocar_unidad');
+        const cantidad = interaction.options.getInteger('cantidad');
 
         if (targetUser.bot) {
             return await interaction.reply({
@@ -99,15 +88,15 @@ module.exports = {
         let expiresIn = null;
         let expiresText = 'Permanente';
 
-        if (duracion === 'temporal') {
-            if (!autoRevokeAmount || !autoRevokeUnit) {
+        if (duracion !== 'permanente') {
+            if (!cantidad) {
                 return await interaction.reply({
-                    content: '❌ Para advertencias temporales debes especificar tanto la **cantidad** como la **unidad** de tiempo.',
+                    content: `❌ Debes especificar la **cantidad** de ${duracion} para advertencias temporales.\n\n💡 Ejemplo: Si elegiste "Horas", especifica cuántas horas (1, 2, 24, etc.)`,
                     ephemeral: true
                 });
             }
-            expiresIn = autoRevokeAmount * TIME_UNITS[autoRevokeUnit];
-            expiresText = `${autoRevokeAmount} ${autoRevokeUnit}`;
+            expiresIn = cantidad * TIME_UNITS[duracion];
+            expiresText = `${cantidad} ${duracion}`;
         }
 
         await interaction.deferReply();
