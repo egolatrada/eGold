@@ -26,24 +26,39 @@ module.exports = {
                 });
             }
 
+            // Verificar que estamos en un canal de ticket
+            const isCommandTicket = channel.name.startsWith('ticket-');
+            const ticketCategories = Object.values(config.tickets?.categories || {});
+            const isPanelTicket = ticketCategories.some(cat => cat.categoryId === channel.parentId);
+            
+            if (!isCommandTicket && !isPanelTicket) {
+                return await interaction.reply({
+                    content: '❌ Este comando solo puede usarse en canales de tickets.',
+                    ephemeral: true
+                });
+            }
+
             // Extraer el emoji, separador y número del nombre actual
-            // Formato esperado: (emoji)┃(nombre)-(número)
-            const emojiSeparatorMatch = channel.name.match(/^(.+?)┃(.+)-(\d+)$/);
+            // Formato esperado: (emoji)(separador)(nombre)-(número)
+            // Soporta varios separadores: ┃, ┊, │, |
+            const emojiSeparatorMatch = channel.name.match(/^(.+?)([┃┊│|])(.+)-(\d+)$/);
             const legacyFormatMatch = channel.name.match(/^ticket-(\d+)/);
             
-            let emojiPart, ticketNumber;
+            let emojiPart, separatorChar, ticketNumber;
             
             if (emojiSeparatorMatch) {
-                // Formato nuevo con emoji: 🔧┃soporte-dudas-12
+                // Formato nuevo con emoji: 🔧┊soporte-dudas-14
                 emojiPart = emojiSeparatorMatch[1]; // 🔧
-                ticketNumber = emojiSeparatorMatch[3]; // 12
+                separatorChar = emojiSeparatorMatch[2]; // ┊
+                ticketNumber = emojiSeparatorMatch[4]; // 14
             } else if (legacyFormatMatch) {
                 // Formato legacy sin emoji: ticket-0012
                 emojiPart = null;
+                separatorChar = null;
                 ticketNumber = legacyFormatMatch[1];
             } else {
                 return await interaction.reply({
-                    content: '❌ Este comando solo funciona en canales de tickets.',
+                    content: '❌ No se pudo detectar el formato del ticket.',
                     ephemeral: true
                 });
             }
@@ -60,11 +75,11 @@ module.exports = {
             
             const sanitizedNewName = sanitizeName(newName);
             
-            // Construir el nuevo nombre preservando el emoji original
+            // Construir el nuevo nombre preservando el emoji y separador original
             let finalName;
-            if (emojiPart) {
+            if (emojiPart && separatorChar) {
                 // Mantener emoji y separador original
-                finalName = `${emojiPart}┃${sanitizedNewName}-${ticketNumber}`;
+                finalName = `${emojiPart}${separatorChar}${sanitizedNewName}-${ticketNumber}`;
             } else {
                 // Formato legacy
                 finalName = `ticket-${ticketNumber}-${sanitizedNewName}`;
