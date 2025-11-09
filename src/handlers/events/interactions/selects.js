@@ -6,7 +6,7 @@ async function handleSelectInteraction(interaction, context) {
     
     try {
         // Select de categoría de ticket
-        if (customId === 'ticket_type') {
+        if (customId === 'ticket_category_select' || customId === 'ticket_type') {
             const { handleTicketCategorySelect } = require('./ticket-selects');
             await handleTicketCategorySelect(interaction, context);
         }
